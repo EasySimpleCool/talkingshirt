@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/talkingshirt/static/css/main.afdefcd4.css",
+    "main.js": "/talkingshirt/static/js/main.31133af7.js",
+    "static/js/453.632dfd5f.chunk.js": "/talkingshirt/static/js/453.632dfd5f.chunk.js",
+    "index.html": "/talkingshirt/index.html",
+    "main.afdefcd4.css.map": "/talkingshirt/static/css/main.afdefcd4.css.map",
+    "main.31133af7.js.map": "/talkingshirt/static/js/main.31133af7.js.map",
+    "453.632dfd5f.chunk.js.map": "/talkingshirt/static/js/453.632dfd5f.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.afdefcd4.css",
+    "static/js/main.31133af7.js"
+  ]
+}
