@@ -1,18 +1,15 @@
-import React from 'react';
-import './App.css';
+import styles from './page.module.css'
 
-function App() {
+export default function Home() {
   return (
-    <div className="App">
-      <header className="App-header">
+    <div className={styles.container}>
+      <header className={styles.header}>
         <h1>Talking Shirt</h1>
         <p>Welcome to the interactive shirt customization experience!</p>
       </header>
-      <main>
+      <main className={styles.main}>
         {/* Main content will go here */}
       </main>
     </div>
-  );
-}
-
-export default App; 
+  )
+} 

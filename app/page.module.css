@@ -1,8 +1,8 @@
-.App {
+.container {
   text-align: center;
 }
 
-.App-header {
+.header {
   background-color: #282c34;
   min-height: 40vh;
   display: flex;
@@ -14,7 +14,7 @@
   padding: 20px;
 }
 
-main {
+.main {
   padding: 20px;
   max-width: 1200px;
   margin: 0 auto;
