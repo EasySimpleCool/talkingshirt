@@ -1,0 +1,23 @@
+{
+  "name": "talkingshirt",
+  "version": "0.1.0",
+  "homepage": "https://talkingshirt.co",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "deploy": "next build && touch out/.nojekyll && cp CNAME out/ && gh-pages -d out"
+  },
+  "dependencies": {
+    "next": "14.1.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.56.0",
+    "eslint-config-next": "14.1.0",
+    "gh-pages": "^6.1.1"
+  }
+}

@@ -6,6 +6,10 @@ const nextConfig = {
   },
   basePath: '',
   assetPrefix: '',
+  // Remove trailing slashes from URLs
+  trailingSlash: false,
+  // Disable server-side rendering for static export
+  reactStrictMode: true,
 }
 
 module.exports = nextConfig 
