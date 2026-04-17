@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TalkingSh*rt - Custom Tees</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: white;
+            overflow-x: hidden;
+        }
+
+        /* Ensure white background throughout */
+        html {
+            background: white;
+        }
+
+        /* Header */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 20px 40px;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.95);
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 600;
+            color: #2c2c2c;
+        }
+
+        /* Footer */
+        footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 20px 40px;
+            z-index: 1000;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transform: translateY(100%);
+            transition: transform 0.3s linear;
+        }
+
+        footer.visible {
+            transform: translateY(0);
+        }
+
+        /* Scroll Container */
+        .scroll-container {
+            height: 250vh;
+            position: relative;
+            background: white;
+        }
+
+        /* Fixed Container for Animation */
+        .fixed-content {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            padding: 0 20px;
+            background: white;
+        }
+
+        /* Animated Text */
+        .animated-text {
+            font-size: clamp(40px, 10vw, 120px);
+            font-weight: 700;
+            color: #2c2c2c;
+            text-align: center;
+            position: absolute;
+            transition: none;
+            width: 100%;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            white-space: nowrap;
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 3px;
+            height: 0.8em;
+            background: #2c2c2c;
+            margin-left: 4px;
+            animation: blink 1s infinite;
+            vertical-align: middle;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        /* T-Shirt Container */
+        .tshirt-container {
+            opacity: 0;
+            transform: scale(0.8);
+            transition: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, 150%) scale(0.8);
+        }
+
+        .tshirt-wrapper {
+            position: relative;
+            width: clamp(300px, 50vw, 600px);
+            margin: 0 auto;
+        }
+
+        .black-square {
+            width: 100%;
+            aspect-ratio: 1;
+            background: #1a1a1a;
+            border-radius: 8px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Editable Text on Shirt */
+        .chest-text-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            text-align: center;
+        }
+
+        .chest-text {
+            color: white;
+            font-size: clamp(20px, 3.5vw, 42px);
+            font-weight: 600;
+            border: none;
+            background: transparent;
+            text-align: center;
+            width: 100%;
+            outline: none;
+            pointer-events: none;
+            caret-color: transparent;
+        }
+
+        .chest-text.editable {
+            pointer-events: auto;
+            cursor: text;
+            caret-color: white;
+        }
+
+        /* White cursor that appears on the square */
+        .white-cursor {
+            display: inline-block;
+            width: 3px;
+            height: 1em;
+            background: white;
+            margin-left: 4px;
+            animation: blink 1s infinite;
+            vertical-align: middle;
+            opacity: 0;
+            position: absolute;
+            pointer-events: none;
+        }
+
+        .white-cursor.visible {
+            opacity: 1;
+        }
+
+        .white-cursor.hidden {
+            display: none;
+        }
+
+        .chest-text::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .add-to-cart {
+            padding: 14px 32px;
+            font-size: 16px;
+            font-weight: 600;
+            background: #2c2c2c;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: none;
+        }
+
+        .add-to-cart:disabled {
+            background: #e0e0e0;
+            color: #999;
+            cursor: not-allowed;
+        }
+
+        .add-to-cart:hover:not(:disabled) {
+            background: #1a1a1a;
+        }
+
+        .add-to-cart:active {
+            transform: translateY(0);
+        }
+
+        /* Instructions */
+        .instructions {
+            position: absolute;
+            bottom: 20vh;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 16px;
+            color: #666;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            text-align: center;
+        }
+
+        .instructions.visible {
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            .animated-text {
+                font-size: clamp(40px, 12vw, 120px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">TalkingSh*rt</div>
+    </header>
+
+    <footer>
+        <button class="add-to-cart" id="addToCart" disabled>Add to cart</button>
+    </footer>
+
+    <div class="scroll-container">
+        <div class="fixed-content">
+            <!-- Animated Text -->
+            <div class="animated-text" id="animatedText">
+                <span class="cursor"></span>
+            </div>
+
+            <!-- T-Shirt -->
+            <div class="tshirt-container" id="tshirtContainer">
+                <div class="tshirt-wrapper">
+                    <div class="black-square"></div>
+                    <div class="chest-text-container">
+                        <input 
+                            type="text" 
+                            class="chest-text" 
+                            id="chestText"
+                            maxlength="15"
+                            placeholder=""
+                        >
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const scrollContainer = document.querySelector('.scroll-container');
+        const animatedText = document.getElementById('animatedText');
+        const tshirtContainer = document.getElementById('tshirtContainer');
+        const chestText = document.getElementById('chestText');
+        const footer = document.querySelector('footer');
+        const addToCartBtn = document.getElementById('addToCart');
+
+        // Check if all elements exist
+        if (!scrollContainer || !animatedText || !tshirtContainer || !chestText || !footer || !addToCartBtn) {
+            console.error('Required elements not found');
+        }
+
+        // Enable/disable button based on input
+        if (chestText && addToCartBtn) {
+            chestText.addEventListener('input', () => {
+                if (chestText.value.trim().length > 0) {
+                    addToCartBtn.disabled = false;
+                } else {
+                    addToCartBtn.disabled = true;
+                }
+            });
+        }
+
+        // Text sequence - using actual cursor element instead of | character
+        const sequence = [
+            { text: '', duration: 0.05 },
+            { text: 'T', duration: 0.1 },
+            { text: 'Ta', duration: 0.15 },
+            { text: 'Tal', duration: 0.2 },
+            { text: 'Talk', duration: 0.35 },
+            { text: 'Talk ', duration: 0.4 },
+            { text: 'Talk s', duration: 0.45 },
+            { text: 'Talk so', duration: 0.5 },
+            { text: 'Talk som', duration: 0.55 },
+            { text: 'Talk some', duration: 0.6 },
+            { text: 'Talk some ', duration: 0.65 },
+            { text: 'Talk some s', duration: 0.7 },
+            { text: 'Talk some sh', duration: 0.75 },
+            { text: 'Talk some sh*', duration: 0.8 },
+            { text: 'Talk some sh*r', duration: 0.85 },
+            { text: 'Talk some sh*rt', duration: 0.95 }
+        ];
+
+        let currentPhase = 'typing'; // typing, deleting, shirt, editable
+
+        // Handle scroll
+        function handleScroll() {
+            try {
+                const scrollTop = window.scrollY;
+                const maxScroll = scrollContainer.offsetHeight - window.innerHeight;
+                const progress = Math.min(Math.max(scrollTop / maxScroll, 0), 1);
+
+                if (progress < 0.2) {
+                // Phase 1: Typing animation
+                currentPhase = 'typing';
+                const typingProgress = progress / 0.2;
+                const index = Math.floor(typingProgress * sequence.length);
+                const textData = sequence[Math.min(index, sequence.length - 1)];
+                animatedText.innerHTML = textData.text + '<span class="cursor"></span>';
+                animatedText.style.opacity = '1';
+                animatedText.style.transform = 'translateY(-50%) scale(1)';
+                tshirtContainer.style.opacity = '0';
+                tshirtContainer.style.transform = 'translate(-50%, 150%) scale(0.8)';
+                chestText.classList.remove('editable');
+                footer.classList.remove('visible');
+
+            } else if (progress < 0.35) {
+                // Phase 1.5: Pause with full text "Talk some sh*rt"
+                currentPhase = 'pause';
+                animatedText.innerHTML = 'Talk some sh*rt<span class="cursor"></span>';
+                animatedText.style.opacity = '1';
+                animatedText.style.transform = 'translateY(-50%) scale(1)';
+                tshirtContainer.style.opacity = '0';
+                tshirtContainer.style.transform = 'translate(-50%, 150%) scale(0.8)';
+                footer.classList.remove('visible');
+
+            } else if (progress < 0.5) {
+                // Phase 2: Delete back to "T"
+                currentPhase = 'deleting';
+                const deleteProgress = (progress - 0.35) / 0.15;
+                const reverseIndex = Math.floor(deleteProgress * (sequence.length - 1));
+                const index = sequence.length - 1 - reverseIndex;
+                const textData = sequence[Math.max(index, 1)];
+                animatedText.innerHTML = textData.text + '<span class="cursor"></span>';
+                animatedText.style.opacity = '1';
+                animatedText.style.transform = 'translateY(-50%) scale(1)';
+                tshirtContainer.style.opacity = '0';
+                tshirtContainer.style.transform = 'translate(-50%, 150%) scale(0.8)';
+                footer.classList.remove('visible');
+
+            } else if (progress < 0.75) {
+                // Phase 3: Show shirt sliding up from bottom
+                currentPhase = 'shirt';
+                const shirtProgress = (progress - 0.5) / 0.25;
+                
+                // Fade out text, shrink it
+                animatedText.style.opacity = Math.max(0, 1 - shirtProgress * 2);
+                const textScale = 1 - shirtProgress * 0.8;
+                animatedText.style.transform = `translateY(-50%) scale(${textScale})`;
+                
+                // Slide shirt up from bottom
+                tshirtContainer.style.opacity = Math.min(1, shirtProgress * 2);
+                const shirtScale = 0.8 + shirtProgress * 0.2;
+                // Start from bottom (100vh below) and move to center
+                const yPosition = -50 + (100 * (1 - shirtProgress));
+                tshirtContainer.style.transform = `translate(-50%, ${yPosition}%) scale(${shirtScale})`;
+                
+                // Remove black cursor as it fades
+                if (shirtProgress > 0.6) {
+                    animatedText.innerHTML = '';
+                } else {
+                    animatedText.innerHTML = '<span class="cursor"></span>';
+                }
+                
+                footer.classList.remove('visible');
+
+            } else {
+                // Phase 4: Shirt fully visible, make editable
+                currentPhase = 'editable';
+                animatedText.style.opacity = '0';
+                animatedText.innerHTML = '';
+                tshirtContainer.style.opacity = '1';
+                tshirtContainer.style.transform = 'translate(-50%, -50%) scale(1)';
+                
+                const editProgress = (progress - 0.75) / 0.25;
+                
+                if (editProgress > 0.2) {
+                    chestText.classList.add('editable');
+                    // Auto-focus the input field
+                    if (document.activeElement !== chestText) {
+                        chestText.focus();
+                    }
+                    // Show footer sliding up
+                    footer.classList.add('visible');
+                } else {
+                    footer.classList.remove('visible');
+                }
+            }
+            } catch (error) {
+                console.error('Scroll handler error:', error);
+            }
+        }
+
+        // Add to cart
+        document.getElementById('addToCart').addEventListener('click', () => {
+            const text = chestText.value || '(blank)';
+            alert(`Added to cart: Black T-shirt with "${text}"`);
+        });
+
+        // Scroll listener
+        window.addEventListener('scroll', handleScroll);
+        handleScroll(); // Initial call
+    </script>
+</body>
+</html>
