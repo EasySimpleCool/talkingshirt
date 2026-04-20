@@ -17,6 +17,8 @@
         --chest-x: 50%; /* horizontal anchor of the chest print on the shirt */
         --chest-y: 27%; /* vertical anchor of the chest print on the shirt */
         --chest-font: clamp(17px, 3vw, 36px);
+        --slide-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+        --slide-dur: 350ms;
       }
 
       html,
@@ -34,36 +36,110 @@
         top: 0;
         left: 0;
         right: 0;
-        padding: 20px 40px;
-        z-index: 1000;
+        height: 60px;
+        z-index: 1100;
         background: rgba(255, 255, 255, 0.95);
         border-bottom: 1px solid #e0e0e0;
+        overflow: hidden;
       }
 
-      .logo {
+      .logo,
+      .about-title {
+        position: absolute;
+        top: 50%;
         font-size: 20px;
         font-weight: 600;
         color: #2c2c2c;
+        transition: transform var(--slide-dur) var(--slide-ease),
+          opacity var(--slide-dur) var(--slide-ease);
       }
 
-      footer {
+      .logo {
+        left: 24px;
+        transform: translateY(-50%);
+      }
+
+      .about-title {
+        right: 24px;
+        /* Off-screen right until about-open. */
+        transform: translate(150%, -50%);
+      }
+
+      /* Single persistent button. Slides across the header bar and
+         crossfades ? ↔ × instead of being swapped out for another element. */
+      .nav-btn {
+        position: absolute;
+        top: 50%;
+        left: 24px;
+        width: 28px;
+        height: 28px;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        color: #2c2c2c;
+        cursor: pointer;
+        /* Sits at the right edge in product state; on about-open it
+           translates to x=0 (left:24px anchor). */
+        transform: translate(calc(100vw - 76px), -50%);
+        transition: transform var(--slide-dur) var(--slide-ease);
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      .nav-btn .icon {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        transition: opacity var(--slide-dur) var(--slide-ease);
+      }
+
+      .nav-btn .icon-close {
+        opacity: 0;
+      }
+
+      /* Fixed at viewport bottom so its horizontal slide can be layered
+         on top of the footer's own translateY drawer animation. */
+      .footer-slider {
         position: fixed;
         bottom: 0;
         left: 0;
         right: 0;
-        padding: 20px 40px;
         z-index: 1000;
+        transform: translateX(0);
+        transition: transform var(--slide-dur) var(--slide-ease);
+      }
+
+      footer {
+        padding: 16px 24px;
         background: white;
         border-top: 1px solid #e0e0e0;
         display: flex;
-        justify-content: center;
+        justify-content: space-between;
         align-items: center;
+        gap: 16px;
         transform: translateY(100%);
         transition: transform 0.3s ease;
       }
 
       footer.visible {
         transform: translateY(0);
+      }
+
+      .size-select {
+        font-family: inherit;
+        font-size: 18px;
+        font-weight: 600;
+        color: #2c2c2c;
+        background: transparent;
+        border: 0;
+        padding: 4px 0;
+        text-decoration: underline;
+        text-underline-offset: 3px;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        cursor: pointer;
+        outline: none;
       }
 
       .scroll-container {
@@ -248,75 +324,222 @@
       }
 
       .add-to-cart {
-        padding: 14px 32px;
-        font-size: 16px;
-        font-weight: 600;
-        background: #2c2c2c;
+        padding: 16px 28px;
+        font-size: 18px;
+        font-weight: 700;
+        background: #4a4a4a;
         color: white;
         border: none;
-        border-radius: 8px;
+        border-radius: 12px;
         cursor: pointer;
       }
 
-      .add-to-cart:disabled {
-        background: #e0e0e0;
-        color: #999;
-        cursor: not-allowed;
+      .add-to-cart:hover {
+        background: #2c2c2c;
       }
 
-      .add-to-cart:hover:not(:disabled) {
-        background: #1a1a1a;
+      /* Horizontal slide wrapper for the product chrome (headline, scroll
+         arrow, t-shirt). Keeps the existing inline transforms on its
+         children untouched — we just translate the wrapper on about-open. */
+      .product-slider {
+        position: absolute;
+        inset: 0;
+        will-change: transform;
+        transition: transform var(--slide-dur) var(--slide-ease);
+      }
+
+      /* About panel — starts off-screen right, slides in on about-open. */
+      .about-panel {
+        position: fixed;
+        top: 60px;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: white;
+        padding: 24px;
+        z-index: 900;
+        overflow-y: auto;
+        transform: translateX(100%);
+        transition: transform var(--slide-dur) var(--slide-ease);
+      }
+
+      .entry {
+        padding-bottom: 24px;
+        border-bottom: 1px solid #e0e0e0;
+      }
+
+      .entry-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin-bottom: 20px;
+      }
+
+      .entry-label {
+        font-size: 13px;
+        font-weight: 700;
+        color: #2c2c2c;
+      }
+
+      .entry-date {
+        font-size: 12px;
+        color: #999;
+      }
+
+      .entry-body p {
+        font-size: 24px;
+        font-weight: 700;
+        line-height: 1.25;
+        color: #2c2c2c;
+      }
+
+      .entry-body p + p {
+        margin-top: 20px;
+      }
+
+      /* ---- About-open state: slide product chrome out left, About in ---- */
+      body.about-open .logo {
+        transform: translate(-150%, -50%);
+        opacity: 0;
+      }
+
+      body.about-open .about-title {
+        transform: translate(0, -50%);
+      }
+
+      body.about-open .nav-btn {
+        transform: translate(0, -50%);
+      }
+
+      body.about-open .nav-btn .icon-help {
+        opacity: 0;
+      }
+
+      body.about-open .nav-btn .icon-close {
+        opacity: 1;
+      }
+
+      body.about-open .product-slider {
+        transform: translateX(-100vw);
+      }
+
+      body.about-open .footer-slider {
+        transform: translateX(-100%);
+      }
+
+      body.about-open .about-panel {
+        transform: translateX(0);
       }
     </style>
   </head>
   <body>
     <header>
       <div class="logo">TalkingSh*rt</div>
+      <div class="about-title" aria-hidden="true">About</div>
+      <button
+        class="nav-btn"
+        id="navBtn"
+        type="button"
+        aria-label="About"
+        aria-expanded="false"
+        aria-controls="aboutPanel"
+      >
+        <svg
+          class="icon icon-help"
+          viewBox="0 0 24 24"
+          fill="#16181A"
+          xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true"
+        >
+          <path
+            d="M12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2ZM12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4ZM12 16C12.5128 16 12.9354 16.3865 12.9932 16.8838L13 17.0098C13 17.5621 12.5523 18.0098 12 18.0098C11.4873 18.0098 11.0648 17.6241 11.0068 17.127L11 17C11 16.4477 11.4477 16 12 16ZM9.20312 7.39551C10.1266 6.17828 11.7182 5.67705 13.1729 6.14453C14.6273 6.61205 15.6284 7.94641 15.6699 9.47363C15.7096 10.9344 14.8633 12.2672 13.5186 12.8662L13.332 12.9434C13.1482 13.008 13.0204 13.1724 13 13.3613L12.998 13.4434C13.0293 13.9947 12.608 14.4668 12.0566 14.498C11.5053 14.5293 11.0332 14.108 11.002 13.5566C10.9389 12.4453 11.618 11.4265 12.6426 11.0664C13.2768 10.8239 13.6892 10.207 13.6709 9.52832C13.6525 8.8495 13.2071 8.25562 12.5605 8.04785C11.9603 7.85513 11.3074 8.03364 10.8887 8.49316L10.7969 8.60449C10.4631 9.04445 9.83549 9.13064 9.39551 8.79688C8.95555 8.46307 8.86936 7.83549 9.20312 7.39551Z"
+          />
+        </svg>
+        <svg
+          class="icon icon-close"
+          viewBox="0 0 24 24"
+          fill="#16181A"
+          xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true"
+        >
+          <path
+            d="M17.2929 5.29289C17.6834 4.90237 18.3164 4.90237 18.707 5.29289C19.0674 5.65338 19.095 6.22091 18.79 6.61321L18.707 6.70696L13.414 11.9999L18.707 17.2929C19.0975 17.6834 19.0975 18.3164 18.707 18.707C18.3465 19.0674 17.7789 19.095 17.3866 18.79L17.2929 18.707L11.9999 13.414L6.70696 18.707C6.31643 19.0975 5.68342 19.0975 5.29289 18.707C4.93241 18.3465 4.90486 17.7789 5.20989 17.3866L5.29289 17.2929L10.5859 11.9999L5.29289 6.70696C4.90237 6.31643 4.90237 5.68342 5.29289 5.29289C5.65338 4.93241 6.22091 4.90486 6.61321 5.20989L6.70696 5.29289L11.9999 10.5859L17.2929 5.29289Z"
+          />
+        </svg>
+      </button>
     </header>
 
-    <footer>
-      <button class="add-to-cart" id="addToCart" disabled>Add to cart</button>
-    </footer>
+    <div class="footer-slider">
+      <footer>
+        <select class="size-select" id="sizeSelect" aria-label="Size">
+          <option value="Small">Small</option>
+          <option value="Medium">Medium</option>
+          <option value="Large" selected>Large</option>
+          <option value="XLarge">XLarge</option>
+        </select>
+        <button class="add-to-cart" id="addToCart" type="button">
+          Add To Cart?
+        </button>
+      </footer>
+    </div>
 
     <div class="scroll-container">
       <div class="fixed-content">
-        <div class="animated-text" id="animatedText">
-          <span class="cursor"></span>
-        </div>
+        <div class="product-slider" id="productSlider">
+          <div class="animated-text" id="animatedText">
+            <span class="cursor"></span>
+          </div>
 
-        <div class="scroll-arrow" id="scrollArrow">
-          <svg
-            viewBox="0 0 8 39"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            aria-hidden="true"
-          >
-            <path
-              d="M7.21683 34.9648C7.41209 35.1601 7.4121 35.4766 7.21683 35.6719L4.03519 38.8535C3.83993 39.0488 3.52342 39.0488 3.32816 38.8535L0.146521 35.6719C-0.0487401 35.4766 -0.0487388 35.1601 0.146521 34.9648C0.341784 34.7696 0.658291 34.7696 0.853553 34.9648L3.18168 37.293L3.18168 0.5C3.18168 0.223857 3.40554 -1.72995e-07 3.68168 -1.60928e-07C3.95782 -1.48857e-07 4.18168 0.223857 4.18168 0.5L4.18168 37.293L6.5098 34.9648C6.70506 34.7696 7.02157 34.7696 7.21683 34.9648Z"
-              fill="currentColor"
-            />
-          </svg>
-        </div>
-
-        <div class="tshirt-container" id="tshirtContainer">
-          <div class="tshirt-wrapper">
-            <img
-              src="black-tee.png"
-              alt="Black T-shirt"
-              class="tshirt-image"
-            />
-            <div class="chest-text-container">
-              <input
-                type="text"
-                class="chest-text"
-                id="chestText"
-                maxlength="10"
+          <div class="scroll-arrow" id="scrollArrow">
+            <svg
+              viewBox="0 0 8 39"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+            >
+              <path
+                d="M7.21683 34.9648C7.41209 35.1601 7.4121 35.4766 7.21683 35.6719L4.03519 38.8535C3.83993 39.0488 3.52342 39.0488 3.32816 38.8535L0.146521 35.6719C-0.0487401 35.4766 -0.0487388 35.1601 0.146521 34.9648C0.341784 34.7696 0.658291 34.7696 0.853553 34.9648L3.18168 37.293L3.18168 0.5C3.18168 0.223857 3.40554 -1.72995e-07 3.68168 -1.60928e-07C3.95782 -1.48857e-07 4.18168 0.223857 4.18168 0.5L4.18168 37.293L6.5098 34.9648C6.70506 34.7696 7.02157 34.7696 7.21683 34.9648Z"
+                fill="currentColor"
               />
+            </svg>
+          </div>
+
+          <div class="tshirt-container" id="tshirtContainer">
+            <div class="tshirt-wrapper">
+              <img
+                src="black-tee.png"
+                alt="Black T-shirt"
+                class="tshirt-image"
+              />
+              <div class="chest-text-container">
+                <input
+                  type="text"
+                  class="chest-text"
+                  id="chestText"
+                  maxlength="10"
+                />
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
+
+    <section class="about-panel" id="aboutPanel" aria-hidden="true">
+      <article class="entry">
+        <header class="entry-head">
+          <span class="entry-label">Launch</span>
+          <time class="entry-date" datetime="2026-04-02">2/04/26</time>
+        </header>
+        <div class="entry-body">
+          <p>
+            TalkingSh*rt is a simple idea. No graphics, no logos, just a word
+            on your chest.
+          </p>
+          <p>Talk some sh*rt.</p>
+        </div>
+      </article>
+    </section>
 
     <script>
       const scrollContainer = document.querySelector(".scroll-container");
@@ -327,6 +550,9 @@
       const chestTextContainer = document.querySelector(".chest-text-container");
       const footer = document.querySelector("footer");
       const addToCartBtn = document.getElementById("addToCart");
+      const sizeSelect = document.getElementById("sizeSelect");
+      const navBtn = document.getElementById("navBtn");
+      const aboutPanel = document.getElementById("aboutPanel");
 
       const FULL_TEXT = "Talk some sh*rt";
 
@@ -440,6 +666,11 @@
       }
 
       function handleScroll() {
+        // While About is open, scroll is locked and the product chrome is
+        // slid off-screen — skip recalculation so e.g. a resize doesn't
+        // re-focus the chest input (which would pop the mobile keyboard).
+        if (document.body.classList.contains("about-open")) return;
+
         const scrollTop = window.scrollY;
         const maxScroll = scrollContainer.offsetHeight - window.innerHeight;
         const progress = clamp(scrollTop / maxScroll, 0, 1);
@@ -570,7 +801,6 @@
         syncHeadlineFromInput();
 
         const hasText = chestText.value.trim().length > 0;
-        addToCartBtn.disabled = !hasText;
         if (hasText) {
           footer.classList.add("visible");
         } else {
@@ -590,7 +820,26 @@
 
       addToCartBtn.addEventListener("click", () => {
         const text = chestText.value || "(blank)";
-        alert(`Added to cart: Black T-shirt with "${text}"`);
+        const size = sizeSelect.value;
+        alert(`Added to cart: ${size} Black T-shirt with "${text}"`);
+      });
+
+      // About panel — single persistent button toggles between product and
+      // about states. CSS handles the cross-header slide + icon crossfade.
+      // We lock document scroll while open so the underlying scroll-driven
+      // animation can't run; scrollY is preserved at the browser level.
+      navBtn.addEventListener("click", () => {
+        const open = document.body.classList.toggle("about-open");
+        navBtn.setAttribute("aria-label", open ? "Close about" : "About");
+        navBtn.setAttribute("aria-expanded", String(open));
+        aboutPanel.setAttribute("aria-hidden", String(!open));
+        document.documentElement.style.overflow = open ? "hidden" : "";
+        document.body.style.overflow = open ? "hidden" : "";
+        // If about is open, the chest input shouldn't be holding focus —
+        // blurring also dismisses the on-screen keyboard on mobile.
+        if (open && document.activeElement === chestText) {
+          chestText.blur();
+        }
       });
 
       window.addEventListener("scroll", handleScroll, { passive: true });
