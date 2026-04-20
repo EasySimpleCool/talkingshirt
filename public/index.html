@@ -14,8 +14,9 @@
       :root {
         --copy-size: clamp(40px, 10vw, 120px);
         --shirt-size: clamp(360px, 60vw, 760px);
-        --chest-y: 32%;
-        --chest-font: clamp(18px, 1.8vw, 28px);
+        --chest-x: 50%; /* horizontal anchor of the chest print on the shirt */
+        --chest-y: 27%; /* vertical anchor of the chest print on the shirt */
+        --chest-font: clamp(17px, 3vw, 36px);
       }
 
       html,
@@ -82,7 +83,8 @@
         overflow: hidden;
       }
 
-      /* Headline text — anchored at viewport center */
+      /* Headline text — anchored at viewport center, stacked above the
+         t-shirt so the cursor lands on top of the chest, not behind it. */
       .animated-text {
         position: absolute;
         top: 50%;
@@ -94,6 +96,7 @@
         color: #2c2c2c;
         text-align: center;
         white-space: nowrap;
+        z-index: 2;
         will-change: transform, color, opacity;
       }
 
@@ -101,10 +104,31 @@
         display: inline-block;
         width: 0.06em;
         height: 0.85em;
-        background: currentColor;
+        /* Fill is independent from the headline `color` so the cursor can
+           fade to 25% on the shirt while typed text stays full opacity. */
+        background: var(--cursor-bg, currentColor);
         margin-left: 0.06em;
         vertical-align: -0.05em;
         animation: blink 1s steps(1) infinite;
+      }
+
+      /* When the cursor is at the END of typed text, negate its layout
+         contribution (own width + left margin) with a matching negative
+         right margin so the parent's bounding box width = text width only.
+         That way `translate(-50%)` centers the *text* on the chest, and the
+         cursor visually extends past the right edge — exactly like the caret
+         in a real `text-align: center` input.
+         When the cursor is in the MIDDLE of text (caret moved with arrow
+         keys / click), it should render inline normally without the negative
+         margin, otherwise the trailing text would overlap the cursor. */
+      .cursor:not(:only-child):last-child {
+        margin-right: -0.12em;
+      }
+
+      /* When the cursor is alone (idle state), remove the left margin so it
+         sits exactly on the horizontal center, in line with the scroll arrow. */
+      .cursor:only-child {
+        margin-left: 0;
       }
 
       @keyframes blink {
@@ -118,21 +142,31 @@
         }
       }
 
-      /* Bouncing scroll-down arrow under the cursor */
+      /* Bouncing scroll-down arrow under the cursor.
+         Position scales with --copy-size so it stays clear of the cursor at
+         all viewport sizes. Sized via height only so the SVG keeps its
+         intrinsic aspect ratio (no chevron stretching). */
       .scroll-arrow {
         position: absolute;
-        top: calc(50% + 1.2em);
+        top: calc(50% + var(--copy-size) * 0.7);
         left: 50%;
         transform: translate(-50%, 0);
-        font-size: clamp(20px, 2vw, 28px);
+        height: clamp(55px, 7vw, 90px);
+        aspect-ratio: 8 / 39; /* matches SVG viewBox so the arrow can't distort */
         color: #2c2c2c;
         opacity: 0;
         transition: opacity 0.3s ease;
         animation: arrowBounce 1.6s ease-in-out infinite;
       }
 
+      .scroll-arrow svg {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+
       .scroll-arrow.visible {
-        opacity: 1;
+        opacity: 0.25;
       }
 
       @keyframes arrowBounce {
@@ -145,14 +179,17 @@
         }
       }
 
-      /* T-shirt — its chest area lands at viewport center */
+      /* T-shirt — its chest area lands at viewport center.
+         Starts hidden; fades in 0 → 1 alongside the rise during the delete
+         phase so the shirt both slides in AND emerges in opacity. */
       .tshirt-container {
         position: absolute;
         top: 50%;
         left: 50%;
         width: var(--shirt-size);
         transform: translate(-50%, calc(-1 * var(--chest-y) + 100vh));
-        will-change: transform;
+        opacity: 0;
+        will-change: transform, opacity;
       }
 
       .tshirt-wrapper {
@@ -172,7 +209,7 @@
       .chest-text-container {
         position: absolute;
         top: var(--chest-y);
-        left: 50%;
+        left: var(--chest-x);
         transform: translate(-50%, -50%);
         width: 70%;
         text-align: center;
@@ -192,14 +229,22 @@
         font-family: inherit;
       }
 
+      /* The input is always invisible; its only job is to receive keystrokes.
+         The visible text + cursor are rendered by the headline element, so the
+         cursor is literally the same DOM element from the typing phase
+         through editing. */
+      .chest-text {
+        color: transparent;
+        caret-color: transparent;
+      }
+
       .chest-text.editable {
         pointer-events: auto;
         cursor: text;
-        caret-color: white;
       }
 
       .chest-text::placeholder {
-        color: rgba(255, 255, 255, 0.55);
+        color: transparent;
       }
 
       .add-to-cart {
@@ -239,7 +284,19 @@
           <span class="cursor"></span>
         </div>
 
-        <div class="scroll-arrow" id="scrollArrow">&#x2193;</div>
+        <div class="scroll-arrow" id="scrollArrow">
+          <svg
+            viewBox="0 0 8 39"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+          >
+            <path
+              d="M7.21683 34.9648C7.41209 35.1601 7.4121 35.4766 7.21683 35.6719L4.03519 38.8535C3.83993 39.0488 3.52342 39.0488 3.32816 38.8535L0.146521 35.6719C-0.0487401 35.4766 -0.0487388 35.1601 0.146521 34.9648C0.341784 34.7696 0.658291 34.7696 0.853553 34.9648L3.18168 37.293L3.18168 0.5C3.18168 0.223857 3.40554 -1.72995e-07 3.68168 -1.60928e-07C3.95782 -1.48857e-07 4.18168 0.223857 4.18168 0.5L4.18168 37.293L6.5098 34.9648C6.70506 34.7696 7.02157 34.7696 7.21683 34.9648Z"
+              fill="currentColor"
+            />
+          </svg>
+        </div>
 
         <div class="tshirt-container" id="tshirtContainer">
           <div class="tshirt-wrapper">
@@ -253,8 +310,7 @@
                 type="text"
                 class="chest-text"
                 id="chestText"
-                maxlength="20"
-                placeholder="Type"
+                maxlength="10"
               />
             </div>
           </div>
@@ -268,20 +324,35 @@
       const scrollArrow = document.getElementById("scrollArrow");
       const tshirtContainer = document.getElementById("tshirtContainer");
       const chestText = document.getElementById("chestText");
+      const chestTextContainer = document.querySelector(".chest-text-container");
       const footer = document.querySelector("footer");
       const addToCartBtn = document.getElementById("addToCart");
 
       const FULL_TEXT = "Talk some sh*rt";
 
-      // Scroll phase boundaries (sum to 1)
+      // Scroll phase boundaries (monotonically increasing, end at 1).
+      // P.idle = 0: idle state only shows at exactly scrollY === 0 (so the
+      // user sees the cursor + arrow on page load); any scroll at all kicks
+      // straight into the typing animation.
       const P = {
-        idle: 0.04,
-        type: 0.32,
-        pause: 0.42,
-        del: 0.52,
-        rise: 0.82,
-        edit: 1.0,
+        idle: 0, // cursor + arrow (only at scroll = 0)
+        type: 0.28, // type "Talk some sh*rt"
+        pause: 0.34, // hold full headline
+        delete: 0.85, // delete FULL_TEXT → "" while shirt rises + cursor shrinks + recolors
+        edit: 1.0, // editable — same cursor stays put, input mirrors into headline
       };
+
+      // Within the delete phase, when does the cursor recolor black→white?
+      // (normalized 0..1 within that phase). Tuned so the flip lands right
+      // when the rising shirt body covers the cursor's location.
+      const COLOR_FLIP_START = 0.30;
+      const COLOR_FLIP_END = 0.55;
+
+      // Ease-out so the shirt rises FAST at the start of deletion and is
+      // essentially in place by the time only "Talk" is left.
+      function easeOutQuart(t) {
+        return 1 - Math.pow(1 - t, 4);
+      }
 
       function lerp(a, b, t) {
         return a + (b - a) * t;
@@ -291,12 +362,29 @@
         return Math.min(Math.max(v, min), max);
       }
 
-      function setHeadline(text) {
-        animatedText.innerHTML = text + '<span class="cursor"></span>';
+      // Render `text` with the fake cursor inserted at `caretPos`. If
+      // caretPos is omitted/invalid, the cursor renders at the end (typing-
+      // animation behavior). This lets the headline mirror the input's
+      // actual selectionStart so arrow keys / clicks reposition the visible
+      // cursor between letters.
+      function setHeadline(text, caretPos) {
+        let pos = caretPos;
+        if (pos == null || pos < 0 || pos > text.length) {
+          pos = text.length;
+        }
+        const before = text.slice(0, pos);
+        const after = text.slice(pos);
+        animatedText.innerHTML =
+          before + '<span class="cursor"></span>' + after;
       }
 
-      function showHeadline(visible) {
-        animatedText.style.opacity = visible ? "1" : "0";
+      // Mirror the chest input's value AND caret position into the headline.
+      function syncHeadlineFromInput() {
+        setHeadline(chestText.value, chestText.selectionStart);
+      }
+
+      function setHeadlineOpacity(value) {
+        animatedText.style.opacity = String(value);
       }
 
       function setShirtRise(riseVh) {
@@ -304,12 +392,51 @@
         tshirtContainer.style.transform = `translate(-50%, calc(-1 * var(--chest-y) + ${riseVh}vh))`;
       }
 
-      function setHeadlineScale(scale) {
-        animatedText.style.transform = `translate(-50%, -50%) scale(${scale})`;
+      function setShirtOpacity(value) {
+        tshirtContainer.style.opacity = String(value);
+      }
+
+      // Combined transform setter so scale + horizontal offset never fight.
+      // xOffsetPx shifts the headline horizontally from viewport center, used
+      // to align the cursor with the actual chest-text position on the shirt
+      // (which can deviate from viewport center via --chest-x).
+      function setHeadlineTransform(scale, xOffsetPx) {
+        const x = xOffsetPx || 0;
+        animatedText.style.transform = `translate(calc(-50% + ${x}px), -50%) scale(${scale})`;
       }
 
       function setHeadlineColor(color) {
         animatedText.style.color = color;
+      }
+
+      // Drives only the cursor's fill (independent from the headline color).
+      // Pass null to fall back to currentColor (default during typing phases).
+      function setCursorBg(color) {
+        if (color) {
+          animatedText.style.setProperty("--cursor-bg", color);
+        } else {
+          animatedText.style.removeProperty("--cursor-bg");
+        }
+      }
+
+      // Measure the *resolved* font sizes off real elements. Reading the
+      // CSS custom property directly returns the literal "clamp(...)" string,
+      // which parseFloat can't handle — so we measure from .animated-text
+      // (font-size: var(--copy-size)) and .chest-text (font-size: var(--chest-font)).
+      function getFinalScale() {
+        const copyPx = parseFloat(getComputedStyle(animatedText).fontSize);
+        const chestPx = parseFloat(getComputedStyle(chestText).fontSize);
+        if (!copyPx || !chestPx) return 0.25;
+        return chestPx / copyPx;
+      }
+
+      // Where (in px from viewport center) does the chest print sit?
+      // Always derived from the actual chest-text-container so the cursor
+      // and the input can never visually disagree, no matter how --chest-x
+      // is tuned or how the shirt scales.
+      function getChestOffsetX() {
+        const rect = chestTextContainer.getBoundingClientRect();
+        return rect.left + rect.width / 2 - window.innerWidth / 2;
       }
 
       function handleScroll() {
@@ -317,14 +444,16 @@
         const maxScroll = scrollContainer.offsetHeight - window.innerHeight;
         const progress = clamp(scrollTop / maxScroll, 0, 1);
 
-        if (progress < P.idle) {
-          // Frame 159 — cursor + bouncing arrow
+        // 1. Idle — cursor + bouncing arrow (only at scroll = 0)
+        if (progress <= P.idle) {
           setHeadline("");
-          showHeadline(true);
-          setHeadlineScale(1);
+          setHeadlineOpacity(1);
+          setHeadlineTransform(1, 0);
           setHeadlineColor("#2c2c2c");
+          setCursorBg(null);
           scrollArrow.classList.add("visible");
           setShirtRise(100);
+          setShirtOpacity(0);
           chestText.classList.remove("editable");
           footer.classList.remove("visible");
           return;
@@ -332,104 +461,130 @@
 
         scrollArrow.classList.remove("visible");
 
+        // 2. Type — type out FULL_TEXT
         if (progress < P.type) {
-          // Frames 160-162 — typing out the headline
           const t = (progress - P.idle) / (P.type - P.idle);
           const len = Math.floor(t * (FULL_TEXT.length + 1));
           setHeadline(FULL_TEXT.slice(0, len));
-          showHeadline(true);
-          setHeadlineScale(1);
+          setHeadlineOpacity(1);
+          setHeadlineTransform(1, 0);
           setHeadlineColor("#2c2c2c");
+          setCursorBg(null);
           setShirtRise(100);
+          setShirtOpacity(0);
           chestText.classList.remove("editable");
           footer.classList.remove("visible");
           return;
         }
 
+        // 3. Pause — hold full headline briefly
         if (progress < P.pause) {
-          // Brief pause on full headline
           setHeadline(FULL_TEXT);
-          showHeadline(true);
-          setHeadlineScale(1);
+          setHeadlineOpacity(1);
+          setHeadlineTransform(1, 0);
           setHeadlineColor("#2c2c2c");
+          setCursorBg(null);
           setShirtRise(100);
+          setShirtOpacity(0);
           footer.classList.remove("visible");
           return;
         }
 
-        if (progress < P.del) {
-          // Frame 163 (a) — quickly delete back to "T"
-          const t = (progress - P.pause) / (P.del - P.pause);
-          const startLen = FULL_TEXT.length;
-          const endLen = 1;
-          const len = Math.round(lerp(startLen, endLen, t));
+        // 4. Delete — delete the full headline while the shirt rises in
+        //    parallel (ease-out so it's almost in place by the time the
+        //    leading "Talk" is being deleted, fully in place when empty).
+        //    The cursor shrinks to chest size and recolors black → white
+        //    along the way so the same cursor element seamlessly arrives
+        //    on the chest in white.
+        if (progress < P.delete) {
+          const t = (progress - P.pause) / (P.delete - P.pause);
+          const eased = easeOutQuart(t);
+
+          // Linear text deletion (15 chars → 0 over the phase)
+          const len = Math.round(lerp(FULL_TEXT.length, 0, t));
           setHeadline(FULL_TEXT.slice(0, len));
-          showHeadline(true);
-          setHeadlineScale(1);
-          setHeadlineColor("#2c2c2c");
-          setShirtRise(100);
-          footer.classList.remove("visible");
-          return;
-        }
 
-        if (progress < P.rise) {
-          // Frames 163 (b) → 164 — shirt rises, headline shrinks + recolors to white
-          const t = (progress - P.del) / (P.rise - P.del);
+          // Shirt rise is front-loaded via easeOutQuart, and opacity fades
+          // 0 → 1 on the same curve so the shirt eases in visually too.
+          setShirtRise(lerp(100, 0, eased));
+          setShirtOpacity(eased);
 
-          // Shirt slides up from below
-          const rise = lerp(100, 0, t);
-          setShirtRise(rise);
-
-          // Headline shrinks from copy size down to chest size
-          const computedCopy = parseFloat(
-            getComputedStyle(document.documentElement)
-              .getPropertyValue("--copy-size") || "80"
+          // Cursor scale + horizontal slide to chest position, both eased so
+          // the cursor settles onto the chest exactly as the shirt arrives.
+          const finalScale = getFinalScale();
+          const chestX = getChestOffsetX();
+          setHeadlineTransform(
+            lerp(1, finalScale, eased),
+            lerp(0, chestX, eased)
           );
-          const computedChest = parseFloat(
-            getComputedStyle(document.documentElement)
-              .getPropertyValue("--chest-font") || "24"
-          );
-          const finalScale = computedChest / computedCopy;
-          const scale = lerp(1, finalScale, t);
-          setHeadlineScale(scale);
 
-          // Recolor headline from dark to white as the dark shirt arrives behind it
+          // Color flip — timed so it happens while the shirt body crosses
+          // the cursor's vertical position. The headline color goes opaque
+          // black → opaque white (so any visible text in transit stays
+          // legible), while the cursor's alpha simultaneously fades toward
+          // 25% so it lands on the chest at the desired final opacity.
           const dark = [44, 44, 44];
           const light = [255, 255, 255];
-          const colorT = clamp((t - 0.4) / 0.5, 0, 1);
-          const c = dark.map((d, i) =>
-            Math.round(lerp(d, light[i], colorT))
+          const colorT = clamp(
+            (t - COLOR_FLIP_START) / (COLOR_FLIP_END - COLOR_FLIP_START),
+            0,
+            1
           );
+          const c = dark.map((d, i) => Math.round(lerp(d, light[i], colorT)));
           setHeadlineColor(`rgb(${c[0]}, ${c[1]}, ${c[2]})`);
-
-          // Show only "T" until late, then fade headline as input takes over
-          setHeadline("T");
-          showHeadline(t < 0.95);
+          const cursorAlpha = lerp(1, 0.5, colorT);
+          setCursorBg(`rgba(${c[0]}, ${c[1]}, ${c[2]}, ${cursorAlpha})`);
+          setHeadlineOpacity(1);
 
           chestText.classList.remove("editable");
           footer.classList.remove("visible");
           return;
         }
 
-        // Frame 164/165/166 — editable
+        // 5. Edit — same headline element + same .cursor stay on the chest.
+        //    Typed text is full-opacity white; the cursor stays at 50% white
+        //    (the "final" treatment carried over from the end of the delete
+        //    phase). The input is invisible but receives keystrokes.
         setShirtRise(0);
-        showHeadline(false);
+        setShirtOpacity(1);
+        setHeadlineTransform(getFinalScale(), getChestOffsetX());
+        setHeadlineColor("rgb(255, 255, 255)");
+        setCursorBg("rgba(255, 255, 255, 0.5)");
+        setHeadlineOpacity(1);
+        syncHeadlineFromInput();
+
         chestText.classList.add("editable");
         if (document.activeElement !== chestText) {
           chestText.focus({ preventScroll: true });
         }
         if (chestText.value.trim().length > 0) {
           footer.classList.add("visible");
+        } else {
+          footer.classList.remove("visible");
         }
       }
 
       chestText.addEventListener("input", () => {
+        // Mirror typed text into the headline so the visible cursor stays the
+        // same .cursor element from the transition (no swap to native caret).
+        syncHeadlineFromInput();
+
         const hasText = chestText.value.trim().length > 0;
         addToCartBtn.disabled = !hasText;
         if (hasText) {
           footer.classList.add("visible");
         } else {
           footer.classList.remove("visible");
+        }
+      });
+
+      // Keep the visible cursor in sync when the user moves the caret with
+      // arrow keys, clicks, Home/End, etc. `selectionchange` fires for all
+      // selection/caret movement; we only act when our hidden input is the
+      // active element.
+      document.addEventListener("selectionchange", () => {
+        if (document.activeElement === chestText) {
+          syncHeadlineFromInput();
         }
       });
 
