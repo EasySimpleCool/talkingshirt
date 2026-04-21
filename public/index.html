@@ -19,6 +19,104 @@
         --chest-font: clamp(17px, 3vw, 36px);
         --slide-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
         --slide-dur: 350ms;
+
+        /* Figma: theme */
+        --theme-fg: #424242;
+        --theme-fg-alt: #808080;
+        --theme-bg: #ffffff;
+        --theme-faint-alt: #e0e0e0;
+        --color-fg-more: #16181a;
+
+        /* Figma: comp/button */
+        --comp-button-fg: #ffffff;
+        --comp-button-bg-default: #424242;
+        --comp-button-h-pad: 16px;
+        --comp-button-v-pad: 8px;
+        --comp-button-b-rad: 8px;
+        --comp-button-min-h: 56px;
+
+        /* Figma: comp/container */
+        --comp-container-max-w: 800px;
+
+        /* Figma: comp/section */
+        --comp-section-md-h-pad: 24px;
+        --comp-section-lg-h-pad: 24px;
+        --comp-section-lg-v-pad: 40px;
+
+        /* Figma: comp/stack */
+        --comp-stack-sm: 16px;
+
+        /* Figma: comp/post */
+        --comp-post-gap: 16px;
+
+        /* Not a Figma variable (yet). Header + footer are both 80px in all three
+           artboards; kept local for DRY. Promote to comp/section/md/height later. */
+        --comp-section-md-height: 80px;
+      }
+
+      /* Typography — statically built from Figma's type styles.
+         font-family inherits from the body-level system stack. */
+      .type-medium {
+        font-weight: 700;
+        font-size: 24px;
+        line-height: 1;
+        letter-spacing: 0;
+      }
+      .type-small {
+        font-weight: 700;
+        font-size: 12px;
+        line-height: 1;
+        letter-spacing: 0;
+      }
+
+      /* Layout primitives — the ONLY way layout is expressed. No native-tag
+         styling anywhere below. Every shell is section > container > stack/row.
+         - [data-section="md"] — Figma's section/md: a vertically-centered 80px
+           bar with 24px h-pad. Used by top-nav and footer-drawer.
+         - [data-section="lg"] — Figma's section/lg: a padded block (40/24)
+           with no fixed height. Used by about-panel.
+         - [data-container] caps content width and centers it.
+         - [data-row] / [data-stack] are flex-row / flex-col with a sensible
+           default cross-axis. [data-justify="between"] toggles justify-content.
+         - [data-gap="sm"] binds to the only Figma gap token (comp/stack/sm). */
+      [data-section="md"] {
+        display: flex;
+        align-items: center;
+        height: var(--comp-section-md-height);
+        padding: 0 var(--comp-section-md-h-pad);
+      }
+      [data-section="lg"] {
+        padding: var(--comp-section-lg-v-pad) var(--comp-section-lg-h-pad);
+      }
+      [data-container] {
+        width: 100%;
+        max-width: var(--comp-container-max-w);
+        margin-inline: auto;
+        /* position:relative so absolutely-positioned children (e.g. the
+           top-nav's logo/about-title/nav-btn) anchor to the container's
+           edges, not the section's. container-type:inline-size exposes
+           the container's live width as 100cqi, used by nav-btn's
+           right-edge transform. */
+        position: relative;
+        container-type: inline-size;
+      }
+      [data-row] {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        width: 100%;
+      }
+      [data-row][data-justify="between"] {
+        justify-content: space-between;
+      }
+      [data-stack] {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        width: 100%;
+      }
+      [data-gap="sm"] {
+        gap: var(--comp-stack-sm);
       }
 
       html,
@@ -31,15 +129,18 @@
         overflow-x: hidden;
       }
 
-      header {
+      /* Top-nav is chrome only — fixed positioning, bg, border. The 80px
+         height + 24px h-pad come from [data-section="md"]. Children are
+         absolutely-positioned so independent slide animations stay simple;
+         flex layout is a no-op for them (abs children don't participate). */
+      .top-nav {
         position: fixed;
         top: 0;
         left: 0;
         right: 0;
-        height: 60px;
         z-index: 1100;
         background: rgba(255, 255, 255, 0.95);
-        border-bottom: 1px solid #e0e0e0;
+        border-bottom: 1px solid var(--theme-faint-alt);
         overflow: hidden;
       }
 
@@ -47,22 +148,22 @@
       .about-title {
         position: absolute;
         top: 50%;
-        font-size: 20px;
-        font-weight: 600;
-        color: #2c2c2c;
+        color: var(--theme-fg);
         transition: transform var(--slide-dur) var(--slide-ease),
           opacity var(--slide-dur) var(--slide-ease);
       }
 
       .logo {
-        left: 24px;
+        left: 0;
         transform: translateY(-50%);
       }
 
       .about-title {
-        right: 24px;
-        /* Off-screen right until about-open. */
-        transform: translate(150%, -50%);
+        right: 0;
+        /* Off-screen right until about-open. Uses 100vw (not a %-of-self)
+           so it always clears .top-nav's overflow clip regardless of where
+           the container sits horizontally. */
+        transform: translate(100vw, -50%);
       }
 
       /* Single persistent button. Slides across the header bar and
@@ -70,17 +171,20 @@
       .nav-btn {
         position: absolute;
         top: 50%;
-        left: 24px;
+        left: 0;
         width: 28px;
         height: 28px;
         padding: 0;
         border: 0;
         background: transparent;
-        color: #2c2c2c;
+        color: var(--color-fg-more);
         cursor: pointer;
-        /* Sits at the right edge in product state; on about-open it
-           translates to x=0 (left:24px anchor). */
-        transform: translate(calc(100vw - 76px), -50%);
+        /* Sits at the container's right edge in product state; on
+           about-open it translates back to x=0 (container's left edge).
+           100cqi = the container's live inline-size, so `100cqi - 28px`
+           leaves exactly one icon's width of travel before the container's
+           right edge. */
+        transform: translate(calc(100cqi - 28px), -50%);
         transition: transform var(--slide-dur) var(--slide-ease);
         -webkit-tap-highlight-color: transparent;
       }
@@ -109,37 +213,56 @@
         transition: transform var(--slide-dur) var(--slide-ease);
       }
 
-      footer {
-        padding: 16px 24px;
-        background: white;
-        border-top: 1px solid #e0e0e0;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 16px;
+      /* Footer-drawer is chrome only — bg, border, and the translateY
+         drawer animation. Layout (80px tall, 24px h-pad, centered row)
+         comes from [data-section="md"] + inner [data-container][data-row]. */
+      .footer-drawer {
+        background: var(--theme-bg);
+        border-top: 1px solid var(--theme-faint-alt);
         transform: translateY(100%);
         transition: transform 0.3s ease;
       }
 
-      footer.visible {
+      .footer-drawer.visible {
         transform: translateY(0);
       }
 
+      /* Size picker — underlined text that opens a native dropdown.
+         The visible underline lives on .size-select-text (a plain <span>,
+         no form-control quirks), and a transparent <select> overlays the
+         label to capture clicks + keyboard interaction. This sidesteps
+         every <select>-specific CSS issue (overflow clipping, intrinsic
+         width = widest option) because the text is no longer rendered by
+         the form control at all. */
       .size-select {
-        font-family: inherit;
-        font-size: 18px;
-        font-weight: 600;
-        color: #2c2c2c;
-        background: transparent;
-        border: 0;
-        padding: 4px 0;
+        position: relative;
+        display: inline-block;
+        color: var(--theme-fg);
+        cursor: pointer;
+      }
+
+      .size-select-text {
         text-decoration: underline;
+        text-decoration-thickness: 2px;
         text-underline-offset: 3px;
+      }
+
+      .size-select-native {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        color: transparent;
+        font: inherit;
+        cursor: pointer;
+        opacity: 0;
         -webkit-appearance: none;
         -moz-appearance: none;
         appearance: none;
-        cursor: pointer;
-        outline: none;
       }
 
       .scroll-container {
@@ -169,7 +292,7 @@
         transform-origin: center center;
         font-size: var(--copy-size);
         font-weight: 700;
-        color: #2c2c2c;
+        color: var(--theme-fg);
         text-align: center;
         white-space: nowrap;
         z-index: 2;
@@ -229,7 +352,7 @@
         transform: translate(-50%, 0);
         height: clamp(55px, 7vw, 90px);
         aspect-ratio: 8 / 39; /* matches SVG viewBox so the arrow can't distort */
-        color: #2c2c2c;
+        color: var(--theme-fg);
         opacity: 0;
         transition: opacity 0.3s ease;
         animation: arrowBounce 1.6s ease-in-out infinite;
@@ -324,18 +447,21 @@
       }
 
       .add-to-cart {
-        padding: 16px 28px;
-        font-size: 18px;
-        font-weight: 700;
-        background: #4a4a4a;
-        color: white;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: var(--comp-button-min-h);
+        padding: var(--comp-button-v-pad) var(--comp-button-h-pad);
+        background: var(--comp-button-bg-default);
+        color: var(--comp-button-fg);
         border: none;
-        border-radius: 12px;
+        border-radius: var(--comp-button-b-rad);
+        font-family: inherit;
         cursor: pointer;
       }
 
       .add-to-cart:hover {
-        background: #2c2c2c;
+        background: color-mix(in srgb, var(--comp-button-bg-default) 85%, black);
       }
 
       /* Horizontal slide wrapper for the product chrome (headline, scroll
@@ -348,58 +474,56 @@
         transition: transform var(--slide-dur) var(--slide-ease);
       }
 
-      /* About panel — starts off-screen right, slides in on about-open. */
+      /* About-panel is chrome only — fixed below the top-nav, bg, scroll,
+         horizontal slide animation. Layout (40/24 padding) comes from
+         [data-section="lg"]; inner [data-container] caps width at 800. */
       .about-panel {
         position: fixed;
-        top: 60px;
+        top: var(--comp-section-md-height);
         left: 0;
         right: 0;
         bottom: 0;
-        background: white;
-        padding: 24px;
+        background: var(--theme-bg);
         z-index: 900;
         overflow-y: auto;
         transform: translateX(100%);
         transition: transform var(--slide-dur) var(--slide-ease);
       }
 
-      .entry {
-        padding-bottom: 24px;
-        border-bottom: 1px solid #e0e0e0;
+      /* Post — matches Figma's Post component. Layout comes from
+         [data-stack] on the post div; component-specific gap is driven
+         by Figma's comp/post/gap token (rather than the generic stack gap).
+         [data-row]/[data-stack] children default to width:100% so the row
+         and divider automatically span the column. */
+      .post {
+        gap: var(--comp-post-gap);
       }
 
-      .entry-head {
-        display: flex;
-        justify-content: space-between;
-        align-items: baseline;
-        margin-bottom: 20px;
+      .post-label {
+        color: var(--theme-fg-alt);
       }
 
-      .entry-label {
-        font-size: 13px;
-        font-weight: 700;
-        color: #2c2c2c;
+      .post-date {
+        color: var(--theme-fg-alt);
       }
 
-      .entry-date {
-        font-size: 12px;
-        color: #999;
+      .post-body {
+        color: var(--theme-fg);
+        width: 100%;
       }
 
-      .entry-body p {
-        font-size: 24px;
-        font-weight: 700;
-        line-height: 1.25;
-        color: #2c2c2c;
-      }
-
-      .entry-body p + p {
-        margin-top: 20px;
+      .post-divider {
+        border: 0;
+        border-top: 1px solid var(--theme-faint-alt);
+        width: 100%;
+        margin: 0;
       }
 
       /* ---- About-open state: slide product chrome out left, About in ---- */
       body.about-open .logo {
-        transform: translate(-150%, -50%);
+        /* -100vw so the logo always clears the viewport regardless of the
+           container's horizontal position (mirrors .about-title's off-state). */
+        transform: translate(-100vw, -50%);
         opacity: 0;
       }
 
@@ -433,54 +557,75 @@
     </style>
   </head>
   <body>
-    <header>
-      <div class="logo">TalkingSh*rt</div>
-      <div class="about-title" aria-hidden="true">About</div>
-      <button
-        class="nav-btn"
-        id="navBtn"
-        type="button"
-        aria-label="About"
-        aria-expanded="false"
-        aria-controls="aboutPanel"
-      >
-        <svg
-          class="icon icon-help"
-          viewBox="0 0 24 24"
-          fill="#16181A"
-          xmlns="http://www.w3.org/2000/svg"
-          aria-hidden="true"
-        >
-          <path
-            d="M12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2ZM12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4ZM12 16C12.5128 16 12.9354 16.3865 12.9932 16.8838L13 17.0098C13 17.5621 12.5523 18.0098 12 18.0098C11.4873 18.0098 11.0648 17.6241 11.0068 17.127L11 17C11 16.4477 11.4477 16 12 16ZM9.20312 7.39551C10.1266 6.17828 11.7182 5.67705 13.1729 6.14453C14.6273 6.61205 15.6284 7.94641 15.6699 9.47363C15.7096 10.9344 14.8633 12.2672 13.5186 12.8662L13.332 12.9434C13.1482 13.008 13.0204 13.1724 13 13.3613L12.998 13.4434C13.0293 13.9947 12.608 14.4668 12.0566 14.498C11.5053 14.5293 11.0332 14.108 11.002 13.5566C10.9389 12.4453 11.618 11.4265 12.6426 11.0664C13.2768 10.8239 13.6892 10.207 13.6709 9.52832C13.6525 8.8495 13.2071 8.25562 12.5605 8.04785C11.9603 7.85513 11.3074 8.03364 10.8887 8.49316L10.7969 8.60449C10.4631 9.04445 9.83549 9.13064 9.39551 8.79688C8.95555 8.46307 8.86936 7.83549 9.20312 7.39551Z"
-          />
-        </svg>
-        <svg
-          class="icon icon-close"
-          viewBox="0 0 24 24"
-          fill="#16181A"
-          xmlns="http://www.w3.org/2000/svg"
-          aria-hidden="true"
-        >
-          <path
-            d="M17.2929 5.29289C17.6834 4.90237 18.3164 4.90237 18.707 5.29289C19.0674 5.65338 19.095 6.22091 18.79 6.61321L18.707 6.70696L13.414 11.9999L18.707 17.2929C19.0975 17.6834 19.0975 18.3164 18.707 18.707C18.3465 19.0674 17.7789 19.095 17.3866 18.79L17.2929 18.707L11.9999 13.414L6.70696 18.707C6.31643 19.0975 5.68342 19.0975 5.29289 18.707C4.93241 18.3465 4.90486 17.7789 5.20989 17.3866L5.29289 17.2929L10.5859 11.9999L5.29289 6.70696C4.90237 6.31643 4.90237 5.68342 5.29289 5.29289C5.65338 4.93241 6.22091 4.90486 6.61321 5.20989L6.70696 5.29289L11.9999 10.5859L17.2929 5.29289Z"
-          />
-        </svg>
-      </button>
-    </header>
+    <div class="top-nav" data-section="md" role="banner">
+      <div data-container>
+        <div data-row>
+          <div class="logo type-medium">TalkingSh*rt</div>
+          <div class="about-title type-medium" aria-hidden="true">About</div>
+          <button
+            class="nav-btn"
+            id="navBtn"
+            type="button"
+            aria-label="About"
+            aria-expanded="false"
+            aria-controls="aboutPanel"
+          >
+            <svg
+              class="icon icon-help"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+            >
+              <path
+                d="M12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2ZM12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4ZM12 16C12.5128 16 12.9354 16.3865 12.9932 16.8838L13 17.0098C13 17.5621 12.5523 18.0098 12 18.0098C11.4873 18.0098 11.0648 17.6241 11.0068 17.127L11 17C11 16.4477 11.4477 16 12 16ZM9.20312 7.39551C10.1266 6.17828 11.7182 5.67705 13.1729 6.14453C14.6273 6.61205 15.6284 7.94641 15.6699 9.47363C15.7096 10.9344 14.8633 12.2672 13.5186 12.8662L13.332 12.9434C13.1482 13.008 13.0204 13.1724 13 13.3613L12.998 13.4434C13.0293 13.9947 12.608 14.4668 12.0566 14.498C11.5053 14.5293 11.0332 14.108 11.002 13.5566C10.9389 12.4453 11.618 11.4265 12.6426 11.0664C13.2768 10.8239 13.6892 10.207 13.6709 9.52832C13.6525 8.8495 13.2071 8.25562 12.5605 8.04785C11.9603 7.85513 11.3074 8.03364 10.8887 8.49316L10.7969 8.60449C10.4631 9.04445 9.83549 9.13064 9.39551 8.79688C8.95555 8.46307 8.86936 7.83549 9.20312 7.39551Z"
+              />
+            </svg>
+            <svg
+              class="icon icon-close"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+            >
+              <path
+                d="M17.2929 5.29289C17.6834 4.90237 18.3164 4.90237 18.707 5.29289C19.0674 5.65338 19.095 6.22091 18.79 6.61321L18.707 6.70696L13.414 11.9999L18.707 17.2929C19.0975 17.6834 19.0975 18.3164 18.707 18.707C18.3465 19.0674 17.7789 19.095 17.3866 18.79L17.2929 18.707L11.9999 13.414L6.70696 18.707C6.31643 19.0975 5.68342 19.0975 5.29289 18.707C4.93241 18.3465 4.90486 17.7789 5.20989 17.3866L5.29289 17.2929L10.5859 11.9999L5.29289 6.70696C4.90237 6.31643 4.90237 5.68342 5.29289 5.29289C5.65338 4.93241 6.22091 4.90486 6.61321 5.20989L6.70696 5.29289L11.9999 10.5859L17.2929 5.29289Z"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
 
     <div class="footer-slider">
-      <footer>
-        <select class="size-select" id="sizeSelect" aria-label="Size">
-          <option value="Small">Small</option>
-          <option value="Medium">Medium</option>
-          <option value="Large" selected>Large</option>
-          <option value="XLarge">XLarge</option>
-        </select>
-        <button class="add-to-cart" id="addToCart" type="button">
-          Add To Cart?
-        </button>
-      </footer>
+      <div class="footer-drawer" data-section="md" role="contentinfo">
+        <div data-container>
+          <div data-row data-justify="between">
+            <label class="size-select">
+              <span class="size-select-text type-medium" id="sizeSelectText"
+                >Large</span
+              >
+              <select
+                class="size-select-native"
+                id="sizeSelect"
+                aria-label="Size"
+              >
+                <option value="Small">Small</option>
+                <option value="Medium">Medium</option>
+                <option value="Large" selected>Large</option>
+                <option value="XLarge">XLarge</option>
+              </select>
+            </label>
+            <button
+              class="add-to-cart type-medium"
+              id="addToCart"
+              type="button"
+            >
+              Add To Cart?
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="scroll-container">
@@ -525,21 +670,32 @@
       </div>
     </div>
 
-    <section class="about-panel" id="aboutPanel" aria-hidden="true">
-      <article class="entry">
-        <header class="entry-head">
-          <span class="entry-label">Launch</span>
-          <time class="entry-date" datetime="2026-04-02">2/04/26</time>
-        </header>
-        <div class="entry-body">
-          <p>
-            TalkingSh*rt is a simple idea. No graphics, no logos, just a word
-            on your chest.
-          </p>
-          <p>Talk some sh*rt.</p>
+    <div
+      class="about-panel"
+      id="aboutPanel"
+      data-section="lg"
+      role="region"
+      aria-label="About"
+      aria-hidden="true"
+    >
+      <div data-container>
+        <div data-stack>
+          <div class="post" data-stack>
+            <div class="post-head" data-row data-justify="between">
+              <span class="post-label type-small">Launch</span>
+              <time class="post-date type-small" datetime="2026-04-02">
+                2/04/26
+              </time>
+            </div>
+            <p class="post-body type-medium">
+              TalkingSh*rt is a simple idea. No graphics, no logos, just a word
+              on your chest.<br />Talk some sh*rt.
+            </p>
+            <div class="post-divider" aria-hidden="true"></div>
+          </div>
         </div>
-      </article>
-    </section>
+      </div>
+    </div>
 
     <script>
       const scrollContainer = document.querySelector(".scroll-container");
@@ -548,9 +704,10 @@
       const tshirtContainer = document.getElementById("tshirtContainer");
       const chestText = document.getElementById("chestText");
       const chestTextContainer = document.querySelector(".chest-text-container");
-      const footer = document.querySelector("footer");
+      const footer = document.querySelector(".footer-drawer");
       const addToCartBtn = document.getElementById("addToCart");
       const sizeSelect = document.getElementById("sizeSelect");
+      const sizeSelectText = document.getElementById("sizeSelectText");
       const navBtn = document.getElementById("navBtn");
       const aboutPanel = document.getElementById("aboutPanel");
 
@@ -816,6 +973,13 @@
         if (document.activeElement === chestText) {
           syncHeadlineFromInput();
         }
+      });
+
+      // Mirror the native select's value into the visible text span whenever
+      // the user picks a different size — the <select> itself is transparent
+      // and invisible, so nothing would update without this.
+      sizeSelect.addEventListener("change", () => {
+        sizeSelectText.textContent = sizeSelect.value;
       });
 
       addToCartBtn.addEventListener("click", () => {
