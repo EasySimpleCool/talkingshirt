@@ -554,7 +554,17 @@
 
       .add-to-cart:disabled {
         opacity: 0.6;
-        cursor: wait;
+        /* Pass clicks through to .add-to-cart-wrap so we can route them to
+           the About panel while the button itself stays truly disabled. */
+        pointer-events: none;
+      }
+
+      /* Wrapper exists solely to catch clicks on the disabled button. It
+         mirrors the button's layout box so the hit area matches 1:1, and
+         shows a pointer cursor to advertise that it's interactive. */
+      .add-to-cart-wrap {
+        display: inline-flex;
+        cursor: pointer;
       }
 
       /* Horizontal slide wrapper for the product chrome (headline, scroll
@@ -717,13 +727,17 @@
                 <option value="XLarge">XLarge</option>
               </select>
             </label>
-            <button
-              class="add-to-cart type-medium"
-              id="addToCart"
-              type="button"
-            >
-              Order | $17
-            </button>
+            <span class="add-to-cart-wrap" id="addToCartWrap">
+              <button
+                class="add-to-cart type-medium"
+                id="addToCart"
+                type="button"
+                disabled
+                aria-disabled="true"
+              >
+                Orders paused
+              </button>
+            </span>
           </div>
         </div>
       </div>
@@ -781,6 +795,18 @@
     >
       <div data-container>
         <div data-stack data-gap="lg">
+          <div class="post" data-stack>
+            <div class="post-head" data-row data-justify="between">
+              <span class="post-label type-small">Sorry</span>
+              <time class="post-date type-small" datetime="2026-04-12">
+                12/04/26
+              </time>
+            </div>
+            <p class="post-body type-medium">
+              Orders are suspended, staff are away from the tools
+            </p>
+            <div class="post-divider" aria-hidden="true"></div>
+          </div>
           <div class="post" data-stack>
             <div class="post-head" data-row data-justify="between">
               <span class="post-label type-small">Launch</span>
@@ -1114,6 +1140,18 @@
       // Kick off Stripe Checkout. The secret key never touches the browser —
       // we POST the order details to our Netlify function, which creates a
       // Checkout Session server-side and hands back the hosted-page URL.
+      // While orders are suspended the button is natively `disabled`, so it
+      // swallows pointer events. CSS sets `pointer-events: none` on the
+      // disabled button so clicks fall through to this wrapper, which routes
+      // them to the About panel (where the "Orders are suspended" post lives).
+      const addToCartWrap = document.getElementById("addToCartWrap");
+      addToCartWrap.addEventListener("click", () => {
+        if (!addToCartBtn.disabled) return;
+        if (!document.body.classList.contains("about-open")) {
+          navBtn.click();
+        }
+      });
+
       addToCartBtn.addEventListener("click", async () => {
         const text = chestText.value.trim();
         const size = sizeSelect.value;
