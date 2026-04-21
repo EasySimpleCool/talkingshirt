@@ -1,7 +1,7 @@
 import Stripe from "stripe";
 
 const ALLOWED_SIZES = new Set(["Small", "Medium", "Large", "XLarge"]);
-const MAX_TEXT_LENGTH = 10;
+const MAX_TEXT_LENGTH = 12;
 const UNIT_AMOUNT_CENTS = 1700;
 const CURRENCY = "aud";
 
