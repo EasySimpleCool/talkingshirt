@@ -46,6 +46,7 @@
 
         /* Figma: comp/stack */
         --comp-stack-sm: 16px;
+        --comp-stack-lg: 32px;
 
         /* Figma: comp/post */
         --comp-post-gap: 16px;
@@ -118,6 +119,9 @@
       }
       [data-gap="sm"] {
         gap: var(--comp-stack-sm);
+      }
+      [data-gap="lg"] {
+        gap: var(--comp-stack-lg);
       }
 
       html,
@@ -707,7 +711,7 @@
       aria-hidden="true"
     >
       <div data-container>
-        <div data-stack>
+        <div data-stack data-gap="lg">
           <div class="post" data-stack>
             <div class="post-head" data-row data-justify="between">
               <span class="post-label type-small">Launch</span>
@@ -729,7 +733,8 @@
                 2/04/26
               </time>
             </div>
-            <p class="post-body type-medium">Lets talk sh*rt</p>
+            <p class="post-body type-medium">For custom stuff.</p>
+            <p class="post-body type-medium">Lets talk sh*rt.</p>
             <p class="post-body type-medium">
               <a href="mailto:easysimplecool@gmail.com"
                 >easysimplecool@gmail.com</a
