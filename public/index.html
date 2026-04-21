@@ -344,15 +344,20 @@
         }
       }
 
-      /* During the edit phase, the fake .cursor mirrors a real text caret —
-         so it should only blink while the hidden input is actually focused.
-         When .editable is set but the input has lost focus, hide the caret
-         entirely (matches how a native <input> renders when blurred). The
-         earlier scroll phases don't carry .editable, so blinking continues
-         normally during typing/delete. */
-      body:has(.chest-text.editable:not(:focus)) .cursor {
-        animation: none;
-        opacity: 0;
+      /* During the edit phase the fake .cursor mirrors a real text caret.
+         Platform split:
+         - Touch (pointer: coarse): blinking means the soft keyboard is up
+           and ready to accept input. If the input is blurred the keyboard is
+           down, so the caret would lie about editability — hide it.
+         - Desktop: there's no keyboard-visibility concept; a steady blink
+           communicates "edit mode, type to edit" regardless of DOM focus.
+         The earlier scroll phases don't carry .editable, so the rule never
+         interferes with typing/delete animations on either platform. */
+      @media (pointer: coarse) {
+        body:has(.chest-text.editable:not(:focus)) .cursor {
+          animation: none;
+          opacity: 0;
+        }
       }
 
       /* Bouncing scroll-down arrow under the cursor.
@@ -706,8 +711,8 @@
               </time>
             </div>
             <p class="post-body type-medium">
-              TalkingSh*rt is a simple idea. No graphics, no logos, just a word
-              on your chest.<br />Talk some sh*rt.
+              TalkingSh*rt is a simple idea. <br />No graphics, no logos, just a
+              word on your chest.<br />Talk some sh*rt.
             </p>
             <div class="post-divider" aria-hidden="true"></div>
           </div>
