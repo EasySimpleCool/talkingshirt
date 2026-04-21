@@ -83,6 +83,7 @@
         top: 0;
         left: 0;
         right: 0;
+        z-index: 1100;
         background: rgba(255, 255, 255, 0.95);
         border-bottom: 1px solid var(--theme-faint-alt);
       }
@@ -114,20 +115,22 @@
       </div>
     </div>
 
-    <main data-section="lg">
-      <div data-container>
-        <div data-stack data-gap="sm">
-          <span class="success-label type-small">Order confirmed</span>
-          <p class="success-body type-medium">
-            Thanks for ordering.<br />
-            Your TalkingSh*rt is on its way.
-          </p>
-          <p class="success-label type-small">
-            You'll get a receipt by email. Any questions — just reply to it.
-          </p>
-          <a class="home-link type-medium" href="/">Back home</a>
+    <main>
+      <section data-section="lg">
+        <div data-container>
+          <div data-stack data-gap="sm">
+            <span class="success-label type-small">Order confirmed</span>
+            <p class="success-body type-medium">
+              Thanks for ordering.<br />
+              Your TalkingSh*rt is on its way.
+            </p>
+            <p class="success-label type-small">
+              You'll get a receipt by email. Any questions — just reply to it.
+            </p>
+            <a class="home-link type-medium" href="/">Back home</a>
+          </div>
         </div>
-      </div>
+      </section>
     </main>
   </body>
 </html>
