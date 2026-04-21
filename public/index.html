@@ -854,7 +854,16 @@
         if (document.body.classList.contains("about-open")) return;
 
         const scrollTop = window.scrollY;
-        const maxScroll = scrollContainer.offsetHeight - window.innerHeight;
+        // clientHeight (layout viewport) is stable across iOS soft-keyboard
+        // and native-picker transitions, while window.innerHeight (visual
+        // viewport) shrinks/grows with them. Using innerHeight here makes
+        // maxScroll jitter whenever the keyboard toggles — which on the edit
+        // phase means progress bounces between 1.0 and ~0.8, replaying the
+        // shirt-rise animation and visually "jumping" the page. clientHeight
+        // matches the units the 300vh scroll-container is sized in, so
+        // maxScroll stays constant until an actual viewport resize.
+        const maxScroll =
+          scrollContainer.offsetHeight - document.documentElement.clientHeight;
         const progress = clamp(scrollTop / maxScroll, 0, 1);
 
         // 1. Idle — cursor + bouncing arrow (only at scroll = 0)
@@ -967,7 +976,18 @@
         syncHeadlineFromInput();
 
         chestText.classList.add("editable");
-        if (document.activeElement !== chestText) {
+        // Only claim focus if nothing else interactive is focused. Without
+        // this guard, tapping the size picker (or any other control) puts
+        // its element into activeElement, and the next scroll event — which
+        // iOS fires freely during keyboard/picker transitions — immediately
+        // yanks focus back to chestText, closing the picker. Leave a focused
+        // <select>/<input>/<button> alone.
+        const active = document.activeElement;
+        const ownsFocus =
+          active &&
+          active !== document.body &&
+          active.matches("input, select, textarea, button");
+        if (active !== chestText && !ownsFocus) {
           chestText.focus({ preventScroll: true });
         }
         if (chestText.value.trim().length > 0) {
@@ -999,26 +1019,6 @@
           syncHeadlineFromInput();
         }
       });
-
-      // Mobile: pop the soft keyboard once scroll has reached the edit phase.
-      // iOS Safari ignores programmatic .focus() for keyboard purposes unless
-      // it runs inside a direct user-gesture handler — handleScroll() doesn't
-      // qualify, so the focus call there silently sets activeElement without
-      // surfacing the keyboard. touchend IS a user gesture, so re-focusing
-      // here is what actually raises the keyboard. Only fires when we're
-      // already in the editable phase, so it never steals focus mid-scroll.
-      window.addEventListener(
-        "touchend",
-        () => {
-          if (
-            chestText.classList.contains("editable") &&
-            document.activeElement !== chestText
-          ) {
-            chestText.focus();
-          }
-        },
-        { passive: true },
-      );
 
       // Mirror the native select's value into the visible text span whenever
       // the user picks a different size — the <select> itself is transparent
