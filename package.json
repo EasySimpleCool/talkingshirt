@@ -1,0 +1,10 @@
+{
+  "name": "talkingshirt",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "TalkingSh*rt — custom tees. Static site + Netlify Functions.",
+  "dependencies": {
+    "stripe": "^22.0.2"
+  }
+}

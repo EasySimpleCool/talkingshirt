@@ -487,6 +487,11 @@
         );
       }
 
+      .add-to-cart:disabled {
+        opacity: 0.6;
+        cursor: wait;
+      }
+
       /* Horizontal slide wrapper for the product chrome (headline, scroll
          arrow, t-shirt). Keeps the existing inline transforms on its
          children untouched — we just translate the wrapper on about-open. */
@@ -1027,10 +1032,38 @@
         sizeSelectText.textContent = sizeSelect.value;
       });
 
-      addToCartBtn.addEventListener("click", () => {
-        const text = chestText.value || "(blank)";
+      // Kick off Stripe Checkout. The secret key never touches the browser —
+      // we POST the order details to our Netlify function, which creates a
+      // Checkout Session server-side and hands back the hosted-page URL.
+      addToCartBtn.addEventListener("click", async () => {
+        const text = chestText.value.trim();
         const size = sizeSelect.value;
-        alert(`Added to cart: ${size} Black T-shirt with "${text}"`);
+        if (!text) return;
+
+        const originalLabel = addToCartBtn.textContent;
+        addToCartBtn.disabled = true;
+        addToCartBtn.textContent = "Loading…";
+
+        try {
+          const res = await fetch(
+            "/.netlify/functions/create-checkout-session",
+            {
+              method: "POST",
+              headers: { "content-type": "application/json" },
+              body: JSON.stringify({ size, text }),
+            },
+          );
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok || !data.url) {
+            throw new Error(data.error || "Checkout failed");
+          }
+          window.location.assign(data.url);
+        } catch (err) {
+          console.error(err);
+          alert("Sorry, we couldn't start checkout. Please try again.");
+          addToCartBtn.disabled = false;
+          addToCartBtn.textContent = originalLabel;
+        }
       });
 
       // About panel — single persistent button toggles between product and
