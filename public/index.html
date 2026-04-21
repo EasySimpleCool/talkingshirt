@@ -22,7 +22,7 @@
         --chest-y: 27%; /* vertical anchor of the chest print on the shirt */
         --chest-font: clamp(17px, 3vw, 36px);
         --slide-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
-        --slide-dur: 350ms;
+        --slide-dur: 500ms;
 
         /* Figma: theme */
         --theme-fg: #424242;
@@ -169,10 +169,13 @@
       }
 
       .about-title {
-        right: 0;
+        left: 0;
         /* Off-screen right until about-open. Uses 100vw (not a %-of-self)
            so it always clears .top-nav's overflow clip regardless of where
-           the container sits horizontally. */
+           the container sits horizontally. Lands at the container's left
+           edge (same slot the logo occupies) so the nav-btn can stay
+           parked on the right — click to open, click to close without
+           the cursor needing to move. */
         transform: translate(100vw, -50%);
       }
 
@@ -204,11 +207,22 @@
         inset: 0;
         width: 100%;
         height: 100%;
-        transition: opacity var(--slide-dur) var(--slide-ease);
+        transition:
+          opacity var(--slide-dur) var(--slide-ease),
+          transform var(--slide-dur) var(--slide-ease);
+      }
+
+      /* Help icon rides out to the left with the logo; close icon enters
+         from the right with the about-title. The button itself never
+         moves, so the click target stays put — tap to open, tap the same
+         spot to close. */
+      .nav-btn .icon-help {
+        transform: translateX(0);
       }
 
       .nav-btn .icon-close {
         opacity: 0;
+        transform: translateX(100vw);
       }
 
       /* Fixed at viewport bottom so its horizontal slide can be layered
@@ -220,7 +234,9 @@
         right: 0;
         z-index: 1000;
         transform: translateX(0);
-        transition: transform var(--slide-dur) var(--slide-ease);
+        transition:
+          transform var(--slide-dur) var(--slide-ease),
+          opacity var(--slide-dur) var(--slide-ease);
       }
 
       /* Footer-drawer is chrome only — bg, border, and the translateY
@@ -506,8 +522,10 @@
       .product-slider {
         position: absolute;
         inset: 0;
-        will-change: transform;
-        transition: transform var(--slide-dur) var(--slide-ease);
+        will-change: transform, opacity;
+        transition:
+          transform var(--slide-dur) var(--slide-ease),
+          opacity var(--slide-dur) var(--slide-ease);
       }
 
       /* About-panel is chrome only — fixed below the top-nav, bg, scroll,
@@ -523,7 +541,10 @@
         z-index: 900;
         overflow-y: auto;
         transform: translateX(100%);
-        transition: transform var(--slide-dur) var(--slide-ease);
+        opacity: 0;
+        transition:
+          transform var(--slide-dur) var(--slide-ease),
+          opacity var(--slide-dur) var(--slide-ease);
       }
 
       /* Post — matches Figma's Post component. Layout comes from
@@ -568,28 +589,29 @@
         transform: translate(0, -50%);
       }
 
-      body.about-open .nav-btn {
-        transform: translate(0, -50%);
-      }
-
       body.about-open .nav-btn .icon-help {
         opacity: 0;
+        transform: translateX(-100vw);
       }
 
       body.about-open .nav-btn .icon-close {
         opacity: 1;
+        transform: translateX(0);
       }
 
       body.about-open .product-slider {
         transform: translateX(-100vw);
+        opacity: 0;
       }
 
       body.about-open .footer-slider {
         transform: translateX(-100%);
+        opacity: 0;
       }
 
       body.about-open .about-panel {
         transform: translateX(0);
+        opacity: 1;
       }
     </style>
   </head>
