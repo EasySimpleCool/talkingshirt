@@ -24,6 +24,7 @@
         --theme-fg: #424242;
         --theme-fg-alt: #808080;
         --theme-bg: #ffffff;
+        --theme-faint: #a8a8a8;
         --theme-faint-alt: #e0e0e0;
         --color-fg-more: #16181a;
 
@@ -149,7 +150,8 @@
         position: absolute;
         top: 50%;
         color: var(--theme-fg);
-        transition: transform var(--slide-dur) var(--slide-ease),
+        transition:
+          transform var(--slide-dur) var(--slide-ease),
           opacity var(--slide-dur) var(--slide-ease);
       }
 
@@ -243,7 +245,8 @@
 
       .size-select-text {
         text-decoration: underline;
-        text-decoration-thickness: 2px;
+        text-decoration-color: var(--theme-faint);
+        text-decoration-thickness: 1px;
         text-underline-offset: 3px;
       }
 
@@ -339,6 +342,17 @@
         100% {
           opacity: 0;
         }
+      }
+
+      /* During the edit phase, the fake .cursor mirrors a real text caret —
+         so it should only blink while the hidden input is actually focused.
+         When .editable is set but the input has lost focus, hide the caret
+         entirely (matches how a native <input> renders when blurred). The
+         earlier scroll phases don't carry .editable, so blinking continues
+         normally during typing/delete. */
+      body:has(.chest-text.editable:not(:focus)) .cursor {
+        animation: none;
+        opacity: 0;
       }
 
       /* Bouncing scroll-down arrow under the cursor.
@@ -461,7 +475,11 @@
       }
 
       .add-to-cart:hover {
-        background: color-mix(in srgb, var(--comp-button-bg-default) 85%, black);
+        background: color-mix(
+          in srgb,
+          var(--comp-button-bg-default) 85%,
+          black
+        );
       }
 
       /* Horizontal slide wrapper for the product chrome (headline, scroll
@@ -621,7 +639,7 @@
               id="addToCart"
               type="button"
             >
-              Add To Cart?
+              Order | $17
             </button>
           </div>
         </div>
@@ -703,7 +721,9 @@
       const scrollArrow = document.getElementById("scrollArrow");
       const tshirtContainer = document.getElementById("tshirtContainer");
       const chestText = document.getElementById("chestText");
-      const chestTextContainer = document.querySelector(".chest-text-container");
+      const chestTextContainer = document.querySelector(
+        ".chest-text-container",
+      );
       const footer = document.querySelector(".footer-drawer");
       const addToCartBtn = document.getElementById("addToCart");
       const sizeSelect = document.getElementById("sizeSelect");
@@ -728,7 +748,7 @@
       // Within the delete phase, when does the cursor recolor black→white?
       // (normalized 0..1 within that phase). Tuned so the flip lands right
       // when the rising shirt body covers the cursor's location.
-      const COLOR_FLIP_START = 0.30;
+      const COLOR_FLIP_START = 0.3;
       const COLOR_FLIP_END = 0.55;
 
       // Ease-out so the shirt rises FAST at the start of deletion and is
@@ -903,7 +923,7 @@
           const chestX = getChestOffsetX();
           setHeadlineTransform(
             lerp(1, finalScale, eased),
-            lerp(0, chestX, eased)
+            lerp(0, chestX, eased),
           );
 
           // Color flip — timed so it happens while the shirt body crosses
@@ -916,7 +936,7 @@
           const colorT = clamp(
             (t - COLOR_FLIP_START) / (COLOR_FLIP_END - COLOR_FLIP_START),
             0,
-            1
+            1,
           );
           const c = dark.map((d, i) => Math.round(lerp(d, light[i], colorT)));
           setHeadlineColor(`rgb(${c[0]}, ${c[1]}, ${c[2]})`);
@@ -974,6 +994,26 @@
           syncHeadlineFromInput();
         }
       });
+
+      // Mobile: pop the soft keyboard once scroll has reached the edit phase.
+      // iOS Safari ignores programmatic .focus() for keyboard purposes unless
+      // it runs inside a direct user-gesture handler — handleScroll() doesn't
+      // qualify, so the focus call there silently sets activeElement without
+      // surfacing the keyboard. touchend IS a user gesture, so re-focusing
+      // here is what actually raises the keyboard. Only fires when we're
+      // already in the editable phase, so it never steals focus mid-scroll.
+      window.addEventListener(
+        "touchend",
+        () => {
+          if (
+            chestText.classList.contains("editable") &&
+            document.activeElement !== chestText
+          ) {
+            chestText.focus();
+          }
+        },
+        { passive: true },
+      );
 
       // Mirror the native select's value into the visible text span whenever
       // the user picks a different size — the <select> itself is transparent
