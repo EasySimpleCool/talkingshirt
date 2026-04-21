@@ -23,7 +23,11 @@
         --chest-font: clamp(17px, 3vw, 36px);
         --slide-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
         --slide-dur: 1000ms;
-        --fade-dur: 300ms;
+        /* Opacity completes in the first 25% of the slide so the fade
+           leads aggressively: by the time an element has moved a quarter
+           of the way, it has already reached its end opacity (0 outbound,
+           1 inbound). Same ease, same start; only the duration differs. */
+        --fade-dur: 250ms;
 
         /* Figma: theme */
         --theme-fg: #424242;
@@ -154,6 +158,10 @@
         overflow: hidden;
       }
 
+      /* Shared transition: opacity rides the same curve + duration as the
+         transform, so at any moment opacity equals the element's slide
+         progress. In-view position = opacity 1; out-of-view position =
+         opacity 0. No delays, no direction-specific timing. */
       .logo,
       .about-title {
         position: absolute;
@@ -204,20 +212,21 @@
         -webkit-tap-highlight-color: transparent;
       }
 
+      /* Help icon rides out to the left with the logo; close icon enters
+         from the right with the about-title. The button itself never
+         moves, so the click target stays put — tap to open, tap the same
+         spot to close. Opacity tracks position (same duration/ease as the
+         transform) — in-view = 1, off-screen = 0. */
       .nav-btn .icon {
         position: absolute;
         inset: 0;
         width: 100%;
         height: 100%;
         transition:
-          opacity var(--fade-dur) var(--slide-ease),
-          transform var(--slide-dur) var(--slide-ease);
+          transform var(--slide-dur) var(--slide-ease),
+          opacity var(--fade-dur) var(--slide-ease);
       }
 
-      /* Help icon rides out to the left with the logo; close icon enters
-         from the right with the about-title. The button itself never
-         moves, so the click target stays put — tap to open, tap the same
-         spot to close. */
       .nav-btn .icon-help {
         transform: translateX(0);
       }
@@ -371,19 +380,18 @@
       }
 
       /* During the edit phase the fake .cursor mirrors a real text caret.
-         Platform split:
-         - Touch (pointer: coarse): blinking means the soft keyboard is up
-           and ready to accept input. If the input is blurred the keyboard is
-           down, so the caret would lie about editability — hide it.
-         - Desktop: there's no keyboard-visibility concept; a steady blink
-           communicates "edit mode, type to edit" regardless of DOM focus.
-         The earlier scroll phases don't carry .editable, so the rule never
-         interferes with typing/delete animations on either platform. */
-      @media (pointer: coarse) {
-        body:has(.chest-text.editable:not(:focus)) .cursor {
-          animation: none;
-          opacity: 0;
-        }
+         Contract: the cursor blinks iff the input actually holds focus.
+         - Touch: blinking means the soft keyboard is up and ready to accept
+           input. If blurred, the keyboard is down, so a blinking caret would
+           lie about editability.
+         - Desktop: same contract. If focus has moved elsewhere, keystrokes
+           won't reach the chest input, so the caret shouldn't pretend it's
+           ready to type.
+         Earlier scroll phases don't carry .editable, so the rule only
+         applies during edit. */
+      body:has(.chest-text.editable:not(:focus)) .cursor {
+        animation: none;
+        opacity: 0;
       }
 
       /* Bouncing scroll-down arrow under the cursor.
