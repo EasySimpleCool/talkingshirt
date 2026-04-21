@@ -17,10 +17,34 @@
 
       :root {
         --copy-size: clamp(40px, 10vw, 120px);
-        --shirt-size: clamp(360px, 60vw, 760px);
+        /* Aggressive zoom — the shirt is sized to FILL the visible section
+           between the fixed header and footer. On mobile that means the
+           sleeves overflow the viewport (~130%+), which is intentional:
+           body has overflow-x:hidden so they just crop off the sides and
+           the remaining canvas reads as a tight, edge-to-edge shirt. On
+           desktop the clamp cap keeps the shirt from exploding on wide
+           monitors. */
+        --shirt-size: clamp(640px, 120vw, 880px);
         --chest-x: 50%; /* horizontal anchor of the chest print on the shirt */
         --chest-y: 27%; /* vertical anchor of the chest print on the shirt */
-        --chest-font: clamp(17px, 3vw, 36px);
+        /* Chest font is expressed as a percentage of the SHIRT'S rendered
+           inline width via container queries (see .tshirt-container, which
+           is a size container, and .chest-text, which reads cqi off it).
+           That means the print stays at a fixed proportion of the shirt at
+           every viewport — the visual relationship between text and shirt
+           never changes, whether the shirt is 640px or 880px wide. 4.7%
+           matches the original chest-font/shirt-size ratio at the desktop
+           cap (36px / 760px). */
+        --chest-font: 4.7cqi;
+        /* Shared vertical anchor for the "stage" (headline cursor in idle/
+           typing, chest on the shirt in edit). Keeping these in lockstep via
+           one token means the same .cursor element lands exactly on the chest
+           at the end of the rise animation. Above 50% so the shirt sits high
+           in the visible band between the fixed header and footer drawer.
+           Nudged further up to match the more aggressive shirt size above —
+           a bigger shirt with the chest at 50vh would hang its hem below
+           the footer. */
+        --stage-center: 36%;
         --slide-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
         --slide-dur: 1000ms;
         /* Opacity completes in the first 25% of the slide so the fade
@@ -324,7 +348,7 @@
          t-shirt so the cursor lands on top of the chest, not behind it. */
       .animated-text {
         position: absolute;
-        top: 50%;
+        top: var(--stage-center);
         left: 50%;
         transform: translate(-50%, -50%) scale(1);
         transform-origin: center center;
@@ -400,7 +424,7 @@
          intrinsic aspect ratio (no chevron stretching). */
       .scroll-arrow {
         position: absolute;
-        top: calc(50% + var(--copy-size) * 0.7);
+        top: calc(var(--stage-center) + var(--copy-size) * 0.7);
         left: 50%;
         transform: translate(-50%, 0);
         height: clamp(55px, 7vw, 90px);
@@ -436,12 +460,19 @@
          phase so the shirt both slides in AND emerges in opacity. */
       .tshirt-container {
         position: absolute;
-        top: 50%;
+        top: var(--stage-center);
         left: 50%;
         width: var(--shirt-size);
         transform: translate(-50%, calc(-1 * var(--chest-y) + 100vh));
         opacity: 0;
         will-change: transform, opacity;
+        /* Establish this as a size container so descendants (specifically
+           .chest-text) can size themselves relative to the shirt's rendered
+           inline width with cqi — see --chest-font in :root. Without this,
+           cqi would fall back to the small viewport unit and the chest print
+           would unlink from the shirt on mobile (where the shirt overflows
+           the viewport). */
+        container-type: inline-size;
       }
 
       .tshirt-wrapper {
