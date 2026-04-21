@@ -22,7 +22,8 @@
         --chest-y: 27%; /* vertical anchor of the chest print on the shirt */
         --chest-font: clamp(17px, 3vw, 36px);
         --slide-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
-        --slide-dur: 500ms;
+        --slide-dur: 1000ms;
+        --fade-dur: 300ms;
 
         /* Figma: theme */
         --theme-fg: #424242;
@@ -160,7 +161,7 @@
         color: var(--theme-fg);
         transition:
           transform var(--slide-dur) var(--slide-ease),
-          opacity var(--slide-dur) var(--slide-ease);
+          opacity var(--fade-dur) var(--slide-ease);
       }
 
       .logo {
@@ -177,6 +178,7 @@
            parked on the right — click to open, click to close without
            the cursor needing to move. */
         transform: translate(100vw, -50%);
+        opacity: 0;
       }
 
       /* Single persistent button. Slides across the header bar and
@@ -208,7 +210,7 @@
         width: 100%;
         height: 100%;
         transition:
-          opacity var(--slide-dur) var(--slide-ease),
+          opacity var(--fade-dur) var(--slide-ease),
           transform var(--slide-dur) var(--slide-ease);
       }
 
@@ -236,7 +238,7 @@
         transform: translateX(0);
         transition:
           transform var(--slide-dur) var(--slide-ease),
-          opacity var(--slide-dur) var(--slide-ease);
+          opacity var(--fade-dur) var(--slide-ease);
       }
 
       /* Footer-drawer is chrome only — bg, border, and the translateY
@@ -525,7 +527,7 @@
         will-change: transform, opacity;
         transition:
           transform var(--slide-dur) var(--slide-ease),
-          opacity var(--slide-dur) var(--slide-ease);
+          opacity var(--fade-dur) var(--slide-ease);
       }
 
       /* About-panel is chrome only — fixed below the top-nav, bg, scroll,
@@ -544,7 +546,7 @@
         opacity: 0;
         transition:
           transform var(--slide-dur) var(--slide-ease),
-          opacity var(--slide-dur) var(--slide-ease);
+          opacity var(--fade-dur) var(--slide-ease);
       }
 
       /* Post — matches Figma's Post component. Layout comes from
@@ -587,6 +589,7 @@
 
       body.about-open .about-title {
         transform: translate(0, -50%);
+        opacity: 1;
       }
 
       body.about-open .nav-btn .icon-help {
