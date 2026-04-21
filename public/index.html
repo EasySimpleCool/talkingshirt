@@ -1037,20 +1037,12 @@
         syncHeadlineFromInput();
 
         chestText.classList.add("editable");
-        // Only claim focus if nothing else interactive is focused. Without
-        // this guard, tapping the size picker (or any other control) puts
-        // its element into activeElement, and the next scroll event — which
-        // iOS fires freely during keyboard/picker transitions — immediately
-        // yanks focus back to chestText, closing the picker. Leave a focused
-        // <select>/<input>/<button> alone.
-        const active = document.activeElement;
-        const ownsFocus =
-          active &&
-          active !== document.body &&
-          active.matches("input, select, textarea, button");
-        if (active !== chestText && !ownsFocus) {
-          chestText.focus({ preventScroll: true });
-        }
+        // Focus is claimed in the `scrollend` handler below, not here. If
+        // we focused on every scroll tick, iOS would pop the keyboard
+        // mid-gesture and — worse — yank focus back from the size picker,
+        // since iOS fires scroll events freely during picker/keyboard
+        // transitions. Waiting for scrollend means the keyboard appears
+        // exactly once, after the user has actually settled at the bottom.
         if (chestText.value.trim().length > 0) {
           footer.classList.add("visible");
         } else {
@@ -1142,6 +1134,41 @@
 
       window.addEventListener("scroll", handleScroll, { passive: true });
       window.addEventListener("resize", handleScroll);
+
+      // Focus the chest input once the user has finished scrolling into the
+      // edit phase. See the edit-branch comment in handleScroll for why this
+      // lives here instead of inside the scroll handler. Guards:
+      //   - About panel open → chrome is hidden, don't grab focus.
+      //   - Not in edit phase → nothing to type into yet.
+      //   - Another interactive element owns focus (e.g. size picker,
+      //     Add-to-cart button) → leave it alone.
+      window.addEventListener("scrollend", () => {
+        if (document.body.classList.contains("about-open")) return;
+        if (!chestText.classList.contains("editable")) return;
+        const active = document.activeElement;
+        const ownsFocus =
+          active &&
+          active !== document.body &&
+          active.matches("input, select, textarea, button");
+        if (active !== chestText && !ownsFocus) {
+          chestText.focus({ preventScroll: true });
+        }
+      });
+
+      // Click anywhere in the middle of the page to focus the chest input.
+      // .scroll-container is the document-flow block that sits *below* the
+      // fixed header, fixed footer, and about-panel in both z-order and DOM
+      // ancestry, so clicks that land on any of that chrome never bubble
+      // here — no need to filter them out. Clicks on empty space around the
+      // shirt (which is inside pointer-events:none .fixed-content) fall
+      // through to .scroll-container and trigger focus.
+      scrollContainer.addEventListener("click", () => {
+        if (document.body.classList.contains("about-open")) return;
+        if (!chestText.classList.contains("editable")) return;
+        if (document.activeElement === chestText) return;
+        chestText.focus({ preventScroll: true });
+      });
+
       handleScroll();
     </script>
   </body>
