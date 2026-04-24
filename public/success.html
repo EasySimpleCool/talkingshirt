@@ -28,14 +28,14 @@
       .type-medium {
         font-weight: 700;
         font-size: 24px;
-        line-height: 1;
+        line-height: normal;
         letter-spacing: 0;
       }
 
       .type-small {
         font-weight: 700;
         font-size: 12px;
-        line-height: 1;
+        line-height: normal;
         letter-spacing: 0;
       }
 
@@ -70,7 +70,7 @@
 
       html,
       body {
-        background: white;
+        background: var(--theme-bg);
       }
 
       body {
@@ -84,7 +84,7 @@
         left: 0;
         right: 0;
         z-index: 1100;
-        background: rgba(255, 255, 255, 0.95);
+        background: color-mix(in srgb, var(--theme-bg) 95%, transparent);
         border-bottom: 1px solid var(--theme-faint-alt);
       }
 

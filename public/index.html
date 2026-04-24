@@ -56,10 +56,9 @@
         /* Figma: theme */
         --theme-fg: #424242;
         --theme-fg-alt: #808080;
-        --theme-bg: #ffffff;
         --theme-faint: #a8a8a8;
         --theme-faint-alt: #e0e0e0;
-        --color-fg-more: #16181a;
+        --theme-bg: #ffffff;
 
         /* Figma: comp/button */
         --comp-button-fg: #ffffff;
@@ -79,7 +78,7 @@
 
         /* Figma: comp/stack */
         --comp-stack-sm: 16px;
-        --comp-stack-lg: 32px;
+        --comp-stack-lg: 40px;
 
         /* Figma: comp/post */
         --comp-post-gap: 16px;
@@ -94,13 +93,13 @@
       .type-medium {
         font-weight: 700;
         font-size: 24px;
-        line-height: 1;
+        line-height: normal;
         letter-spacing: 0;
       }
       .type-small {
         font-weight: 700;
         font-size: 12px;
-        line-height: 1;
+        line-height: normal;
         letter-spacing: 0;
       }
 
@@ -159,7 +158,7 @@
 
       html,
       body {
-        background: white;
+        background: var(--theme-bg);
       }
 
       body {
@@ -177,7 +176,7 @@
         left: 0;
         right: 0;
         z-index: 1100;
-        background: rgba(255, 255, 255, 0.95);
+        background: color-mix(in srgb, var(--theme-bg) 95%, transparent);
         border-bottom: 1px solid var(--theme-faint-alt);
         overflow: hidden;
       }
@@ -224,7 +223,7 @@
         padding: 0;
         border: 0;
         background: transparent;
-        color: var(--color-fg-more);
+        color: var(--theme-fg);
         cursor: pointer;
         /* Sits at the container's right edge in product state; on
            about-open it translates back to x=0 (container's left edge).
@@ -330,7 +329,7 @@
       .scroll-container {
         height: 300vh;
         position: relative;
-        background: white;
+        background: var(--theme-bg);
       }
 
       .fixed-content {
@@ -340,7 +339,7 @@
         width: 100%;
         height: 100vh;
         pointer-events: none;
-        background: white;
+        background: var(--theme-bg);
         overflow: hidden;
       }
 
@@ -499,7 +498,7 @@
       }
 
       .chest-text {
-        color: white;
+        color: var(--theme-bg);
         font-size: var(--chest-font);
         font-weight: 700;
         border: none;
@@ -874,6 +873,46 @@
       const COLOR_FLIP_START = 0.3;
       const COLOR_FLIP_END = 0.55;
 
+      // Headline colors are resolved from CSS custom properties so the design
+      // tokens (--theme-fg, --theme-bg) are the single source of truth. The
+      // delete-phase interpolation needs per-channel math, so we parse each
+      // token into a tuple once at init and keep a CSS string alongside for
+      // the static phases.
+      function parseCssColorToRgb(cssColor) {
+        // Minimal parser for the two shapes we actually put in tokens: `#rgb`,
+        // `#rrggbb`, and `rgb(r, g, b)` / `rgba(r, g, b, a)`. Anything else
+        // would indicate someone dropped a non-token value in a :root var.
+        const hex = cssColor.trim().match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i);
+        if (hex) {
+          const h =
+            hex[1].length === 3
+              ? hex[1]
+                  .split("")
+                  .map((c) => c + c)
+                  .join("")
+              : hex[1];
+          return [
+            parseInt(h.slice(0, 2), 16),
+            parseInt(h.slice(2, 4), 16),
+            parseInt(h.slice(4, 6), 16),
+          ];
+        }
+        const rgb = cssColor.match(/(\d+(?:\.\d+)?)/g);
+        if (rgb && rgb.length >= 3) {
+          return [Number(rgb[0]), Number(rgb[1]), Number(rgb[2])];
+        }
+        throw new Error(`Unsupported CSS color in token: "${cssColor}"`);
+      }
+      function readToken(name) {
+        return getComputedStyle(document.documentElement)
+          .getPropertyValue(name)
+          .trim();
+      }
+      const FG_DARK_RGB = parseCssColorToRgb(readToken("--theme-fg"));
+      const FG_DARK_CSS = `rgb(${FG_DARK_RGB.join(", ")})`;
+      const BG_LIGHT_RGB = parseCssColorToRgb(readToken("--theme-bg"));
+      const BG_LIGHT_CSS = `rgb(${BG_LIGHT_RGB.join(", ")})`;
+
       // Ease-out so the shirt rises FAST at the start of deletion and is
       // essentially in place by the time only "Talk" is left.
       function easeOutQuart(t) {
@@ -989,7 +1028,7 @@
           setHeadline("");
           setHeadlineOpacity(1);
           setHeadlineTransform(1, 0);
-          setHeadlineColor("#2c2c2c");
+          setHeadlineColor(FG_DARK_CSS);
           setCursorBg(null);
           scrollArrow.classList.add("visible");
           setShirtRise(100);
@@ -1008,7 +1047,7 @@
           setHeadline(FULL_TEXT.slice(0, len));
           setHeadlineOpacity(1);
           setHeadlineTransform(1, 0);
-          setHeadlineColor("#2c2c2c");
+          setHeadlineColor(FG_DARK_CSS);
           setCursorBg(null);
           setShirtRise(100);
           setShirtOpacity(0);
@@ -1022,7 +1061,7 @@
           setHeadline(FULL_TEXT);
           setHeadlineOpacity(1);
           setHeadlineTransform(1, 0);
-          setHeadlineColor("#2c2c2c");
+          setHeadlineColor(FG_DARK_CSS);
           setCursorBg(null);
           setShirtRise(100);
           setShirtOpacity(0);
@@ -1063,8 +1102,8 @@
           // black → opaque white (so any visible text in transit stays
           // legible), while the cursor's alpha simultaneously fades toward
           // 25% so it lands on the chest at the desired final opacity.
-          const dark = [44, 44, 44];
-          const light = [255, 255, 255];
+          const dark = FG_DARK_RGB;
+          const light = BG_LIGHT_RGB;
           const colorT = clamp(
             (t - COLOR_FLIP_START) / (COLOR_FLIP_END - COLOR_FLIP_START),
             0,
@@ -1088,8 +1127,10 @@
         setShirtRise(0);
         setShirtOpacity(1);
         setHeadlineTransform(getFinalScale(), getChestOffsetX());
-        setHeadlineColor("rgb(255, 255, 255)");
-        setCursorBg("rgba(255, 255, 255, 0.5)");
+        setHeadlineColor(BG_LIGHT_CSS);
+        setCursorBg(
+          `rgba(${BG_LIGHT_RGB[0]}, ${BG_LIGHT_RGB[1]}, ${BG_LIGHT_RGB[2]}, 0.5)`,
+        );
         setHeadlineOpacity(1);
         syncHeadlineFromInput();
 
