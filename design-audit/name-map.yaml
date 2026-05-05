@@ -1,0 +1,45 @@
+# name-map.yaml — Layer 2 of the normalize pipeline.
+#
+# Maps Figma component / variable names → canonical code names used in
+# public/index.html.  Add an entry whenever fuzzy matching (Layer 3) produces
+# a false positive or misses a pairing that's obvious to a human.
+#
+# Format:
+#   "Figma name as it appears in the panel": "code name"
+#
+# Keys are matched case-insensitively after Layer 1 normalisation
+# (lowercase, strip punctuation, collapse whitespace).
+
+aliases:
+  # Figma component name         → HTML class / token name
+  "Navigation / Top bar":         top-nav
+  "Nav Button":                   nav-btn
+  "Footer / Drawer":              footer-drawer
+  "Size Selector":                size-select
+  "Add To Cart":                  add-to-cart
+  "About Panel":                  about-panel
+  "Post / Item":                  post
+  "T-Shirt / Container":          tshirt-container
+  "Chest Text":                   chest-text
+  "Scroll Indicator":             scroll-arrow
+  "Animated Headline":            animated-text
+
+  # Figma variable name           → CSS custom property (without --)
+  "theme/fg":                     theme-fg
+  "theme/fg-alt":                 theme-fg-alt
+  "theme/faint":                  theme-faint
+  "theme/faint-alt":              theme-faint-alt
+  "theme/bg":                     theme-bg
+  "comp/button/fg":               comp-button-fg
+  "comp/button/bg/default":       comp-button-bg-default
+  "comp/button/h-pad":            comp-button-h-pad
+  "comp/button/v-pad":            comp-button-v-pad
+  "comp/button/b-rad":            comp-button-b-rad
+  "comp/button/min-h":            comp-button-min-h
+  "comp/container/max-w":         comp-container-max-w
+  "comp/section/md/h-pad":        comp-section-md-h-pad
+  "comp/section/lg/h-pad":        comp-section-lg-h-pad
+  "comp/section/lg/v-pad":        comp-section-lg-v-pad
+  "comp/stack/sm":                comp-stack-sm
+  "comp/stack/lg":                comp-stack-lg
+  "comp/post/gap":                comp-post-gap

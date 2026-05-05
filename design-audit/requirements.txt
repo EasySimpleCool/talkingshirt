@@ -1,0 +1,7 @@
+requests
+pyyaml
+rapidfuzz
+
+# Optional: enable --embeddings mode in compare.py for semantic token matching.
+# Heavy install (~500 MB); comment out if you don't need it.
+# sentence-transformers

@@ -5,3 +5,5 @@ node_modules
 .netlify
 .DS_Store
 .cursor/
+design-audit/.env
+design-audit/output/
