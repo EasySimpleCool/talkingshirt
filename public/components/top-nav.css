@@ -1,0 +1,95 @@
+.top-nav {
+  background: color-mix(in srgb, var(--theme-bg) 95%, transparent);
+  border-bottom: calc(var(--number-1) * 1px) solid var(--theme-faint-alt);
+  overflow: hidden;
+}
+
+.top-nav--fixed {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: calc(var(--number-160) * 6.875);
+}
+
+.top-nav .logo,
+.top-nav .about-title {
+  position: absolute;
+  top: 50%;
+  color: var(--theme-fg);
+  transition:
+    transform var(--slide-dur) ease,
+    opacity var(--fade-dur) ease;
+}
+
+.top-nav .logo {
+  left: 0;
+  transform: translateY(-50%);
+}
+
+.top-nav .about-title {
+  left: 0;
+  transform: translate(100vw, -50%);
+  opacity: calc(var(--number-0));
+}
+
+.top-nav .nav-btn {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: var(--nav-btn-size);
+  height: var(--nav-btn-size);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--theme-fg);
+  cursor: pointer;
+  transform: translate(calc(100cqi - var(--nav-btn-size)), -50%);
+  transition: transform var(--slide-dur) ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.top-nav .nav-btn .icon {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transition:
+    transform var(--slide-dur) ease,
+    opacity var(--fade-dur) ease;
+}
+
+.top-nav .nav-btn .icon-help {
+  transform: translateX(0);
+}
+
+.top-nav .nav-btn .icon-close {
+  opacity: calc(var(--number-0));
+  transform: translateX(100vw);
+}
+
+body.about-open .top-nav .logo {
+  transform: translate(-100vw, -50%);
+  opacity: calc(var(--number-0));
+}
+
+body.about-open .top-nav .about-title {
+  transform: translate(0, -50%);
+  opacity: calc(var(--number-1));
+}
+
+body.about-open .top-nav .nav-btn .icon-help {
+  opacity: calc(var(--number-0));
+  transform: translateX(-100vw);
+}
+
+body.about-open .top-nav .nav-btn .icon-close {
+  opacity: calc(var(--number-1));
+  transform: translateX(0);
+}
+
+.top-nav--simple .logo {
+  position: static;
+  transform: none;
+  transition: none;
+}

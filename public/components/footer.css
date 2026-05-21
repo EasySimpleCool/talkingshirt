@@ -1,0 +1,22 @@
+.footer-slider {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: calc(var(--number-160) * 6.25);
+}
+
+.footer-drawer {
+  background: var(--theme-bg);
+  border-top: calc(var(--number-1) * 1px) solid var(--theme-faint-alt);
+  transform: translateY(100%);
+  transition: transform calc(var(--number-24) * 12.5ms) ease;
+}
+
+.footer-drawer--visible {
+  transform: translateY(0);
+}
+
+.footer-slider--static .footer-drawer {
+  transform: translateY(0);
+}

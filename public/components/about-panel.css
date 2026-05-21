@@ -1,0 +1,8 @@
+.about-panel {
+  background: var(--theme-bg);
+  border-top: calc(var(--number-1) * 1px) solid var(--theme-faint-alt);
+}
+
+.about-panel--inset {
+  padding-top: calc(var(--comp-section-md-height) * 1px);
+}

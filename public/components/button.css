@@ -1,0 +1,28 @@
+.add-to-cart {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(var(--comp-button-min-h) * 1px);
+  padding: calc(var(--comp-button-v-pad) * 1px)
+    calc(var(--comp-button-h-pad) * 1px);
+  background: var(--comp-button-bg-default);
+  color: var(--comp-button-fg);
+  border: none;
+  border-radius: calc(var(--comp-button-b-rad) * 1px);
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.add-to-cart:hover {
+  background: var(--comp-button-bg-hover);
+}
+
+.add-to-cart:disabled {
+  opacity: calc(var(--number-40) / (var(--number-40) + var(--number-24)));
+  pointer-events: none;
+}
+
+.add-to-cart-wrap {
+  display: inline-flex;
+  cursor: pointer;
+}

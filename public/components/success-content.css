@@ -1,0 +1,18 @@
+.success-body {
+  color: var(--theme-fg);
+}
+
+.success-label {
+  color: var(--theme-fg-alt);
+}
+
+.home-link {
+  color: var(--theme-fg);
+  text-decoration: underline;
+  text-decoration-color: var(--theme-faint-alt);
+  text-underline-offset: calc(var(--number-4) * 1px);
+}
+
+.success-main {
+  padding-top: calc(var(--comp-section-md-height) * 1px);
+}

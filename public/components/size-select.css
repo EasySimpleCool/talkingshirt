@@ -1,0 +1,31 @@
+.size-select {
+  position: relative;
+  display: inline-block;
+  color: var(--theme-fg);
+  cursor: pointer;
+}
+
+.size-select-text {
+  text-decoration: underline;
+  text-decoration-color: var(--theme-faint);
+  text-decoration-thickness: calc(var(--number-1) * 1px);
+  text-underline-offset: calc(var(--number-4) * 1px);
+}
+
+.size-select-native {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: transparent;
+  font: inherit;
+  cursor: pointer;
+  opacity: calc(var(--number-0));
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}

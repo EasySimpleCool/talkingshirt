@@ -1,0 +1,21 @@
+.post {
+  gap: calc(var(--comp-post-gap) * 1px);
+}
+
+.post-label,
+.post-date {
+  color: var(--theme-fg-alt);
+}
+
+.post-body {
+  color: var(--theme-fg);
+  width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.post-divider {
+  border: 0;
+  border-top: calc(var(--number-1) * 1px) solid var(--theme-faint-alt);
+  width: 100%;
+  margin: 0;
+}

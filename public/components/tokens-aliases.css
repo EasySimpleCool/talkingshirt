@@ -1,0 +1,6 @@
+/* Aliases composed only from talkingshirt-tokens (CDN number tier). */
+:root {
+  --nav-btn-size: calc((var(--number-24) + var(--number-4)) * 1px);
+  --slide-dur: calc(var(--number-160) * 6.25ms);
+  --fade-dur: calc(var(--number-40) * 6.25ms);
+}

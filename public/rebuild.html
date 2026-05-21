@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TalkingSh*rt — Component rebuild</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/EasySimpleCool/talkingshirt-tokens@main/dist/index.css"
+    />
+    <link rel="stylesheet" href="/components/index.css" />
+  </head>
+  <body class="rebuild-page">
+    <header class="rebuild-intro" data-container>
+      <h1 class="type-medium">Component rebuild</h1>
+      <p class="type-small">
+        Styles use only
+        <a
+          class="home-link"
+          href="https://cdn.jsdelivr.net/gh/EasySimpleCool/talkingshirt-tokens@main/dist/index.css"
+          >talkingshirt-tokens</a
+        >
+        (CDN). Markup loads from /components/*.html.
+      </p>
+    </header>
+
+    <main>
+      <section class="rebuild-section" data-container>
+        <h2 class="rebuild-section__title type-small">Theme / color</h2>
+        <div class="rebuild-row">
+          <span
+            class="rebuild-token-swatch type-small"
+            style="--swatch: var(--theme-fg)"
+            >fg</span
+          >
+          <span
+            class="rebuild-token-swatch type-small"
+            style="--swatch: var(--theme-fg-alt)"
+            >fg-alt</span
+          >
+          <span
+            class="rebuild-token-swatch type-small"
+            style="--swatch: var(--theme-faint)"
+            >faint</span
+          >
+          <span
+            class="rebuild-token-swatch type-small"
+            style="--swatch: var(--theme-faint-alt)"
+            >faint-alt</span
+          >
+          <span
+            class="rebuild-token-swatch type-small"
+            style="--swatch: var(--theme-bg); border-color: var(--theme-faint-alt)"
+            >bg</span
+          >
+        </div>
+      </section>
+
+      <section class="rebuild-section" data-container>
+        <h2 class="rebuild-section__title type-small">Typography</h2>
+        <div data-stack data-gap="sm">
+          <p class="type-medium">type-medium — TalkingSh*rt</p>
+          <p class="type-small">type-small — Order confirmed</p>
+        </div>
+      </section>
+
+      <section class="rebuild-section" data-container>
+        <h2 class="rebuild-section__title type-small">Button</h2>
+        <div class="rebuild-row">
+          <div data-component="button"></div>
+          <div data-component="button" data-variant="disabled"></div>
+        </div>
+      </section>
+
+      <section class="rebuild-section" data-container>
+        <h2 class="rebuild-section__title type-small">Size select</h2>
+        <div data-component="size-select"></div>
+      </section>
+
+      <section class="rebuild-section">
+        <h2 class="rebuild-section__title type-small" data-container>
+          Top nav (product)
+        </h2>
+        <div class="rebuild-section__frame rebuild-section__frame--nav">
+          <div data-component="top-nav"></div>
+        </div>
+        <p class="type-small" data-container style="margin-top: calc(var(--comp-stack-sm) * 1px)">
+          Toggle About on the ? button to preview about-open state.
+        </p>
+      </section>
+
+      <section class="rebuild-section">
+        <h2 class="rebuild-section__title type-small" data-container>
+          Top nav (success)
+        </h2>
+        <div class="rebuild-section__frame rebuild-section__frame--nav">
+          <div data-component="top-nav-simple"></div>
+        </div>
+      </section>
+
+      <section class="rebuild-section">
+        <h2 class="rebuild-section__title type-small" data-container>Footer</h2>
+        <div class="rebuild-section__frame rebuild-section__frame--footer">
+          <div data-component="footer"></div>
+        </div>
+      </section>
+
+      <section class="rebuild-section" data-container>
+        <h2 class="rebuild-section__title type-small">Post</h2>
+        <div data-component="post"></div>
+      </section>
+
+      <section class="rebuild-section" data-container>
+        <h2 class="rebuild-section__title type-small">About panel</h2>
+        <div data-component="about-panel"></div>
+      </section>
+
+      <section class="rebuild-section" data-container>
+        <h2 class="rebuild-section__title type-small">Success content</h2>
+        <div data-component="success-content"></div>
+      </section>
+    </main>
+
+    <script type="module">
+      import { mountAll } from "/js/components.js";
+
+      mountAll().catch((err) => {
+        console.error(err);
+        document.body.insertAdjacentHTML(
+          "beforeend",
+          `<p class="type-small" style="color: var(--color-red); padding: calc(var(--number-24) * 1px)">Failed to load components: ${err.message}</p>`,
+        );
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,13 @@
+.type-medium {
+  font-weight: 700;
+  font-size: calc(var(--number-24) * 1px);
+  line-height: normal;
+  letter-spacing: calc(var(--number-0) * 1px);
+}
+
+.type-small {
+  font-weight: 700;
+  font-size: calc(var(--number-12) * 1px);
+  line-height: normal;
+  letter-spacing: calc(var(--number-0) * 1px);
+}
