@@ -1,0 +1,9 @@
+.icon-text__label {
+  color: var(--theme-faint);
+}
+
+.icon-text__icon {
+  width: var(--comp-nav-icon-size);
+  height: var(--comp-nav-icon-size);
+  flex-shrink: 0;
+}

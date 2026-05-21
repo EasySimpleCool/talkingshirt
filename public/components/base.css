@@ -7,3 +7,11 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   color: var(--theme-fg);
 }
+
+/* Comps/type — remove :root block when vars ship on CDN */
+:root {
+  --type-medium-size: 24px;
+  --type-small-size: 12px;
+  --type-weight-bold: 700;
+  --type-weight-medium: 500;
+}

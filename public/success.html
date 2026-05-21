@@ -4,119 +4,26 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>TalkingSh*rt — Order confirmed</title>
-    <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-
-      :root {
-        --theme-fg: #424242;
-        --theme-fg-alt: #808080;
-        --theme-bg: #ffffff;
-        --theme-faint-alt: #e0e0e0;
-
-        --comp-container-max-w: 800px;
-        --comp-section-md-h-pad: 24px;
-        --comp-section-md-height: 80px;
-        --comp-section-lg-h-pad: 24px;
-        --comp-section-lg-v-pad: 40px;
-        --comp-stack-sm: 16px;
-      }
-
-      .type-medium {
-        font-weight: 700;
-        font-size: 24px;
-        line-height: normal;
-        letter-spacing: 0;
-      }
-
-      .type-small {
-        font-weight: 700;
-        font-size: 12px;
-        line-height: normal;
-        letter-spacing: 0;
-      }
-
-      [data-section="md"] {
-        display: flex;
-        align-items: center;
-        height: var(--comp-section-md-height);
-        padding: 0 var(--comp-section-md-h-pad);
-      }
-
-      [data-section="lg"] {
-        padding: var(--comp-section-lg-v-pad) var(--comp-section-lg-h-pad);
-      }
-
-      [data-container] {
-        width: 100%;
-        max-width: var(--comp-container-max-w);
-        margin-inline: auto;
-        position: relative;
-      }
-
-      [data-stack] {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        width: 100%;
-      }
-
-      [data-gap="sm"] {
-        gap: var(--comp-stack-sm);
-      }
-
-      html,
-      body {
-        background: var(--theme-bg);
-      }
-
-      body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        color: var(--theme-fg);
-      }
-
-      .top-nav {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        z-index: 1100;
-        background: color-mix(in srgb, var(--theme-bg) 95%, transparent);
-        border-bottom: 1px solid var(--theme-faint-alt);
-      }
-
-      main {
-        padding-top: var(--comp-section-md-height);
-      }
-
-      .success-body {
-        color: var(--theme-fg);
-      }
-
-      .success-label {
-        color: var(--theme-fg-alt);
-      }
-
-      .home-link {
-        color: var(--theme-fg);
-        text-decoration: underline;
-        text-decoration-color: var(--theme-faint-alt);
-        text-underline-offset: 3px;
-      }
-    </style>
+    <!-- pin: 269a193 until jsDelivr @main includes comps.css -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/EasySimpleCool/talkingshirt-tokens@269a193e0d0fc8d58b03e3fe026d80f68cca1352/dist/index.css"
+    />
+    <link rel="stylesheet" href="/components/index.css" />
   </head>
   <body>
-    <div class="top-nav" data-section="md" role="banner">
+    <div class="top-nav top-nav--simple top-nav--fixed" data-section="md" role="banner">
       <div data-container>
-        <div class="type-medium">TalkingSh*rt</div>
+        <div data-row>
+          <a class="logo" href="/" aria-label="TalkingSh*rt home">
+            <img class="logo__img" src="/Logo.svg" alt="" />
+          </a>
+        </div>
       </div>
     </div>
 
     <main>
-      <section data-section="lg">
+      <section class="success-main" data-section="lg">
         <div data-container>
           <div data-stack data-gap="sm">
             <span class="success-label type-small">Order confirmed</span>

@@ -1,0 +1,214 @@
+/* Landing page only — not imported by rebuild.html.
+   Output / proposed Output tokens only. See public/components/README.md */
+
+body {
+  overflow-x: hidden;
+}
+
+/* Pending layout.* Output tokens (see README audit). */
+:root {
+  --layout-copy-size: clamp(
+    var(--layout-copy-min),
+    10vw,
+    var(--layout-copy-max)
+  );
+  --layout-shirt-size: clamp(
+    var(--layout-shirt-min),
+    140vw,
+    var(--layout-shirt-max)
+  );
+  --layout-stage-center: 36%;
+  --layout-chest-x: 50%;
+  --layout-chest-y: 27%;
+  --layout-chest-font: 4.7cqi;
+}
+
+.scroll-container {
+  height: 300vh;
+  position: relative;
+  background: var(--theme-bg);
+}
+
+.fixed-content {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  pointer-events: none;
+  background: var(--theme-bg);
+  overflow: hidden;
+}
+
+.animated-text {
+  position: absolute;
+  top: var(--layout-stage-center);
+  left: 50%;
+  transform: translate(-50%, -50%) scale(1);
+  transform-origin: center center;
+  font-size: var(--layout-copy-size);
+  font-weight: var(--type-weight-bold);
+  color: var(--theme-fg);
+  text-align: center;
+  white-space: nowrap;
+  z-index: 2;
+  will-change: transform, color, opacity;
+}
+
+.cursor {
+  display: inline-block;
+  width: 0.06em;
+  height: 0.85em;
+  background: var(--cursor-bg, currentColor);
+  margin-left: 0.06em;
+  vertical-align: -0.05em;
+  animation: blink 1s steps(1) infinite;
+}
+
+.cursor:not(:only-child):last-child {
+  margin-right: -0.12em;
+}
+
+.cursor:only-child {
+  margin-left: 0;
+}
+
+@keyframes blink {
+  0%,
+  50% {
+    opacity: 1;
+  }
+  51%,
+  100% {
+    opacity: 0;
+  }
+}
+
+body:has(.chest-text.editable:not(:focus)) .cursor {
+  animation: none;
+  opacity: 0;
+}
+
+.scroll-arrow {
+  position: absolute;
+  top: calc(var(--layout-stage-center) + var(--layout-copy-size) * 0.7);
+  left: 50%;
+  transform: translate(-50%, 0);
+  height: clamp(
+    var(--layout-arrow-min),
+    7vw,
+    var(--layout-arrow-max)
+  );
+  aspect-ratio: 8 / 39;
+  color: var(--theme-fg);
+  opacity: 0;
+  transition: opacity var(--motion-fade-dur) var(--motion-ease);
+  animation: arrowBounce 1.6s ease-in-out infinite;
+}
+
+.scroll-arrow svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.scroll-arrow.visible {
+  opacity: 0.25;
+}
+
+@keyframes arrowBounce {
+  0%,
+  100% {
+    transform: translate(-50%, 0);
+  }
+  50% {
+    transform: translate(-50%, var(--comp-stack-xs));
+  }
+}
+
+.tshirt-container {
+  position: absolute;
+  top: var(--layout-stage-center);
+  left: 50%;
+  width: var(--layout-shirt-size);
+  transform: translate(-50%, calc(-1 * var(--layout-chest-y) + 100vh));
+  opacity: 0;
+  will-change: transform, opacity;
+  container-type: inline-size;
+}
+
+.tshirt-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.tshirt-image {
+  width: 100%;
+  height: auto;
+  display: block;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.chest-text-container {
+  position: absolute;
+  top: var(--layout-chest-y);
+  left: var(--layout-chest-x);
+  transform: translate(-50%, -50%);
+  width: 70%;
+  text-align: center;
+}
+
+.chest-text {
+  color: var(--theme-bg);
+  font-size: var(--layout-chest-font);
+  font-weight: var(--type-weight-bold);
+  border: none;
+  background: transparent;
+  text-align: center;
+  width: 100%;
+  outline: none;
+  pointer-events: none;
+  caret-color: transparent;
+  font-family: inherit;
+}
+
+.chest-text {
+  color: transparent;
+  caret-color: transparent;
+}
+
+.chest-text.editable {
+  pointer-events: auto;
+  cursor: text;
+}
+
+.chest-text::placeholder {
+  color: transparent;
+}
+
+.product-slider {
+  position: absolute;
+  inset: 0;
+  will-change: transform, opacity;
+  transition:
+    transform var(--motion-slide-dur) var(--motion-ease),
+    opacity var(--motion-fade-dur) var(--motion-ease);
+}
+
+.footer-slider {
+  transform: translateX(0);
+  transition:
+    transform var(--motion-slide-dur) var(--motion-ease),
+    opacity var(--motion-fade-dur) var(--motion-ease);
+}
+
+body.about-open .product-slider {
+  transform: translateX(-100vw);
+  opacity: 0;
+}
+
+body.about-open .footer-slider {
+  transform: translateX(-100%);
+  opacity: 0;
+}

@@ -10,9 +10,9 @@
   color: var(--theme-fg);
   text-decoration: underline;
   text-decoration-color: var(--theme-faint-alt);
-  text-underline-offset: calc(var(--number-4) * 1px);
+  text-underline-offset: var(--comp-link-underline-offset);
 }
 
 .success-main {
-  padding-top: calc(var(--comp-section-md-height) * 1px);
+  padding-top: var(--comp-section-md-height);
 }

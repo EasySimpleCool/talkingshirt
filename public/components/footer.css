@@ -3,14 +3,14 @@
   bottom: 0;
   left: 0;
   right: 0;
-  z-index: calc(var(--number-160) * 6.25);
+  z-index: 1000;
 }
 
 .footer-drawer {
   background: var(--theme-bg);
-  border-top: calc(var(--number-1) * 1px) solid var(--theme-faint-alt);
+  border-top: var(--comp-border-width) solid var(--theme-faint-alt);
   transform: translateY(100%);
-  transition: transform calc(var(--number-24) * 12.5ms) ease;
+  transition: transform var(--motion-slide-dur) var(--motion-ease);
 }
 
 .footer-drawer--visible {

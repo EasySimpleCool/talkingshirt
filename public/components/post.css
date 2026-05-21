@@ -1,5 +1,5 @@
 .post {
-  gap: calc(var(--comp-post-gap) * 1px);
+  gap: var(--comp-post-gap);
 }
 
 .post-label,
@@ -15,7 +15,7 @@
 
 .post-divider {
   border: 0;
-  border-top: calc(var(--number-1) * 1px) solid var(--theme-faint-alt);
+  border-top: var(--comp-border-width) solid var(--theme-faint-alt);
   width: 100%;
   margin: 0;
 }

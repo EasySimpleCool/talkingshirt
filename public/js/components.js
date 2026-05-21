@@ -62,7 +62,7 @@ export async function mount(selector, name) {
  * Wire rebuild demo interactions (about toggle).
  */
 export function initRebuildDemo() {
-  const toggle = document.querySelector("[data-about-toggle]");
+  const toggle = document.querySelector("[data-about-toggle], #navBtn");
   if (!toggle) return;
 
   toggle.addEventListener("click", () => {

@@ -12,8 +12,13 @@
 
 aliases:
   # Figma component name         → HTML class / token name
+  "Header":                       top-nav
+  "IconText":                     icon-text
   "Navigation / Top bar":         top-nav
   "Nav Button":                   nav-btn
+  "Button":                       add-to-cart
+  "Footer":                       footer-drawer
+  "Post":                         post
   "Footer / Drawer":              footer-drawer
   "Size Selector":                size-select
   "Add To Cart":                  add-to-cart

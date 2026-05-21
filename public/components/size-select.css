@@ -8,8 +8,8 @@
 .size-select-text {
   text-decoration: underline;
   text-decoration-color: var(--theme-faint);
-  text-decoration-thickness: calc(var(--number-1) * 1px);
-  text-underline-offset: calc(var(--number-4) * 1px);
+  text-decoration-thickness: var(--comp-border-width);
+  text-underline-offset: var(--comp-link-underline-offset);
 }
 
 .size-select-native {
@@ -24,7 +24,7 @@
   color: transparent;
   font: inherit;
   cursor: pointer;
-  opacity: calc(var(--number-0));
+  opacity: 0;
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;

@@ -1,8 +1,8 @@
-@import "./tokens-aliases.css";
 @import "./reset.css";
 @import "./base.css";
 @import "./layout.css";
 @import "./type.css";
+@import "./icon-text.css";
 @import "./top-nav.css";
 @import "./button.css";
 @import "./size-select.css";

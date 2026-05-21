@@ -4,6 +4,9 @@
   "private": true,
   "type": "module",
   "description": "TalkingSh*rt — custom tees. Static site + Netlify Functions.",
+  "scripts": {
+    "dev": "node scripts/dev.mjs"
+  },
   "dependencies": {
     "stripe": "^22.0.2"
   }
