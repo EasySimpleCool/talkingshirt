@@ -1,9 +1,10 @@
 import Stripe from "stripe";
-
-const ALLOWED_SIZES = new Set(["Small", "Medium", "Large", "XLarge"]);
-const MAX_TEXT_LENGTH = 12;
-const UNIT_AMOUNT_CENTS = 1700;
-const CURRENCY = "aud";
+import {
+  ALLOWED_SIZES,
+  CURRENCY,
+  UNIT_AMOUNT_CENTS,
+} from "./_shared/constants.js";
+import { sanitiseCustomText } from "./_shared/sanitise.js";
 
 function json(status, body) {
   return new Response(JSON.stringify(body), {
@@ -30,25 +31,18 @@ export default async (req) => {
   }
 
   const size = typeof payload?.size === "string" ? payload.size : "";
-  const rawText = typeof payload?.text === "string" ? payload.text : "";
-  const text = rawText.trim();
+  const textResult = sanitiseCustomText(payload?.text);
 
   if (!ALLOWED_SIZES.has(size)) {
     return json(400, { error: "Invalid size" });
   }
-  if (text.length === 0) {
-    return json(400, { error: "Custom text is required" });
-  }
-  if (text.length > MAX_TEXT_LENGTH) {
-    return json(400, { error: "Custom text is too long" });
+  if (!textResult.ok) {
+    return json(400, { error: textResult.error });
   }
 
+  const text = textResult.text;
   const stripe = new Stripe(secretKey);
-
-  // The deployed site URL is the most reliable base for success/cancel URLs.
-  // Fall back to the request's own origin when running under `netlify dev`.
   const origin = Netlify.env.get("URL") || new URL(req.url).origin;
-
   const metadata = { size, custom_text: text };
 
   try {

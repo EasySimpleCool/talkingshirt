@@ -9,7 +9,7 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/gh/EasySimpleCool/talkingshirt-tokens@269a193e0d0fc8d58b03e3fe026d80f68cca1352/dist/index.css"
     />
-    <link rel="stylesheet" href="/components/index.css" />
+    <link rel="stylesheet" href="/css/main.css" />
   </head>
   <body class="rebuild-page">
     <header class="rebuild-intro" data-section="lg">
@@ -22,7 +22,7 @@
               class="home-link"
               href="https://cdn.jsdelivr.net/gh/EasySimpleCool/talkingshirt-tokens@269a193e0d0fc8d58b03e3fe026d80f68cca1352/dist/index.css"
               >talkingshirt-tokens</a
-            >. Markup from <code>/components/*.html</code>.
+            >. Markup from <code>/js/components/*.html</code>.
           </p>
         </div>
       </div>
@@ -236,16 +236,6 @@
       </section>
     </main>
 
-    <script type="module">
-      import { mountAll } from "/js/components.js";
-
-      mountAll().catch((err) => {
-        console.error(err);
-        document.body.insertAdjacentHTML(
-          "beforeend",
-          `<div data-section="lg"><div data-container><p class="type-small" style="color: var(--theme-fg)">Failed to load components: ${err.message}</p></div></div>`,
-        );
-      });
-    </script>
+    <script type="module" src="/js/main.js"></script>
   </body>
 </html>

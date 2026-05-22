@@ -2,7 +2,7 @@
 
 Design-system components for the static site. **Components consume Output + Comps tiers only** (`--theme-*`, `--comp-*`). Input (`--color-*`, `--number-*`) and Screen (`--number-sm/md/lg`) live in the token CDN and must not appear in this folder.
 
-CDN (load first, before `index.css`):
+CDN (load first, before `main.css`):
 
 `https://cdn.jsdelivr.net/gh/EasySimpleCool/talkingshirt-tokens@269a193e0d0fc8d58b03e3fe026d80f68cca1352/dist/index.css`
 
@@ -21,7 +21,7 @@ Components are written once with no spacing/sizing media queries. Responsiveness
 
 ## Layout
 
-See [`layout.md`](../../layout.md). Every block: `[data-section]` → `[data-container]` → `[data-stack]` or `[data-row]`. Component CSS is chrome only (border, position, animation) — never flex, gap, or section padding on a component class.
+See [`layout.md`](layout.md). Every block: `[data-section]` → `[data-container]` → `[data-stack]` or `[data-row]`. Component CSS is chrome only (border, position, animation) — never flex, gap, or section padding on a component class.
 
 ## Files
 
@@ -39,9 +39,9 @@ See [`layout.md`](../../layout.md). Every block: `[data-section]` → `[data-con
 | `about-panel.css` + `about-panel.html` | About shell | Ready |
 | `success-content.css` + `success-content.html` | Success copy block | Partial — underline offset token pending |
 | `rebuild-page.css` | Dev preview chrome only | theme + comp vars only |
-| `index.css` | Bundle import | — |
+| `main.css` | Bundle import | — |
 
-Landing-only UI (shirt, scroll, cursor) lives in [`/product/index-product.css`](../product/index-product.css), not here.
+Landing-only UI (shirt, scroll, cursor) lives in [`/css/landing.css`](../public/css/landing.css), not in `main.css`.
 
 ## Token audit
 
@@ -104,10 +104,7 @@ Open http://127.0.0.1:8888/rebuild.html
   rel="stylesheet"
   href="https://cdn.jsdelivr.net/gh/EasySimpleCool/talkingshirt-tokens@269a193e0d0fc8d58b03e3fe026d80f68cca1352/dist/index.css"
 />
-<link rel="stylesheet" href="/components/index.css" />
+<link rel="stylesheet" href="/css/main.css" />
 <div data-component="button"></div>
-<script type="module">
-  import { mountAll } from "/js/components.js";
-  mountAll();
-</script>
+<script type="module" src="/js/main.js"></script>
 ```

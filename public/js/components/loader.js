@@ -1,4 +1,4 @@
-const COMPONENTS_BASE = "/components";
+const COMPONENTS_BASE = "/js/components";
 
 /** @type {Record<string, string>} */
 const TEMPLATES = {
