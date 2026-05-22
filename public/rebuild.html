@@ -4,12 +4,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>TalkingSh*rt — Component rebuild</title>
-    <!-- pin: 269a193 until jsDelivr @main includes comps.css -->
+    <!-- pin: 6989e79 -->
     <link
       rel="stylesheet"
-      href="https://cdn.jsdelivr.net/gh/EasySimpleCool/talkingshirt-tokens@269a193e0d0fc8d58b03e3fe026d80f68cca1352/dist/index.css"
+      href="https://cdn.jsdelivr.net/gh/EasySimpleCool/talkingshirt-tokens@6989e7981a44a6f747d5c7f76d439aa85399cc93/dist/index.css"
     />
     <link rel="stylesheet" href="/css/main.css" />
+    <link rel="stylesheet" href="/css/rebuild.css" />
   </head>
   <body class="rebuild-page">
     <header class="rebuild-intro" data-section="lg">
@@ -17,10 +18,10 @@
         <div data-stack data-gap="sm">
           <h1 class="type-medium">Component rebuild</h1>
           <p class="type-small">
-            Output + Comps tiers only (<code>--theme-*</code>, <code>--comp-*</code>). CDN:
+            Output + Comps tiers; typography via Output text-medium / text-small (<code>--theme-*</code>, <code>--comp-*</code>). CDN:
             <a
               class="home-link"
-              href="https://cdn.jsdelivr.net/gh/EasySimpleCool/talkingshirt-tokens@269a193e0d0fc8d58b03e3fe026d80f68cca1352/dist/index.css"
+              href="https://cdn.jsdelivr.net/gh/EasySimpleCool/talkingshirt-tokens@6989e7981a44a6f747d5c7f76d439aa85399cc93/dist/index.css"
               >talkingshirt-tokens</a
             >. Markup from <code>/js/components/*.html</code>.
           </p>
@@ -36,11 +37,11 @@
             <ul class="rebuild-checklist type-small" data-stack data-gap="sm">
               <li data-status="ready">layout — Comps spacing tokens</li>
               <li data-status="ready">button — comp.button.*</li>
-              <li data-status="ready">post, about-panel shell</li>
-              <li data-status="ready">type — Figma Medium / Small (307:32)</li>
+              <li data-status="ready">post</li>
+              <li data-status="ready">type — text-medium / text-small (Output tier)</li>
               <li data-status="blocked">
-                top-nav, footer, size-select — comp.border.width, comp.nav.icon-size,
-                motion.*
+                header, footer, size-select — comp.border.width, comp.nav.icon-size (placeholder in base.css);
+                motion.* (placeholder in base.css)
               </li>
               <li data-status="blocked">
                 success-content — comp.link-underline-offset
@@ -175,12 +176,12 @@
       <section class="rebuild-section" data-section="lg">
         <div data-container>
           <div data-stack data-gap="sm">
-            <h2 class="rebuild-section__title type-small">Top nav (product)</h2>
+            <h2 class="rebuild-section__title type-small">Header (Type=Home)</h2>
             <div class="rebuild-section__frame rebuild-section__frame--nav">
-              <div data-component="top-nav"></div>
+              <div data-component="header"></div>
             </div>
             <p class="type-small rebuild-muted">
-              Toggle About on the ? button to preview about-open state.
+              Toggle About to preview Header Type=About (body.about-open).
             </p>
           </div>
         </div>
@@ -189,9 +190,9 @@
       <section class="rebuild-section" data-section="lg">
         <div data-container>
           <div data-stack data-gap="sm">
-            <h2 class="rebuild-section__title type-small">Top nav (success)</h2>
+            <h2 class="rebuild-section__title type-small">Header (Type=Home, logo only)</h2>
             <div class="rebuild-section__frame rebuild-section__frame--nav">
-              <div data-component="top-nav-simple"></div>
+              <div data-component="header" data-variant="logo-only"></div>
             </div>
           </div>
         </div>
@@ -213,15 +214,6 @@
           <div data-stack data-gap="sm">
             <h2 class="rebuild-section__title type-small">Post</h2>
             <div data-component="post"></div>
-          </div>
-        </div>
-      </section>
-
-      <section class="rebuild-section" data-section="lg">
-        <div data-container>
-          <div data-stack data-gap="sm">
-            <h2 class="rebuild-section__title type-small">About panel</h2>
-            <div data-component="about-panel"></div>
           </div>
         </div>
       </section>

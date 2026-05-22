@@ -1,0 +1,98 @@
+.header {
+  background: var(--theme-bg);
+  border-bottom: var(--comp-border-width) solid var(--theme-faint-alt);
+}
+
+.header--fixed {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1100;
+}
+
+.header__start {
+  position: relative;
+  min-width: 0;
+}
+
+.header .logo {
+  color: var(--theme-fg);
+  line-height: 0;
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.header .logo__img {
+  display: block;
+}
+
+.header__title {
+  color: var(--theme-fg);
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translate(100vw, -50%);
+  opacity: 0;
+  white-space: nowrap;
+  transition:
+    opacity var(--motion-fade-dur) var(--motion-ease),
+    transform var(--motion-slide-dur) var(--motion-ease);
+}
+
+.header__toggle {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  color: var(--theme-faint);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.header__toggle-state--about {
+  display: none;
+}
+
+body.about-open .header .logo {
+  transform: translateX(-100vw);
+  opacity: 0;
+}
+
+body.about-open .header__title {
+  transform: translateY(-50%);
+  opacity: 1;
+}
+
+body.about-open .header__toggle-state--home {
+  display: none;
+}
+
+body.about-open .header__toggle-state--about {
+  display: flex;
+}
+
+/* Page chrome — scrollable Post stack below Header Type=About (not a Figma component). */
+.about-content {
+  background: var(--theme-bg);
+  border-top: var(--comp-border-width) solid var(--theme-faint-alt);
+}
+
+.about-content--overlay {
+  position: fixed;
+  top: var(--comp-section-md-height);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 900;
+  overflow-y: auto;
+  transform: translateX(100%);
+  opacity: 0;
+  transition:
+    transform var(--motion-slide-dur) var(--motion-ease),
+    opacity var(--motion-fade-dur) var(--motion-ease);
+}
+
+body.about-open .about-content--overlay {
+  transform: translateX(0);
+  opacity: 1;
+}

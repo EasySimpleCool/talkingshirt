@@ -3,11 +3,9 @@
 @import "./components/layout.css";
 @import "./components/type.css";
 @import "./components/icon-text.css";
-@import "./components/top-nav.css";
+@import "./components/header.css";
 @import "./components/button.css";
 @import "./components/size-select.css";
 @import "./components/footer.css";
 @import "./components/post.css";
-@import "./components/about-panel.css";
 @import "./components/success-content.css";
-@import "./components/rebuild-page.css";

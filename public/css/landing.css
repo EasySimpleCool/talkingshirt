@@ -1,12 +1,17 @@
-/* Landing page only — not imported by rebuild.html.
-   Output / proposed Output tokens only. See docs/components.md */
+/* Landing-only scroll/animation — not part of the design system.
+   May consume --theme-* for color only. All layout/motion values are local. */
 
 body {
   overflow-x: hidden;
 }
 
-/* Pending layout.* Output tokens (see README audit). */
 :root {
+  --layout-copy-min: 32px;
+  --layout-copy-max: 120px;
+  --layout-shirt-min: 320px;
+  --layout-shirt-max: 720px;
+  --layout-arrow-min: 20px;
+  --layout-arrow-max: 40px;
   --layout-copy-size: clamp(
     var(--layout-copy-min),
     10vw,
@@ -47,7 +52,7 @@ body {
   transform: translate(-50%, -50%) scale(1);
   transform-origin: center center;
   font-size: var(--layout-copy-size);
-  font-weight: var(--type-weight-bold);
+  font-weight: var(--text-medium-font-weight);
   color: var(--theme-fg);
   text-align: center;
   white-space: nowrap;
@@ -160,9 +165,9 @@ body:has(.chest-text.editable:not(:focus)) .cursor {
 }
 
 .chest-text {
-  color: var(--theme-bg);
+  color: transparent;
   font-size: var(--layout-chest-font);
-  font-weight: var(--type-weight-bold);
+  font-weight: var(--text-medium-font-weight);
   border: none;
   background: transparent;
   text-align: center;
@@ -171,11 +176,6 @@ body:has(.chest-text.editable:not(:focus)) .cursor {
   pointer-events: none;
   caret-color: transparent;
   font-family: inherit;
-}
-
-.chest-text {
-  color: transparent;
-  caret-color: transparent;
 }
 
 .chest-text.editable {

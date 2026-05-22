@@ -15,33 +15,34 @@
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:title" content="TalkingSh*rt" />
     <meta name="twitter:description" content="Custom tees." />
-    <!-- pin: 269a193 until jsDelivr @main includes comps.css -->
+    <!-- pin: 6989e79 -->
     <link
       rel="stylesheet"
-      href="https://cdn.jsdelivr.net/gh/EasySimpleCool/talkingshirt-tokens@269a193e0d0fc8d58b03e3fe026d80f68cca1352/dist/index.css"
+      href="https://cdn.jsdelivr.net/gh/EasySimpleCool/talkingshirt-tokens@6989e7981a44a6f747d5c7f76d439aa85399cc93/dist/index.css"
     />
     <link rel="stylesheet" href="/css/main.css" />
     <link rel="stylesheet" href="/css/landing.css" />
   </head>
   <body>
-    <div class="top-nav top-nav--fixed" data-section="md" role="banner">
+    <div class="header header--fixed" data-section="md" data-type="home" role="banner">
       <div data-container>
         <div data-row data-justify="between">
-          <div class="top-nav__start">
+          <div class="header__start">
             <a class="logo" href="/" aria-label="TalkingSh*rt home">
               <img class="logo__img" src="/assets/images/Logo.svg" alt="" />
             </a>
-            <div class="about-title type-medium" aria-hidden="true">About</div>
+            <div class="header__title type-medium" aria-hidden="true">About</div>
           </div>
           <button
-            class="nav-btn"
-            id="navBtn"
+            class="header__toggle"
+            id="headerToggle"
+            data-about-toggle
             type="button"
             aria-label="About"
             aria-expanded="false"
-            aria-controls="aboutPanel"
+            aria-controls="aboutContent"
           >
-            <span class="nav-btn__state nav-btn__state--home icon-text" data-row data-gap="2xs">
+            <span class="header__toggle-state header__toggle-state--home icon-text" data-row data-gap="2xs">
               <span class="icon-text__label type-small">About</span>
               <img
                 class="icon-text__icon"
@@ -52,10 +53,9 @@
               />
             </span>
             <span
-              class="nav-btn__state nav-btn__state--about icon-text"
+              class="header__toggle-state header__toggle-state--about icon-text"
               data-row
               data-gap="2xs"
-              hidden
             >
               <span class="icon-text__label type-small">Close</span>
               <img
@@ -72,7 +72,7 @@
     </div>
 
     <div class="footer-slider">
-      <div class="footer-drawer" data-section="md" role="contentinfo">
+      <div class="footer" data-section="md" role="contentinfo">
         <div data-container>
           <div data-row data-justify="between">
             <label class="size-select">
@@ -90,9 +90,9 @@
                 <option value="XLarge">XLarge</option>
               </select>
             </label>
-            <span class="add-to-cart-wrap" id="addToCartWrap">
+            <span class="button-wrap" id="addToCartWrap">
               <button
-                class="add-to-cart type-medium"
+                class="button type-medium"
                 id="addToCart"
                 type="button"
                 disabled
@@ -140,6 +140,7 @@
                   class="chest-text"
                   id="chestText"
                   maxlength="12"
+                  aria-label="Shirt text"
                 />
               </div>
             </div>
@@ -149,8 +150,8 @@
     </div>
 
     <div
-      class="about-panel about-panel--overlay"
-      id="aboutPanel"
+      class="about-content about-content--overlay"
+      id="aboutContent"
       data-section="lg"
       role="region"
       aria-label="About"

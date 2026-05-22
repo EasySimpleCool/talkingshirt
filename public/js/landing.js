@@ -5,12 +5,12 @@ export function initLanding() {
   const tshirtContainer = document.getElementById("tshirtContainer");
   const chestText = document.getElementById("chestText");
   const chestTextContainer = document.querySelector(".chest-text-container");
-  const footer = document.querySelector(".footer-drawer");
+  const footer = document.querySelector(".footer");
   const addToCartBtn = document.getElementById("addToCart");
   const sizeSelect = document.getElementById("sizeSelect");
   const sizeSelectText = document.getElementById("sizeSelectText");
-  const navBtn = document.getElementById("navBtn");
-  const aboutPanel = document.getElementById("aboutPanel");
+  const headerToggle = document.getElementById("headerToggle");
+  const aboutContent = document.getElementById("aboutContent");
 
   const FULL_TEXT = "Talk some sh*rt";
 
@@ -141,15 +141,15 @@ export function initLanding() {
       setHeadlineTransform(1, 0);
       setHeadlineColor(FG_DARK_CSS);
       setCursorBg(null);
-      scrollArrow.classList.add("visible");
+      scrollArrow.classList.add("footer--visible");
       setShirtRise(100);
       setShirtOpacity(0);
       chestText.classList.remove("editable");
-      footer.classList.remove("visible");
+      footer.classList.remove("footer--visible");
       return;
     }
 
-    scrollArrow.classList.remove("visible");
+    scrollArrow.classList.remove("footer--visible");
 
     if (progress < P.type) {
       const t = (progress - P.idle) / (P.type - P.idle);
@@ -162,7 +162,7 @@ export function initLanding() {
       setShirtRise(100);
       setShirtOpacity(0);
       chestText.classList.remove("editable");
-      footer.classList.remove("visible");
+      footer.classList.remove("footer--visible");
       return;
     }
 
@@ -174,7 +174,7 @@ export function initLanding() {
       setCursorBg(null);
       setShirtRise(100);
       setShirtOpacity(0);
-      footer.classList.remove("visible");
+      footer.classList.remove("footer--visible");
       return;
     }
 
@@ -207,7 +207,7 @@ export function initLanding() {
       setHeadlineOpacity(1);
 
       chestText.classList.remove("editable");
-      footer.classList.remove("visible");
+      footer.classList.remove("footer--visible");
       return;
     }
 
@@ -223,9 +223,9 @@ export function initLanding() {
 
     chestText.classList.add("editable");
     if (chestText.value.trim().length > 0) {
-      footer.classList.add("visible");
+      footer.classList.add("footer--visible");
     } else {
-      footer.classList.remove("visible");
+      footer.classList.remove("footer--visible");
     }
   }
 
@@ -233,9 +233,9 @@ export function initLanding() {
     syncHeadlineFromInput();
     const hasText = chestText.value.trim().length > 0;
     if (hasText) {
-      footer.classList.add("visible");
+      footer.classList.add("footer--visible");
     } else {
-      footer.classList.remove("visible");
+      footer.classList.remove("footer--visible");
     }
   });
 
@@ -253,7 +253,7 @@ export function initLanding() {
   addToCartWrap.addEventListener("click", () => {
     if (!addToCartBtn.disabled) return;
     if (!document.body.classList.contains("about-open")) {
-      navBtn.click();
+      headerToggle.click();
     }
   });
 
@@ -285,13 +285,12 @@ export function initLanding() {
     }
   });
 
-  navBtn.addEventListener("click", () => {
+  headerToggle.addEventListener("click", () => {
     const open = document.body.classList.toggle("about-open");
-    navBtn.setAttribute("aria-label", open ? "Close about" : "About");
-    navBtn.setAttribute("aria-expanded", String(open));
-    aboutPanel.setAttribute("aria-hidden", String(!open));
-    document.documentElement.style.overflow = open ? "hidden" : "";
-    document.body.style.overflow = open ? "hidden" : "";
+    headerToggle.setAttribute("aria-label", open ? "Close about" : "About");
+    headerToggle.setAttribute("aria-expanded", String(open));
+    aboutContent.setAttribute("aria-hidden", String(!open));
+    document.documentElement.classList.toggle("is-scroll-locked", open);
     if (open && document.activeElement === chestText) {
       chestText.blur();
     }

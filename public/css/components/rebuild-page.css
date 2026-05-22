@@ -35,7 +35,7 @@
   min-height: var(--comp-section-md-height);
 }
 
-.rebuild-section__frame--nav .top-nav--fixed {
+.rebuild-section__frame--nav .header--fixed {
   position: absolute;
 }
 

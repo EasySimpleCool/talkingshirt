@@ -6,7 +6,7 @@ How to structure markup in TalkingShirt. Read this before adding or editing any 
 
 **Every shell is `section > container > stack | row`.** No exceptions, no shortcuts, no laying things out on native tags.
 
-Layout is expressed through four data attributes — `[data-section]`, `[data-container]`, `[data-stack]`, `[data-row]` — and only through them. Class names (`.top-nav`, `.about-panel`, `.post`) carry visual chrome (background, border, position, animation), never layout.
+Layout is expressed through four data attributes — `[data-section]`, `[data-container]`, `[data-stack]`, `[data-row]` — and only through them. Class names (`.header`, `.about-content`, `.post`) carry visual chrome (background, border, position, animation), never layout.
 
 ## The primitives
 
@@ -16,8 +16,8 @@ The outermost shell of any block of content. Owns the page's vertical rhythm and
 
 | Variant             | Padding        | Height                           | When to use                                      |
 | ------------------- | -------------- | -------------------------------- | ------------------------------------------------ |
-| `data-section="md"` | `0 24px` h-pad | fixed `80px`, contents v-centred | Bars: top-nav, footer-drawer                     |
-| `data-section="lg"` | `40px 24px`    | content-driven                   | Padded content blocks: about-panel, success page |
+| `data-section="md"` | `0 24px` h-pad | fixed `80px`, contents v-centred | Bars: header, footer                     |
+| `data-section="lg"` | `40px 24px`    | content-driven                   | Padded content blocks: about-content, success page |
 
 Sections are full-bleed by default. They never cap their own width — that's the container's job.
 
@@ -83,7 +83,7 @@ Stack and row are composable — a stack can contain rows, a row can contain sta
 **Top-nav (a bar):**
 
 ```html
-<div class="top-nav" data-section="md" role="banner">
+<div class="header" data-section="md" role="banner">
   <div data-container>
     <div data-row>
       <!-- logo, title, button -->
@@ -95,7 +95,7 @@ Stack and row are composable — a stack can contain rows, a row can contain sta
 **About panel (a long scrollable block):**
 
 ```html
-<div class="about-panel" data-section="lg">
+<div class="about-content" data-section="lg">
   <div data-container>
     <div data-stack data-gap="lg">
       <div class="post" data-stack>
@@ -116,7 +116,7 @@ Note: `.post` is a `[data-stack]` with its own gap token (`--comp-post-gap`) —
 **Footer-drawer (a bar with two ends):**
 
 ```html
-<div class="footer-drawer" data-section="md">
+<div class="footer" data-section="md">
   <div data-container>
     <div data-row data-justify="between">
       <label>...</label>
@@ -128,7 +128,7 @@ Note: `.post` is a `[data-stack]` with its own gap token (`--comp-post-gap`) —
 
 ## What components are for
 
-Components (`.top-nav`, `.about-panel`, `.post`, `.add-to-cart`) own chrome only:
+Components (`.header`, `.about-content`, `.post`, `.button`) own chrome only:
 
 - `position`, `top/left/right/bottom`, `z-index`
 - `background`, `border`, `border-radius`

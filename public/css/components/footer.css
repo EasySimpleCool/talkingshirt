@@ -6,17 +6,17 @@
   z-index: 1000;
 }
 
-.footer-drawer {
+.footer {
   background: var(--theme-bg);
   border-top: var(--comp-border-width) solid var(--theme-faint-alt);
   transform: translateY(100%);
   transition: transform var(--motion-slide-dur) var(--motion-ease);
 }
 
-.footer-drawer--visible {
+.footer--visible {
   transform: translateY(0);
 }
 
-.footer-slider--static .footer-drawer {
+.footer-slider--static .footer {
   transform: translateY(0);
 }

@@ -8,10 +8,20 @@ body {
   color: var(--theme-fg);
 }
 
-/* Comps/type — remove :root block when vars ship on CDN */
+/* TODO: placeholder — replace with motion/* from CDN once shipped. */
 :root {
-  --type-medium-size: 24px;
-  --type-small-size: 12px;
-  --type-weight-bold: 700;
-  --type-weight-medium: 500;
+  --motion-slide-dur: 320ms;
+  --motion-fade-dur: 200ms;
+  --motion-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  /* TODO: placeholder — ship comp/border/width from CDN. */
+  --comp-border-width: 1px;
+  /* TODO: placeholder — ship comp/nav/icon-size from CDN. */
+  --comp-nav-icon-size: 24px;
+  /* TODO: placeholder — ship comp/link/underline-offset from CDN. */
+  --comp-link-underline-offset: 2px;
+}
+
+html.is-scroll-locked,
+html.is-scroll-locked body {
+  overflow: hidden;
 }

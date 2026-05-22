@@ -1,15 +1,15 @@
-/* Figma text style: Medium — 24px, weight 700, line-height 100% */
+/* Figma text style: Medium — Output tier text-medium composite */
 .type-medium {
-  font-size: var(--type-medium-size);
-  font-weight: var(--type-weight-bold);
-  line-height: normal;
-  letter-spacing: 0;
+  font-size: var(--text-medium-font-size);
+  font-weight: var(--text-medium-font-weight);
+  line-height: var(--text-medium-line-height);
+  letter-spacing: var(--text-medium-letter-spacing);
 }
 
-/* Figma text style: Small — 12px, weight 500, line-height 100% */
+/* Figma text style: Small — Output tier text-small composite */
 .type-small {
-  font-size: var(--type-small-size);
-  font-weight: var(--type-weight-medium);
-  line-height: normal;
-  letter-spacing: 0;
+  font-size: var(--text-small-font-size);
+  font-weight: var(--text-small-font-weight);
+  line-height: var(--text-small-line-height);
+  letter-spacing: var(--text-small-letter-spacing);
 }

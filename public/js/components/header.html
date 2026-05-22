@@ -1,44 +1,35 @@
-<div class="top-nav top-nav--fixed" data-section="md" role="banner">
+<div class="header header--fixed" data-section="md" data-type="home" role="banner">
   <div data-container>
     <div data-row data-justify="between">
-      <div class="top-nav__start">
+      <div class="header__start">
         <a class="logo" href="/" aria-label="TalkingSh*rt home">
           <img class="logo__img" src="/assets/images/Logo.svg" alt="" />
         </a>
-        <div class="about-title type-medium" aria-hidden="true">About</div>
+        <div class="header__title type-medium" aria-hidden="true">About</div>
       </div>
       <button
-        class="nav-btn"
+        class="header__toggle"
         type="button"
-        id="navBtn"
+        id="headerToggle"
         data-about-toggle
         aria-label="About"
-        aria-controls="aboutPanel"
+        aria-controls="aboutContent"
         aria-expanded="false"
       >
-        <span class="nav-btn__state nav-btn__state--home icon-text" data-row data-gap="2xs">
+        <span class="header__toggle-state header__toggle-state--home icon-text" data-row data-gap="2xs">
           <span class="icon-text__label type-small">About</span>
           <img
             class="icon-text__icon"
             src="/assets/images/ball.svg"
             alt=""
-            width="24"
-            height="24"
           />
         </span>
-        <span
-          class="nav-btn__state nav-btn__state--about icon-text"
-          data-row
-          data-gap="2xs"
-          hidden
-        >
+        <span class="header__toggle-state header__toggle-state--about icon-text" data-row data-gap="2xs">
           <span class="icon-text__label type-small">Close</span>
           <img
             class="icon-text__icon"
             src="/assets/images/close.svg"
             alt=""
-            width="24"
-            height="24"
           />
         </span>
       </button>

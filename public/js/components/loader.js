@@ -2,14 +2,13 @@ const COMPONENTS_BASE = "/js/components";
 
 /** @type {Record<string, string>} */
 const TEMPLATES = {
-  "top-nav": "top-nav.html",
-  "top-nav-simple": "top-nav-simple.html",
+  header: "header.html",
+  "header-logo-only": "header-logo-only.html",
   button: "button.html",
   "button-disabled": "button-disabled.html",
   "size-select": "size-select.html",
   footer: "footer.html",
   post: "post.html",
-  "about-panel": "about-panel.html",
   "success-content": "success-content.html",
 };
 
@@ -46,23 +45,10 @@ async function mountNested(root) {
 }
 
 /**
- * @param {string} selector
- * @param {string} name
- */
-export async function mount(selector, name) {
-  const host = document.querySelector(selector);
-  if (!host) {
-    throw new Error(`Mount host not found: ${selector}`);
-  }
-  host.innerHTML = await fetchTemplate(name);
-  await mountNested(host);
-}
-
-/**
- * Wire rebuild demo interactions (about toggle).
+ * Wire rebuild demo interactions (Header About toggle).
  */
 export function initRebuildDemo() {
-  const toggle = document.querySelector("[data-about-toggle], #navBtn");
+  const toggle = document.querySelector("[data-about-toggle], #headerToggle");
   if (!toggle) return;
 
   toggle.addEventListener("click", () => {
@@ -80,6 +66,9 @@ function resolveComponentName(host) {
   const variant = host.getAttribute("data-variant");
   if (variant === "disabled" && base === "button") {
     return "button-disabled";
+  }
+  if (variant === "logo-only" && base === "header") {
+    return "header-logo-only";
   }
   return base;
 }
