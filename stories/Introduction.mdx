@@ -1,0 +1,35 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="Introduction" />
+
+# TalkingSh*rt components
+
+Five Figma components, rendered from the same HTML templates as production (`public/js/components/*.html`).
+
+## Figma
+
+[talkingshirt — main](https://www.figma.com/design/PusPmQilWCtdXjIiNIxeKn/talkingshirt---main)
+
+| Component | Node |
+|-----------|------|
+| IconText | `308:1314` |
+| Button | `194:1095` |
+| Header | `79:486` |
+| Footer | `79:418` |
+| Post | `79:543` |
+
+## Tokens
+
+CDN pin `6989e79`:
+
+`https://cdn.jsdelivr.net/gh/EasySimpleCool/talkingshirt-tokens@6989e7981a44a6f747d5c7f76d439aa85399cc93/dist/index.css`
+
+Loaded in `.storybook/preview-head.html` before `/css/main.css`.
+
+## Run
+
+```bash
+npm run storybook
+```
+
+Site dev server (unchanged): `npm run dev`

@@ -3,231 +3,32 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>TalkingSh*rt — Component rebuild</title>
+    <title>TalkingSh*rt — Component gallery</title>
     <!-- pin: 6989e79 -->
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/gh/EasySimpleCool/talkingshirt-tokens@6989e7981a44a6f747d5c7f76d439aa85399cc93/dist/index.css"
     />
     <link rel="stylesheet" href="/css/main.css" />
-    <link rel="stylesheet" href="/css/rebuild.css" />
+    <meta http-equiv="refresh" content="0; url=http://localhost:6006" />
   </head>
-  <body class="rebuild-page">
-    <header class="rebuild-intro" data-section="lg">
+  <body>
+    <div data-section="lg">
       <div data-container>
         <div data-stack data-gap="sm">
-          <h1 class="type-medium">Component rebuild</h1>
+          <h1 class="type-medium">Component gallery moved to Storybook</h1>
           <p class="type-small">
-            Output + Comps tiers; typography via Output text-medium / text-small (<code>--theme-*</code>, <code>--comp-*</code>). CDN:
-            <a
-              class="home-link"
-              href="https://cdn.jsdelivr.net/gh/EasySimpleCool/talkingshirt-tokens@6989e7981a44a6f747d5c7f76d439aa85399cc93/dist/index.css"
-              >talkingshirt-tokens</a
-            >. Markup from <code>/js/components/*.html</code>.
+            Run <code>npm run storybook</code> and open
+            <a class="home-link type-medium" href="http://localhost:6006"
+              >http://localhost:6006</a
+            >.
+          </p>
+          <p class="type-small">
+            Markup still lives in <code>/js/components/*.html</code>. Stories
+            render the same templates.
           </p>
         </div>
       </div>
-    </header>
-
-    <main>
-      <section class="rebuild-section" data-section="lg">
-        <div data-container>
-          <div data-stack data-gap="sm">
-            <h2 class="rebuild-section__title type-small">Token compliance</h2>
-            <ul class="rebuild-checklist type-small" data-stack data-gap="sm">
-              <li data-status="ready">layout — Comps spacing tokens</li>
-              <li data-status="ready">button — comp.button.*</li>
-              <li data-status="ready">post</li>
-              <li data-status="ready">type — text-medium / text-small (Output tier)</li>
-              <li data-status="blocked">
-                header, footer, size-select — comp.border.width, comp.nav.icon-size (placeholder in base.css);
-                motion.* (placeholder in base.css)
-              </li>
-              <li data-status="blocked">
-                success-content — comp.link-underline-offset
-              </li>
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      <section class="rebuild-section" data-section="lg">
-        <div data-container>
-          <div data-stack data-gap="sm">
-            <h2 class="rebuild-section__title type-small">Screen layer (data-screen)</h2>
-            <p class="type-small rebuild-muted">
-              Same markup; gap uses <code>comp.stack.md</code>. Forced
-              <code>data-screen</code> overrides viewport.
-            </p>
-            <div data-stack data-gap="md">
-              <div
-                class="rebuild-screen-demo__panel"
-                data-section="lg"
-                data-screen="mobile"
-              >
-                <div data-container>
-                  <div data-stack data-gap="sm">
-                    <p class="type-small rebuild-muted">data-screen="mobile"</p>
-                    <div data-stack data-gap="md">
-                      <p class="type-medium">Stack item</p>
-                      <p class="type-medium">Stack item</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div
-                class="rebuild-screen-demo__panel"
-                data-section="lg"
-                data-screen="desktop"
-              >
-                <div data-container>
-                  <div data-stack data-gap="sm">
-                    <p class="type-small rebuild-muted">data-screen="desktop"</p>
-                    <div data-stack data-gap="md">
-                      <p class="type-medium">Stack item</p>
-                      <p class="type-medium">Stack item</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="rebuild-section" data-section="lg">
-        <div data-container>
-          <div data-stack data-gap="sm">
-            <h2 class="rebuild-section__title type-small">Theme / color</h2>
-            <div data-row data-gap="sm">
-              <span data-row data-gap="xs" class="rebuild-token-swatch type-small">
-                <span
-                  class="rebuild-token-swatch__chip"
-                  style="--swatch: var(--theme-fg)"
-                ></span>
-                fg
-              </span>
-              <span data-row data-gap="xs" class="rebuild-token-swatch type-small">
-                <span
-                  class="rebuild-token-swatch__chip"
-                  style="--swatch: var(--theme-fg-alt)"
-                ></span>
-                fg-alt
-              </span>
-              <span data-row data-gap="xs" class="rebuild-token-swatch type-small">
-                <span
-                  class="rebuild-token-swatch__chip"
-                  style="--swatch: var(--theme-faint)"
-                ></span>
-                faint
-              </span>
-              <span data-row data-gap="xs" class="rebuild-token-swatch type-small">
-                <span
-                  class="rebuild-token-swatch__chip"
-                  style="--swatch: var(--theme-faint-alt)"
-                ></span>
-                faint-alt
-              </span>
-              <span data-row data-gap="xs" class="rebuild-token-swatch type-small">
-                <span
-                  class="rebuild-token-swatch__chip"
-                  style="--swatch: var(--theme-bg)"
-                ></span>
-                bg
-              </span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="rebuild-section" data-section="lg">
-        <div data-container>
-          <div data-stack data-gap="sm">
-            <h2 class="rebuild-section__title type-small">Typography</h2>
-            <div data-stack data-gap="sm">
-              <p class="type-medium">Medium</p>
-              <p class="type-small">Small</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="rebuild-section" data-section="lg">
-        <div data-container>
-          <div data-stack data-gap="sm">
-            <h2 class="rebuild-section__title type-small">Button</h2>
-            <div data-row data-gap="sm">
-              <div data-component="button"></div>
-              <div data-component="button" data-variant="disabled"></div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="rebuild-section" data-section="lg">
-        <div data-container>
-          <div data-stack data-gap="sm">
-            <h2 class="rebuild-section__title type-small">Size select</h2>
-            <div data-component="size-select"></div>
-          </div>
-        </div>
-      </section>
-
-      <section class="rebuild-section" data-section="lg">
-        <div data-container>
-          <div data-stack data-gap="sm">
-            <h2 class="rebuild-section__title type-small">Header (Type=Home)</h2>
-            <div class="rebuild-section__frame rebuild-section__frame--nav">
-              <div data-component="header"></div>
-            </div>
-            <p class="type-small rebuild-muted">
-              Toggle About to preview Header Type=About (body.about-open).
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <section class="rebuild-section" data-section="lg">
-        <div data-container>
-          <div data-stack data-gap="sm">
-            <h2 class="rebuild-section__title type-small">Header (Type=Home, logo only)</h2>
-            <div class="rebuild-section__frame rebuild-section__frame--nav">
-              <div data-component="header" data-variant="logo-only"></div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="rebuild-section" data-section="lg">
-        <div data-container>
-          <div data-stack data-gap="sm">
-            <h2 class="rebuild-section__title type-small">Footer</h2>
-            <div class="rebuild-section__frame rebuild-section__frame--footer">
-              <div data-component="footer"></div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="rebuild-section" data-section="lg">
-        <div data-container>
-          <div data-stack data-gap="sm">
-            <h2 class="rebuild-section__title type-small">Post</h2>
-            <div data-component="post"></div>
-          </div>
-        </div>
-      </section>
-
-      <section class="rebuild-section" data-section="lg">
-        <div data-container>
-          <div data-stack data-gap="sm">
-            <h2 class="rebuild-section__title type-small">Success content</h2>
-            <div data-component="success-content"></div>
-          </div>
-        </div>
-      </section>
-    </main>
-
-    <script type="module" src="/js/main.js"></script>
+    </div>
   </body>
 </html>

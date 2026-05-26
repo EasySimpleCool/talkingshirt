@@ -1,0 +1,22 @@
+/* Storybook-only — forced states not expressible via :hover in static preview. */
+.button--hover {
+  background: var(--comp-button-bg-hover);
+}
+
+.about-open .header .logo {
+  transform: translateX(-100vw);
+  opacity: 0;
+}
+
+.about-open .header__title {
+  transform: translateY(-50%);
+  opacity: 1;
+}
+
+.about-open .header__toggle-state--home {
+  display: none;
+}
+
+.about-open .header__toggle-state--about {
+  display: flex;
+}

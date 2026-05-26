@@ -12,7 +12,15 @@ Open http://127.0.0.1:8888/ (port increments if 8888 is busy).
 
 - `/` — landing page (scroll animation, checkout)
 - `/success.html` — order confirmation
-- `/rebuild.html` — component gallery
+- `/rebuild.html` — redirects to Storybook (legacy path)
+
+### Component gallery (Storybook)
+
+```bash
+npm run storybook
+```
+
+Open http://localhost:6006. Stories render templates from `public/js/components/*.html`.
 
 ## Structure
 
@@ -26,6 +34,8 @@ public/
   js/components/         # Partial loader + HTML templates
   assets/images/         # SVG, PNG
 netlify/functions/       # Stripe checkout + webhook
+stories/                 # Storybook stories (Figma components)
+.storybook/              # Storybook config
 docs/                    # Internal docs (not deployed)
 ```
 

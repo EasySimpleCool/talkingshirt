@@ -7,3 +7,7 @@ node_modules
 .cursor/
 design-audit/.env
 design-audit/output/
+
+*storybook.log
+storybook-static
+storybook-static/
