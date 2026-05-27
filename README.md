@@ -12,15 +12,25 @@ Open http://127.0.0.1:8888/ (port increments if 8888 is busy).
 
 - `/` — landing page (scroll animation, checkout)
 - `/success.html` — order confirmation
-- `/rebuild.html` — redirects to Storybook (legacy path)
+- `/rebuild.html` — redirects to `/storybook/` (legacy path)
 
 ### Component gallery (Storybook)
+
+Local:
 
 ```bash
 npm run storybook
 ```
 
 Open http://localhost:6006. Stories render templates from `public/js/components/*.html`.
+
+Published (after Netlify deploy): `/storybook/` on your site domain.
+
+Build locally:
+
+```bash
+npm run build:site
+```
 
 ## Structure
 

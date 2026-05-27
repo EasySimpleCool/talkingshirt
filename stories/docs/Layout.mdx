@@ -1,0 +1,70 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="Docs/Layout" />
+
+# Layout system
+
+Every block follows **`section > container > stack | row`**. Layout is expressed through data attributes only — component classes carry chrome, not flex or padding.
+
+## Primitives
+
+| Attribute | Role |
+|-----------|------|
+| `data-section="md"` | Bar shell: fixed 80px height, 24px horizontal pad. Header, footer. |
+| `data-section="lg"` | Content shell: 40px vertical, 24px horizontal pad. About panel, success page. |
+| `data-container` | Max-width 800px (`--comp-container-max-w`), centered. Always inside a section. |
+| `data-stack` | Vertical flex column, `align-items: flex-start`. |
+| `data-row` | Horizontal flex row. Add `data-justify="between"` for space-between. |
+| `data-gap="2xs\|xs\|sm\|md\|lg"` | Gap on stack or row via `--comp-stack-*` tokens. |
+
+## Pattern
+
+```html
+<div data-section="md|lg">
+  <div data-container>
+    <div data-stack data-gap="sm">
+      <!-- content -->
+    </div>
+  </div>
+</div>
+```
+
+## Examples from production
+
+**Header (bar):**
+
+```html
+<div class="header" data-section="md">
+  <div data-container>
+    <div data-row><!-- logo, title, toggle --></div>
+  </div>
+</div>
+```
+
+**Footer (bar with two ends):**
+
+```html
+<div class="footer" data-section="md">
+  <div data-container>
+    <div data-row data-justify="between">
+      <div data-mount="size-select"></div>
+      <div data-mount="button"></div>
+    </div>
+  </div>
+</div>
+```
+
+**Post (content block):**
+
+```html
+<div class="post" data-stack>
+  <div class="post-head" data-row data-justify="between">...</div>
+  <p class="post-body">...</p>
+</div>
+```
+
+## Storybook decorator
+
+Stories that do not bring their own section shell get wrapped in `data-section="lg" > data-container > data-stack`. Header and Footer set `sectionDecorator: false` and use `frameBar()` at 390px instead.
+
+Full spec: [`docs/layout.md`](../../docs/layout.md) in the repo.

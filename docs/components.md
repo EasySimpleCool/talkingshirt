@@ -64,8 +64,12 @@ Landing animation: [`/css/landing.css`](../public/css/landing.css) — code-only
 
 ## Preview
 
+Local Storybook:
+
 ```bash
-npm run dev
+npm run storybook
 ```
 
-Open http://127.0.0.1:8888/rebuild.html
+Open http://localhost:6006.
+
+Published gallery: `/storybook/` on the Netlify site (built via `npm run build:site` on deploy). Legacy path `/rebuild.html` redirects there.

@@ -1,10 +1,18 @@
 import { Meta } from "@storybook/addon-docs/blocks";
 
-<Meta title="Introduction" />
+<Meta title="Docs/Introduction" />
 
 # TalkingSh*rt components
 
-Five Figma components, rendered from the same HTML templates as production (`public/js/components/*.html`).
+Six Figma components, rendered from the same HTML templates as production (`public/js/components/*.html`).
+
+## Docs
+
+- [Configure](?path=/docs/docs-configure--docs) — project setup and published gallery
+- [Layout](?path=/docs/docs-layout--docs) — section, container, stack, row
+- [Screen sizing](?path=/docs/docs-screensizing--docs) — viewports and `data-screen`
+- [Testing](?path=/docs/docs-testing--docs) — Vitest browser tests
+- [Accessibility](?path=/docs/docs-accessibility--docs) — a11y addon
 
 ## Figma
 
@@ -17,6 +25,7 @@ Five Figma components, rendered from the same HTML templates as production (`pub
 | Header | `79:486` |
 | Footer | `79:418` |
 | Post | `79:543` |
+| SizeSelect | (inside Footer) |
 
 ## Tokens
 
@@ -26,10 +35,16 @@ CDN pin `6989e79`:
 
 Loaded in `.storybook/preview-head.html` before `/css/main.css`.
 
-## Run
+## Run locally
 
 ```bash
 npm run storybook
 ```
 
-Site dev server (unchanged): `npm run dev`
+Open http://localhost:6006.
+
+Site dev server: `npm run dev` → http://127.0.0.1:8888/
+
+## Published gallery
+
+After deploy: `/storybook/` on the Netlify site (e.g. `https://yoursite.netlify.app/storybook/`).

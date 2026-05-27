@@ -23,5 +23,6 @@
 }
 
 .button-wrap {
+  display: inline-block;
   cursor: pointer;
 }

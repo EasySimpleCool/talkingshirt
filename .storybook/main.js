@@ -11,7 +11,19 @@ const config = {
     "@storybook/addon-docs",
   ],
   framework: "@storybook/html-vite",
-  staticDirs: [{ from: "../public", to: "/" }],
+  staticDirs: [
+    { from: "../public/css", to: "/css" },
+    { from: "../public/js", to: "/js" },
+    { from: "../public/assets", to: "/assets" },
+  ],
+  docs: {
+    autodocs: "tag",
+  },
+  async viteFinal(config) {
+    const { mergeConfig } = await import("vite");
+    const base = process.env.STORYBOOK_BASE || "/";
+    return mergeConfig(config, { base, publicDir: false });
+  },
 };
 
 export default config;

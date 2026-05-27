@@ -1,0 +1,60 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="Docs/Screen sizing" />
+
+# Screen sizing
+
+Responsiveness comes from the CDN token bundle, not component media queries.
+
+## Four-tier model
+
+| Tier | Who uses it | Examples |
+|------|-------------|----------|
+| Input | Tokens repo only | `--color-black`, `--number-16` |
+| Screen | Tokens repo only | `--number-sm`, `--number-md`, `--number-lg` via `@media` and `[data-screen]` |
+| Output | Components | `--theme-fg`, `--text-medium-font-size` |
+| Comps | Components | `--comp-section-lg-v-pad`, `--comp-stack-md` |
+
+Components reference Output and Comps only. Spacing changes when comp tokens resolve differently at each screen tier upstream.
+
+## Breakpoints (CDN `screen.css`)
+
+| Context | `--number-sm` | `--number-md` | `--number-lg` |
+|---------|---------------|---------------|---------------|
+| Mobile (`max-width: 767px` or `[data-screen="mobile"]`) | 16 | 24 | 40 |
+| Desktop (`min-width: 768px` or `[data-screen="desktop"]`) | 24 | 40 | 80 |
+
+Container max width: `--comp-container-max-w` → 800px (`--common-main-body`).
+
+## Storybook controls
+
+### Viewport toolbar
+
+Use the viewport menu in the toolbar to resize the preview iframe:
+
+| Preset | Size | Use |
+|--------|------|-----|
+| Figma mobile | 390 × 844 | Matches Figma artboard; default |
+| Mobile | 375 × 667 | Common phone |
+| Desktop | 1280 × 800 | Desktop layout |
+| Container max | 800 × 800 | Content cap width |
+
+Bar components (Header, Footer) render inside a 390px `frameBar` regardless of viewport.
+
+### Screen toolbar
+
+The **Screen** global forces `data-screen` on `<html>`, overriding viewport-based token switching:
+
+- **Auto** — CDN uses `@media` only
+- **Mobile** — force mobile tier tokens
+- **Desktop** — force desktop tier tokens
+
+Useful for comparing section padding at the same iframe width.
+
+## Figma artboard vs container
+
+- **390px** — Figma mobile frame; Header/Footer stories use this via `frameBar()`.
+- **800px** — `--comp-container-max-w`; content blocks cap here.
+- **768px** — CDN mobile/desktop breakpoint.
+
+No spacing media queries in `public/css/components/`. If a value does not exist as a token, stop and propose one before hard-coding.

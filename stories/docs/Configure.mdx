@@ -1,0 +1,61 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="Docs/Configure" />
+
+# Configure your project
+
+TalkingSh*rt Storybook renders production HTML templates with the same CDN token bundle as the live site.
+
+## Production pipeline
+
+CDN tokens load first in `.storybook/preview-head.html`, then `/css/main.css`. Stories import templates from `public/js/components/*.html` via `stories/lib/render-template.js`.
+
+[Storybook configuration docs](https://storybook.js.org/docs/configure)
+
+## Layout context
+
+Most stories wrap in `data-section="lg" > data-container > data-stack`. Header and Footer skip that wrapper — they ship their own `data-section="md"` bar shell inside a 390px `frameBar`.
+
+[Layout docs](?path=/docs/docs-layout--docs)
+
+## Autodocs
+
+Each Figma component has a Docs tab with rendered stories and HTML source. Tags and descriptions live in `stories/figma/*.stories.js`.
+
+[Autodocs guide](https://storybook.js.org/docs/writing-docs/autodocs)
+
+## Publish and share
+
+Production builds copy Storybook to `/storybook/` on the Netlify site. Share that URL with anyone — no local setup required.
+
+```bash
+npm run build:site
+```
+
+[Publishing docs](https://storybook.js.org/docs/sharing/publish-storybook)
+
+## Commands
+
+| Command | What it does |
+|---------|--------------|
+| `npm run storybook` | Local dev at localhost:6006 |
+| `npm run build:site` | Build Storybook → `public/storybook/` |
+| `npm run dev` | Site + Netlify functions |
+| `npx vitest` | Browser tests on stories |
+
+## Addons
+
+| Addon | Purpose |
+|-------|---------|
+| Docs | Autodocs and MDX pages |
+| a11y | Accessibility panel ([docs](?path=/docs/docs-accessibility--docs)) |
+| Vitest | Browser tests ([docs](?path=/docs/docs-testing--docs)) |
+| Chromatic | Visual regression (optional) |
+
+## Figma
+
+[talkingshirt — main](https://www.figma.com/design/PusPmQilWCtdXjIiNIxeKn/talkingshirt---main)
+
+## Tokens
+
+All visual values come from the CDN bundle. Components use `var(--theme-*)` and `var(--comp-*)` only. See [Screen sizing](?path=/docs/docs-screensizing--docs) for viewport and breakpoint tooling.

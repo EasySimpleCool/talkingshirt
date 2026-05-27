@@ -8,8 +8,16 @@ import {
 /** @type { import('@storybook/html-vite').Meta } */
 export default {
   title: "Figma/Header",
+  tags: ["autodocs"],
   parameters: {
     layout: "centered",
+    sectionDecorator: false,
+    docs: {
+      description: {
+        component:
+          "Top nav bar (`79:486`). Template: `header.html`. Type Home and Type About states; About toggle wired in stories via `wireHeaderToggle`.",
+      },
+    },
   },
 };
 

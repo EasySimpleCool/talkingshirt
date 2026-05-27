@@ -11,3 +11,4 @@ design-audit/output/
 *storybook.log
 storybook-static
 storybook-static/
+public/storybook/

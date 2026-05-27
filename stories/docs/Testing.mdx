@@ -1,0 +1,32 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="Docs/Testing" />
+
+# Testing
+
+Storybook stories run as browser tests via `@storybook/addon-vitest`.
+
+## Run tests
+
+```bash
+npx vitest
+```
+
+Vitest uses Playwright Chromium to mount each story. Config: `vitest.config.js`.
+
+## Play functions
+
+Stories can include `play` functions that simulate user interaction:
+
+| Story | What it tests |
+|-------|---------------|
+| Header / Toggle interaction | Clicks About toggle, opens Type About state |
+| SizeSelect / Default | Selects Medium from the native select |
+
+## CI
+
+Netlify builds the site and Storybook on deploy. To run tests in CI, add `npx vitest --run` to the build pipeline or a separate GitHub Action.
+
+## Chromatic
+
+The Chromatic addon is installed for visual regression if you connect a Chromatic project later. Not required for local or Vitest testing.

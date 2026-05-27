@@ -1,0 +1,34 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="Docs/Accessibility" />
+
+# Accessibility
+
+The `@storybook/addon-a11y` addon runs axe checks against each story.
+
+## Addon panel
+
+Open the **Accessibility** panel in the Storybook sidebar to inspect violations, passes, and incomplete checks for the current story.
+
+## Current config
+
+In `.storybook/preview.js`:
+
+```js
+a11y: {
+  test: "todo",
+},
+```
+
+Automated a11y tests in Vitest are disabled (`todo`). The panel still works for manual review.
+
+## Components to watch
+
+| Component | Notes |
+|-----------|-------|
+| Header toggle | `aria-expanded`, `aria-label` switch between About and Close |
+| SizeSelect | Native `<select>` with visible label via underlined text |
+| Button | Disabled state uses `:disabled` and `aria-disabled` on landing page |
+| IconText | Decorative icons use `alt=""` |
+
+To enable automated checks, change `test: "todo"` to `test: "error"` once stories pass consistently.

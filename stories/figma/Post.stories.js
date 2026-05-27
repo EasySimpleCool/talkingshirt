@@ -3,8 +3,15 @@ import { loadTemplate, renderHtml } from "../lib/render-template.js";
 /** @type { import('@storybook/html-vite').Meta } */
 export default {
   title: "Figma/Post",
+  tags: ["autodocs"],
   parameters: {
     layout: "centered",
+    docs: {
+      description: {
+        component:
+          "About panel post block (`79:543`). Template: `post.html`. Label, date, and body copy.",
+      },
+    },
   },
   argTypes: {
     title: { control: "text" },
