@@ -8,12 +8,14 @@
     "dev": "node scripts/dev.mjs",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build -o storybook-static",
-    "build:site": "STORYBOOK_BASE=/storybook/ npm run build-storybook && rm -rf public/storybook && cp -r storybook-static public/storybook"
+    "build:site": "STORYBOOK_BASE=/storybook/ npm run build-storybook && rm -rf public/storybook && cp -r storybook-static public/storybook",
+    "code-connect:publish": "figma connect publish"
   },
   "dependencies": {
     "stripe": "^22.0.2"
   },
   "devDependencies": {
+    "@figma/code-connect": "^1.3.12",
     "@chromatic-com/storybook": "^5.2.1",
     "@storybook/addon-a11y": "^10.4.1",
     "@storybook/addon-docs": "^10.4.1",

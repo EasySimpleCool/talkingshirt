@@ -62,6 +62,12 @@ Landing animation: [`/css/landing.css`](../public/css/landing.css) — code-only
 - `comp/border/width`, `comp/nav/icon-size`, `comp/link/underline-offset`
 - `motion/*` (when ready)
 
+## Figma and Code Connect
+
+- File registry (personal vs work): [`figma-files.md`](figma-files.md)
+- Component property model: [`figma-component-spec.md`](figma-component-spec.md)
+- Dev Mode snippets (publish when work org ready): [`code-connect.md`](code-connect.md)
+
 ## Preview
 
 Local Storybook:

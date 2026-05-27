@@ -1,0 +1,8 @@
+{
+  "codeConnect": {
+    "include": ["code-connect/**/*.figma.ts"],
+    "exclude": ["public/**", "storybook-static/**", "node_modules/**"],
+    "label": "HTML",
+    "language": "html"
+  }
+}
