@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 """
 normalize.py — shared name-matching utilities for the design-audit pipeline.
 

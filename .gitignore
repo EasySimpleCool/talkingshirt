@@ -6,6 +6,7 @@ node_modules
 .DS_Store
 .cursor/
 design-audit/.env
+design-audit/.venv
 design-audit/output/
 
 *storybook.log

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 """
 scan_figma.py — pull component and variable data from a Figma file.
 
@@ -14,6 +16,7 @@ Reads FIGMA_TOKEN, FIGMA_FILE_KEY, FIGMA_NODE_MAIN, FIGMA_NODE_BENCH from
 import argparse
 import json
 import os
+import re
 import sys
 from pathlib import Path
 
@@ -32,17 +35,64 @@ def _load_env() -> None:
         if not line or line.startswith("#") or "=" not in line:
             continue
         key, _, val = line.partition("=")
-        os.environ.setdefault(key.strip(), val.strip())
+        val = val.strip()
+        if "#" in val:
+            val = val.split("#", 1)[0].strip()
+        os.environ.setdefault(key.strip(), val)
 
 
 _load_env()
 
-FIGMA_TOKEN = os.environ.get("FIGMA_TOKEN", "")
-FILE_KEY = os.environ.get("FIGMA_FILE_KEY", "")
-NODE_MAIN = os.environ.get("FIGMA_NODE_MAIN", "")
-NODE_BENCH = os.environ.get("FIGMA_NODE_BENCH", "")
+
+def _env(name: str) -> str:
+    """Read an env var, treating placeholder values (your_..._here) as unset."""
+    val = os.environ.get(name, "").strip()
+    if val.startswith("your_") and val.endswith("_here"):
+        return ""
+    return val
+
+
+def parse_file_key(value: str) -> str:
+    """Accept either a bare file key or a full Figma URL and return the key."""
+    if not value:
+        return ""
+    m = re.search(r"figma\.com/(?:design|file)/([A-Za-z0-9]+)", value)
+    if m:
+        return m.group(1)
+    return value
+
+
+FIGMA_TOKEN = _env("FIGMA_TOKEN")
+
+# main and bench are SEPARATE Figma files:
+#   bench = staging file of ready-to-build components
+#   main  = shipped components (a component moves bench → main once built)
+# FIGMA_FILE_KEY is kept as a legacy fallback for the main target.
+FILE_KEY_MAIN = parse_file_key(_env("FIGMA_FILE_KEY_MAIN") or _env("FIGMA_FILE_KEY"))
+FILE_KEY_BENCH = parse_file_key(_env("FIGMA_FILE_KEY_BENCH"))
+NODE_MAIN = _env("FIGMA_NODE_MAIN")
+NODE_BENCH = _env("FIGMA_NODE_BENCH")
 
 FIGMA_API = "https://api.figma.com/v1"
+
+
+def target_config(target: str) -> tuple[str, str]:
+    """Return (file_key, node_id) for the requested target."""
+    if target == "bench":
+        if not FILE_KEY_BENCH:
+            sys.exit(
+                "Error: FIGMA_FILE_KEY_BENCH not set. The bench is a separate "
+                "Figma file from main — add its key to .env."
+            )
+        if FILE_KEY_BENCH == FILE_KEY_MAIN:
+            sys.exit(
+                "Error: FIGMA_FILE_KEY_BENCH points at the same file as main "
+                f"({FILE_KEY_BENCH}). Bench must be a separate Figma file."
+            )
+        return FILE_KEY_BENCH, NODE_BENCH
+    if not FILE_KEY_MAIN:
+        sys.exit("Error: FIGMA_FILE_KEY_MAIN (or FIGMA_FILE_KEY) not set.")
+    return FILE_KEY_MAIN, NODE_MAIN
 
 
 def _headers() -> dict:
@@ -82,7 +132,12 @@ def get_variables(file_key: str) -> dict:
 # ---------------------------------------------------------------------------
 
 def _walk_components(node: dict, results: list) -> None:
-    """Recursively collect COMPONENT and COMPONENT_SET nodes."""
+    """Collect top-level COMPONENT and COMPONENT_SET nodes.
+
+    Stops descending once a component (or set) is found, so variant children
+    (e.g. "Property 1=Default") and nested instances ("ball") are not treated
+    as separate components.
+    """
     kind = node.get("type", "")
     if kind in ("COMPONENT", "COMPONENT_SET"):
         results.append({
@@ -90,6 +145,7 @@ def _walk_components(node: dict, results: list) -> None:
             "node_id": node.get("id", ""),
             "description": node.get("description", ""),
         })
+        return
     for child in node.get("children", []):
         _walk_components(child, results)
 
@@ -169,31 +225,33 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    if not FILE_KEY:
-        sys.exit("Error: FIGMA_FILE_KEY not set.")
+    file_key, node_raw = target_config(args.target)
+    node_id = node_raw or None
 
-    node_id = NODE_MAIN if args.target == "main" else NODE_BENCH
-    if not node_id:
-        env_var = "FIGMA_NODE_MAIN" if args.target == "main" else "FIGMA_NODE_BENCH"
-        sys.exit(f"Error: {env_var} not set.")
-
-    print(f"Fetching file {FILE_KEY} …", file=sys.stderr)
-    file_data = get_file(FILE_KEY)
+    print(f"Fetching {args.target} file {file_key} …", file=sys.stderr)
+    file_data = get_file(file_key)
 
     components = extract_components(file_data, node_id)
+    if node_id and not components:
+        print(
+            f"Warning: node {node_id!r} yielded 0 components "
+            "(canvas pages often have no API children); scanning whole document.",
+            file=sys.stderr,
+        )
+        components = extract_components(file_data, None)
     print(f"Found {len(components)} component(s).", file=sys.stderr)
 
     variables: list[dict] = []
     if not args.no_variables:
         print("Fetching variables …", file=sys.stderr)
-        var_data = get_variables(FILE_KEY)
+        var_data = get_variables(file_key)
         if var_data:
             variables = extract_variables(var_data)
             print(f"Found {len(variables)} variable(s).", file=sys.stderr)
 
     output = {
         "target": args.target,
-        "file_key": FILE_KEY,
+        "file_key": file_key,
         "node_id": node_id,
         "components": components,
         "variables": variables,

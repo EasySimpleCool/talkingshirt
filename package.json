@@ -9,7 +9,8 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build -o storybook-static",
     "build:site": "STORYBOOK_BASE=/storybook/ npm run build-storybook && rm -rf public/storybook && cp -r storybook-static public/storybook",
-    "code-connect:publish": "figma connect publish"
+    "code-connect:publish": "figma connect publish",
+    "design-audit": "node design-audit/run.mjs"
   },
   "dependencies": {
     "stripe": "^22.0.2"

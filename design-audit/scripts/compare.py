@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 """
 compare.py — directional drift report: Figma (source of truth) → code.
 
@@ -51,13 +53,39 @@ def _parse_code_scan_components(text: str) -> list[str]:
         if in_section and re.match(r"^##\s+", line):
             break
         if in_section:
-            # Accept lines like "- **name**" or "### name" or "| name |"
-            m = re.match(r"^[-*]\s+\*{0,2}(`?)(\S.*?)\1\*{0,2}", line)
+            # Accept lines like "- **name**", "- `name`", or "### name"
+            m = re.match(r"^[-*]\s+\*\*(.+?)\*\*\s*$", line)
             if m:
-                names.append(m.group(2).strip())
+                names.append(m.group(1).strip())
+                continue
+            m = re.match(r"^[-*]\s+`([^`]+)`\s*$", line)
+            if m:
+                names.append(m.group(1).strip())
+                continue
             m2 = re.match(r"^###\s+`?(\S[^`]*)`?", line)
             if m2:
                 names.append(m2.group(1).strip())
+    return names
+
+
+def _parse_code_scan_assets(text: str) -> list[str]:
+    """Extract asset names from the ## Assets section of code-scan.md."""
+    in_section = False
+    names: list[str] = []
+    for line in text.splitlines():
+        if re.match(r"^##\s+Assets", line, re.IGNORECASE):
+            in_section = True
+            continue
+        if in_section and re.match(r"^##\s+", line):
+            break
+        if in_section:
+            m = re.match(r"^[-*]\s+`([^`]+)`\s*$", line)
+            if m:
+                names.append(m.group(1).strip())
+                continue
+            m = re.match(r"^[-*]\s+\*\*(.+?)\*\*\s*$", line)
+            if m:
+                names.append(m.group(1).strip())
     return names
 
 
@@ -90,6 +118,7 @@ def load_code_scan(path: str) -> dict:
     text = p.read_text()
     return {
         "components": _parse_code_scan_components(text),
+        "assets": _parse_code_scan_assets(text),
         "tokens": _parse_code_scan_tokens(text),
     }
 
@@ -163,20 +192,43 @@ def compare(figma: dict, code: dict, use_embeddings: bool) -> dict:
     """
     figma_components = [c["name"] for c in figma.get("components", [])]
     code_components = code.get("components", [])
+    code_assets = code.get("assets", [])
 
-    matched, missing = [], []
+    matched, asset_matched, missing = [], [], []
     used_code: set[str] = set()
+    used_asset: set[str] = set()
 
     for fc in figma_components:
         if use_embeddings:
             hit = _try_embeddings_match(fc, code_components)
-            layer = "embeddings" if hit else None
-        else:
-            hit, layer = resolve(fc, code_components)
+            if hit:
+                matched.append({"figma": fc, "code": hit, "layer": "embeddings"})
+                used_code.add(hit)
+            else:
+                missing.append(fc)
+            continue
 
-        if hit:
-            matched.append({"figma": fc, "code": hit, "layer": layer})
-            used_code.add(hit)
+        # Solid matches first (exact/map) against components, then assets —
+        # so icons resolve to their SVG asset before any fuzzy component noise.
+        comp_hit, comp_layer = resolve(fc, code_components)
+        if comp_hit and comp_layer in ("exact", "map"):
+            matched.append({"figma": fc, "code": comp_hit, "layer": comp_layer})
+            used_code.add(comp_hit)
+            continue
+
+        asset_hit, asset_layer = resolve(fc, code_assets)
+        if asset_hit and asset_layer in ("exact", "map"):
+            asset_matched.append({"figma": fc, "code": asset_hit, "layer": asset_layer})
+            used_asset.add(asset_hit)
+            continue
+
+        # Fall back to fuzzy: component first, then asset.
+        if comp_hit:
+            matched.append({"figma": fc, "code": comp_hit, "layer": comp_layer})
+            used_code.add(comp_hit)
+        elif asset_hit:
+            asset_matched.append({"figma": fc, "code": asset_hit, "layer": asset_layer})
+            used_asset.add(asset_hit)
         else:
             missing.append(fc)
 
@@ -203,6 +255,7 @@ def compare(figma: dict, code: dict, use_embeddings: bool) -> dict:
 
     return {
         "matched": matched,
+        "asset_matched": asset_matched,
         "missing": missing,
         "extra": extra,
         "token_matched": tok_matched,
@@ -241,6 +294,12 @@ def render_report(result: dict, llm_commentary: str = "") -> str:
             lines.append(f"- `{name}`")
         lines.append("")
 
+    # Icons / assets (icons live as SVGs, not component templates)
+    if result.get("asset_matched"):
+        lines += ["## Icons / assets", "", "### Matched", ""]
+        lines += _table(result["asset_matched"], ["figma", "code", "layer"])
+        lines.append("")
+
     # Tokens
     lines += ["## Tokens", ""]
     if result["token_matched"]:
@@ -267,6 +326,7 @@ def render_report(result: dict, llm_commentary: str = "") -> str:
         f"- Components matched: {len(result['matched'])}  |  "
         f"missing: {len(result['missing'])}  |  "
         f"extra: {len(result['extra'])}",
+        f"- Icons/assets matched: {len(result.get('asset_matched', []))}",
         f"- Tokens matched: {len(result['token_matched'])}  |  "
         f"missing: {len(result['token_missing'])}  |  "
         f"extra: {len(result['token_extra'])}",
