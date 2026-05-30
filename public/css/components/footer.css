@@ -10,7 +10,7 @@
   background: var(--theme-bg);
   border-top: var(--comp-border-width) solid var(--theme-faint-alt);
   transform: translateY(100%);
-  transition: transform var(--motion-slide-dur) var(--motion-ease);
+  transition: transform var(--motion-drawer-dur) var(--motion-ease);
 }
 
 .footer--visible {

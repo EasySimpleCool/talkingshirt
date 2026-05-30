@@ -17,7 +17,8 @@
 }
 
 .button:disabled {
-  /* TODO: swap to var(--comp-button-bg-disabled) once CDN ships bg-disabled token. */
+  /* Figma's Button Disabled variant reuses comp/button/bg-hover for the fill —
+     there is no separate bg-disabled token. */
   background: var(--comp-button-bg-hover);
   pointer-events: none;
 }

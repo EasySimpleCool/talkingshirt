@@ -6,12 +6,12 @@ body {
 }
 
 :root {
-  --layout-copy-min: 32px;
+  --layout-copy-min: 40px;
   --layout-copy-max: 120px;
-  --layout-shirt-min: 320px;
-  --layout-shirt-max: 720px;
-  --layout-arrow-min: 20px;
-  --layout-arrow-max: 40px;
+  --layout-shirt-min: 720px;
+  --layout-shirt-max: 960px;
+  --layout-arrow-min: 55px;
+  --layout-arrow-max: 90px;
   --layout-copy-size: clamp(
     var(--layout-copy-min),
     10vw,
@@ -127,7 +127,7 @@ body:has(.chest-text.editable:not(:focus)) .cursor {
     transform: translate(-50%, 0);
   }
   50% {
-    transform: translate(-50%, var(--comp-stack-xs));
+    transform: translate(-50%, 10px);
   }
 }
 

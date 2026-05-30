@@ -21,6 +21,9 @@
   line-height: 0;
   transform: translateX(0);
   opacity: 1;
+  transition:
+    opacity var(--motion-fade-dur) var(--motion-ease),
+    transform var(--motion-slide-dur) var(--motion-ease);
 }
 
 .header .logo__img {

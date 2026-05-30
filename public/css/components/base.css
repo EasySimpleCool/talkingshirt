@@ -10,8 +10,9 @@ body {
 
 /* TODO: placeholder — replace with motion/* from CDN once shipped. */
 :root {
-  --motion-slide-dur: 320ms;
-  --motion-fade-dur: 200ms;
+  --motion-slide-dur: 1000ms;
+  --motion-fade-dur: 250ms;
+  --motion-drawer-dur: 300ms;
   --motion-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
   /* TODO: placeholder — ship comp/border/width from CDN. */
   --comp-border-width: 1px;
