@@ -17,6 +17,7 @@
 }
 
 .header .logo {
+  display: inline-block;
   color: var(--theme-fg);
   line-height: 0;
   transform: translateX(0);
@@ -44,6 +45,7 @@
 }
 
 .header__toggle {
+  position: relative;
   padding: 0;
   border: 0;
   background: transparent;
@@ -52,8 +54,23 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+.header__toggle-state--home {
+  transform: translateX(0);
+  opacity: 1;
+  transition:
+    opacity var(--motion-fade-dur) var(--motion-ease),
+    transform var(--motion-slide-dur) var(--motion-ease);
+}
+
 .header__toggle-state--about {
-  display: none;
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translate(100vw, -50%);
+  opacity: 0;
+  transition:
+    opacity var(--motion-fade-dur) var(--motion-ease),
+    transform var(--motion-slide-dur) var(--motion-ease);
 }
 
 body.about-open .header .logo {
@@ -67,11 +84,13 @@ body.about-open .header__title {
 }
 
 body.about-open .header__toggle-state--home {
-  display: none;
+  transform: translateX(-100vw);
+  opacity: 0;
 }
 
 body.about-open .header__toggle-state--about {
-  display: flex;
+  transform: translate(0, -50%);
+  opacity: 1;
 }
 
 /* Page chrome — scrollable Post stack below Header Type=About (not a Figma component). */
