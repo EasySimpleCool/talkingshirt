@@ -44,13 +44,7 @@
           >
             <span class="header__toggle-state header__toggle-state--home icon-text" data-row data-gap="2xs">
               <span class="icon-text__label type-small">About</span>
-              <img
-                class="icon-text__icon"
-                src="/assets/images/ball.svg"
-                alt=""
-                width="24"
-                height="24"
-              />
+              <span class="icon-text__icon icon-text__icon--ball" aria-hidden="true"></span>
             </span>
             <span
               class="header__toggle-state header__toggle-state--about icon-text"
@@ -58,13 +52,7 @@
               data-gap="2xs"
             >
               <span class="icon-text__label type-small">Close</span>
-              <img
-                class="icon-text__icon"
-                src="/assets/images/close.svg"
-                alt=""
-                width="24"
-                height="24"
-              />
+              <span class="icon-text__icon icon-text__icon--close" aria-hidden="true"></span>
             </span>
           </button>
         </div>
@@ -88,6 +76,7 @@
                 <option value="Medium">Medium</option>
                 <option value="Large" selected>Large</option>
                 <option value="XLarge">XLarge</option>
+                <option value="XXLarge">XXLarge</option>
               </select>
             </label>
             <span class="button-wrap" id="addToCartWrap">
@@ -95,10 +84,8 @@
                 class="button type-medium"
                 id="addToCart"
                 type="button"
-                disabled
-                aria-disabled="true"
               >
-                Orders paused
+                Order | $23
               </button>
             </span>
           </div>
@@ -161,14 +148,14 @@
         <div data-stack data-gap="lg">
           <div class="post" data-stack>
             <div class="post-head" data-row data-justify="between">
-              <span class="post-label type-small">Sorry</span>
+              <span class="post-label type-small">Open</span>
               <time class="post-date type-small" datetime="2026-04-12">
                 12/04/26
               </time>
             </div>
             <p class="post-body type-medium">
-              Orders are suspended, staff are away from the tools.<br />
-              <br />We'll be back soon.
+              Orders are open, staff are back at the tools.<br />
+              <br />Pick a size, type a word, order a sh*rt.
             </p>
             <div class="post-divider" aria-hidden="true"></div>
           </div>

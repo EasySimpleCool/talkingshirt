@@ -17,18 +17,18 @@ Code names: [`design-audit/name-map.yaml`](../design-audit/name-map.yaml). Figma
 | Property | Figma type | Values / notes | Code |
 |----------|------------|----------------|------|
 | `Label` | TEXT | e.g. About, Close | `.icon-text__label` |
-| `Icon` | VARIANT or INSTANCE_SWAP | About → `ball.svg`, Close → `close.svg` | `.icon-text__icon` `src` |
+| `Icon` | VARIANT or INSTANCE_SWAP | About → `ball.svg`, Close → `close.svg` | `.icon-text__icon` modifier (`--ball` / `--close`) |
 
 **Template:** [`code-connect/IconText.figma.ts`](../code-connect/IconText.figma.ts)  
 **HTML:** [`public/js/components/icon-text.html`](../public/js/components/icon-text.html)
 
-If `Icon` is VARIANT (not swap), use: `About`, `Close` mapping to `/assets/images/ball.svg` and `/assets/images/close.svg`.
+If `Icon` is VARIANT (not swap), use: `About`, `Close` mapping to the `icon-text__icon--ball` and `icon-text__icon--close` modifier classes (each sets a `--icon-text-mask` to the matching SVG).
 
 ## Button
 
 | Property | Figma type | Values / notes | Code |
 |----------|------------|----------------|------|
-| `Label` | TEXT | e.g. Order \| $17, Orders paused | button text |
+| `Label` | TEXT | e.g. Order \| $23, Orders paused | button text |
 | `State` | VARIANT | `Default`, `Hover`, `Disabled` | default / `.button--hover` / `disabled` attr |
 
 **Template:** [`code-connect/Button.figma.ts`](../code-connect/Button.figma.ts)  
@@ -50,7 +50,7 @@ If `Icon` is VARIANT (not swap), use: `About`, `Close` mapping to `/assets/image
 
 | Property | Figma type | Values / notes | Code |
 |----------|------------|----------------|------|
-| `Size` | VARIANT | Small, Medium, Large, XLarge | label + `<option selected>` |
+| `Size` | VARIANT | Small, Medium, Large, XLarge, XXLarge | label + `<option selected>` |
 
 **Template:** [`code-connect/SizeSelect.figma.ts`](../code-connect/SizeSelect.figma.ts)  
 **HTML:** [`size-select.html`](../public/js/components/size-select.html)  

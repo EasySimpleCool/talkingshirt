@@ -26,7 +26,7 @@ function renderIconText({ label, icon }) {
   return renderHtml(`
     <span class="icon-text" data-row data-gap="2xs">
       <span class="icon-text__label type-small">${label}</span>
-      <img class="icon-text__icon" src="${icon}" alt="" />
+      <span class="icon-text__icon" style="--icon-text-mask: url('${icon}')" aria-hidden="true"></span>
     </span>
   `);
 }

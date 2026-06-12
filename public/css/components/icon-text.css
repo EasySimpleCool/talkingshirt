@@ -1,9 +1,20 @@
 .icon-text__label {
-  color: var(--theme-faint);
+  color: var(--theme-fg);
 }
 
 .icon-text__icon {
   width: var(--comp-nav-icon-size);
   height: var(--comp-nav-icon-size);
   flex-shrink: 0;
+  background-color: var(--theme-fg);
+  -webkit-mask: var(--icon-text-mask) center / contain no-repeat;
+  mask: var(--icon-text-mask) center / contain no-repeat;
+}
+
+.icon-text__icon--ball {
+  --icon-text-mask: url("/assets/images/ball.svg");
+}
+
+.icon-text__icon--close {
+  --icon-text-mask: url("/assets/images/close.svg");
 }

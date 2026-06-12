@@ -101,6 +101,7 @@ body.about-open .header__toggle-state--about {
 
 .about-content--overlay {
   position: fixed;
+  border-top: 0;
   top: var(--comp-section-md-height);
   left: 0;
   right: 0;

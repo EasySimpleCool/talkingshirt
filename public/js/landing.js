@@ -249,14 +249,6 @@ export function initLanding() {
     sizeSelectText.textContent = sizeSelect.value;
   });
 
-  const addToCartWrap = document.getElementById("addToCartWrap");
-  addToCartWrap.addEventListener("click", () => {
-    if (!addToCartBtn.disabled) return;
-    if (!document.body.classList.contains("about-open")) {
-      headerToggle.click();
-    }
-  });
-
   addToCartBtn.addEventListener("click", async () => {
     const text = chestText.value.trim();
     const size = sizeSelect.value;

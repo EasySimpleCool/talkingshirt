@@ -33,7 +33,7 @@ const homeToggle =
   figma.code`
         <span class="header__toggle-state header__toggle-state--home icon-text" data-row data-gap="2xs">
           <span class="icon-text__label type-small">About</span>
-          <img class="icon-text__icon" src="/assets/images/ball.svg" alt="" />
+          <span class="icon-text__icon icon-text__icon--ball" aria-hidden="true"></span>
         </span>`;
 
 const aboutToggle =
@@ -41,7 +41,7 @@ const aboutToggle =
   figma.code`
         <span class="header__toggle-state header__toggle-state--about icon-text" data-row data-gap="2xs">
           <span class="icon-text__label type-small">Close</span>
-          <img class="icon-text__icon" src="/assets/images/close.svg" alt="" />
+          <span class="icon-text__icon icon-text__icon--close" aria-hidden="true"></span>
         </span>`;
 
 export default {

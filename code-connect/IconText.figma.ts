@@ -13,9 +13,9 @@ const instance = figma.selectedInstance;
 
 const label = instance.getString("Label");
 
-const iconSrc = instance.getEnum("Icon", {
-  About: "/assets/images/ball.svg",
-  Close: "/assets/images/close.svg",
+const iconModifier = instance.getEnum("Icon", {
+  About: "icon-text__icon--ball",
+  Close: "icon-text__icon--close",
 });
 
 const iconSwap = instance.getInstanceSwap("Icon");
@@ -23,7 +23,7 @@ let iconPart;
 if (iconSwap && iconSwap.type === "INSTANCE") {
   iconPart = iconSwap.executeTemplate().example;
 } else {
-  iconPart = figma.code`<img class="icon-text__icon" src="${iconSrc}" alt="" width="24" height="24" />`;
+  iconPart = figma.code`<span class="icon-text__icon ${iconModifier}" aria-hidden="true"></span>`;
 }
 
 export default {

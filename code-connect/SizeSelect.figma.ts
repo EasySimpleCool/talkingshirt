@@ -15,12 +15,14 @@ const size = instance.getEnum("Size", {
   Medium: "Medium",
   Large: "Large",
   XLarge: "XLarge",
+  XXLarge: "XXLarge",
 });
 
 const selectedSmall = size === "Small" ? " selected" : "";
 const selectedMedium = size === "Medium" ? " selected" : "";
 const selectedLarge = size === "Large" ? " selected" : "";
 const selectedXLarge = size === "XLarge" ? " selected" : "";
+const selectedXXLarge = size === "XXLarge" ? " selected" : "";
 
 export default {
   id: "size-select",
@@ -33,6 +35,7 @@ export default {
     <option value="Medium"${selectedMedium}>Medium</option>
     <option value="Large"${selectedLarge}>Large</option>
     <option value="XLarge"${selectedXLarge}>XLarge</option>
+    <option value="XXLarge"${selectedXXLarge}>XXLarge</option>
   </select>
 </label>
   `,
