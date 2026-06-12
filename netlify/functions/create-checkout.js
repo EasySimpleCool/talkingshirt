@@ -63,7 +63,7 @@ export default async (req) => {
         },
       ],
       metadata,
-      payment_intent_data: { metadata, statement_descriptor: "TalkingShirt" },
+      payment_intent_data: { metadata, statement_descriptor_suffix: "TEE" },
       shipping_address_collection: { allowed_countries: ["AU"] },
       shipping_options: [
         {
