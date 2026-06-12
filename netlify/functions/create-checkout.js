@@ -56,14 +56,14 @@ export default async (req) => {
             currency: CURRENCY,
             unit_amount: UNIT_AMOUNT_CENTS,
             product_data: {
-              name: "TalkingShirt Black Tee",
+              name: "TalkingSh*rt Tee",
               description: `Size ${size} — "${text}"`,
             },
           },
         },
       ],
       metadata,
-      payment_intent_data: { metadata },
+      payment_intent_data: { metadata, statement_descriptor: "TalkingShirt" },
       shipping_address_collection: { allowed_countries: ["AU"] },
       shipping_options: [
         {
