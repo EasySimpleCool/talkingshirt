@@ -6,6 +6,7 @@
   "description": "TalkingSh*rt — custom tees. Static site + Netlify Functions.",
   "scripts": {
     "dev": "node scripts/dev.mjs",
+    "dev:netlify": "netlify dev",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build -o storybook-static",
     "build:site": "STORYBOOK_BASE=/storybook/ npm run build-storybook && rm -rf public/storybook && cp -r storybook-static public/storybook",

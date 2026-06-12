@@ -2,6 +2,7 @@ import Stripe from "stripe";
 import {
   ALLOWED_SIZES,
   CURRENCY,
+  SHIPPING_AMOUNT_CENTS,
   UNIT_AMOUNT_CENTS,
 } from "./_shared/constants.js";
 import { sanitiseCustomText } from "./_shared/sanitise.js";
@@ -64,6 +65,15 @@ export default async (req) => {
       metadata,
       payment_intent_data: { metadata },
       shipping_address_collection: { allowed_countries: ["AU"] },
+      shipping_options: [
+        {
+          shipping_rate_data: {
+            type: "fixed_amount",
+            fixed_amount: { amount: SHIPPING_AMOUNT_CENTS, currency: CURRENCY },
+            display_name: "Standard shipping",
+          },
+        },
+      ],
       success_url: `${origin}/success.html?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/`,
     });
