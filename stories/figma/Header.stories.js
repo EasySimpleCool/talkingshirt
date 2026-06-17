@@ -1,17 +1,11 @@
 import { userEvent, within } from "storybook/test";
-import {
-  frameBar,
-  renderTemplate,
-  wireHeaderToggle,
-} from "../lib/render-template.js";
+import { renderTemplate, wireHeaderToggle } from "../lib/render-template.js";
 
 /** @type { import('@storybook/html-vite').Meta } */
 export default {
   title: "Figma/Header",
   tags: ["autodocs"],
   parameters: {
-    layout: "centered",
-    sectionDecorator: false,
     docs: {
       description: {
         component:
@@ -25,7 +19,7 @@ function renderHeaderFrame() {
   const wrap = document.createElement("div");
   const root = renderTemplate("header");
   const header = root.querySelector(".header") ?? root;
-  wrap.appendChild(frameBar(header));
+  wrap.appendChild(header);
   wireHeaderToggle(wrap);
   return wrap;
 }

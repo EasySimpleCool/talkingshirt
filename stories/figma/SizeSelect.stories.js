@@ -6,7 +6,6 @@ export default {
   title: "Figma/SizeSelect",
   tags: ["autodocs"],
   parameters: {
-    layout: "centered",
     docs: {
       description: {
         component:

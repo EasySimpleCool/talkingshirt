@@ -54,19 +54,6 @@ export function renderHtml(html) {
 }
 
 /**
- * Bar-width frame matching Figma artboard (~390px).
- * @param {HTMLElement} child
- * @returns {HTMLDivElement}
- */
-export function frameBar(child) {
-  const frame = document.createElement("div");
-  frame.style.width = "390px";
-  frame.style.maxWidth = "100%";
-  frame.appendChild(child);
-  return frame;
-}
-
-/**
  * Wire Header About toggle on a wrapper (scoped .about-open, not document.body).
  * @param {HTMLElement} root
  */

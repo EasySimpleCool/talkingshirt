@@ -5,7 +5,6 @@ export default {
   title: "Figma/Post",
   tags: ["autodocs"],
   parameters: {
-    layout: "centered",
     docs: {
       description: {
         component:

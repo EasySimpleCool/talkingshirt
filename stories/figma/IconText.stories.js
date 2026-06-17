@@ -5,7 +5,6 @@ export default {
   title: "Figma/IconText",
   tags: ["autodocs"],
   parameters: {
-    layout: "centered",
     docs: {
       description: {
         component:

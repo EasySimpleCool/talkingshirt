@@ -1,11 +1,10 @@
-import { frameBar, renderTemplate } from "../lib/render-template.js";
+import { renderTemplate } from "../lib/render-template.js";
 
 /** @type { import('@storybook/html-vite').Meta } */
 export default {
   title: "Figma/Button",
   tags: ["autodocs"],
   parameters: {
-    layout: "centered",
     docs: {
       description: {
         component:
@@ -40,10 +39,8 @@ export const Disabled = {
 
 export const InFooter = {
   name: "In footer",
-  parameters: { sectionDecorator: false },
   render: () => {
     const root = renderTemplate("footer");
-    const footer = root.querySelector(".footer-slider") ?? root;
-    return frameBar(footer);
+    return root.querySelector(".footer-slider") ?? root;
   },
 };

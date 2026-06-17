@@ -29,6 +29,11 @@
 
 .header .logo__img {
   display: block;
+  width: 139px;
+  height: 29px;
+  background-color: currentColor;
+  -webkit-mask: url(/assets/images/Logo.svg) no-repeat center / contain;
+  mask: url(/assets/images/Logo.svg) no-repeat center / contain;
 }
 
 .header__title {

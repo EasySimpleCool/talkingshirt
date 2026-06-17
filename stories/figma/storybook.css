@@ -3,6 +3,21 @@
   background: var(--comp-button-bg-hover);
 }
 
+/* Fixed chrome on the live site; keep in flow for canvas preview. */
+.header--fixed {
+  position: relative;
+  top: auto;
+  left: auto;
+  right: auto;
+}
+
+.footer-slider {
+  position: relative;
+  bottom: auto;
+  left: auto;
+  right: auto;
+}
+
 .about-open .header .logo {
   transform: translateX(-100vw);
   opacity: 0;

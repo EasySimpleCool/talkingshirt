@@ -16,7 +16,6 @@ const preview = {
     },
   },
   parameters: {
-    layout: "centered",
     controls: {
       matchers: {
         color: /(background|color)$/i,
@@ -61,32 +60,6 @@ const preview = {
         delete document.documentElement.dataset.screen;
       }
       return story();
-    },
-    (story, context) => {
-      const rendered = story();
-      if (context.parameters.layout === "fullscreen") {
-        return rendered;
-      }
-      if (context.parameters.sectionDecorator === false) {
-        return rendered;
-      }
-
-      const root = document.createElement("div");
-      root.setAttribute("data-section", "lg");
-      const container = document.createElement("div");
-      container.setAttribute("data-container", "");
-      const stack = document.createElement("div");
-      stack.setAttribute("data-stack", "");
-
-      if (rendered instanceof Node) {
-        stack.appendChild(rendered);
-      } else {
-        stack.innerHTML = String(rendered);
-      }
-
-      container.appendChild(stack);
-      root.appendChild(container);
-      return root;
     },
   ],
 };

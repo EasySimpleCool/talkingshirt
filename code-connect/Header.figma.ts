@@ -53,7 +53,7 @@ export default {
     <div data-row data-justify="between">
       <div class="header__start">
         <a class="logo" href="/" aria-label="TalkingSh*rt home">
-          <img class="logo__img" src="/assets/images/Logo.svg" alt="" />
+          <span class="logo__img" aria-hidden="true"></span>
         </a>
         <div class="header__title type-medium" aria-hidden="true">About</div>
       </div>

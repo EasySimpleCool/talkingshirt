@@ -1,12 +1,10 @@
-import { frameBar, renderTemplate } from "../lib/render-template.js";
+import { renderTemplate } from "../lib/render-template.js";
 
 /** @type { import('@storybook/html-vite').Meta } */
 export default {
   title: "Figma/Footer",
   tags: ["autodocs"],
   parameters: {
-    layout: "centered",
-    sectionDecorator: false,
     docs: {
       description: {
         component:
@@ -19,7 +17,6 @@ export default {
 export const Default = {
   render: () => {
     const root = renderTemplate("footer");
-    const footer = root.querySelector(".footer-slider") ?? root;
-    return frameBar(footer);
+    return root.querySelector(".footer-slider") ?? root;
   },
 };

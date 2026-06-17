@@ -14,7 +14,7 @@ CDN tokens load first in `.storybook/preview-head.html`, then `/css/main.css`. S
 
 ## Layout context
 
-Most stories wrap in `data-section="lg" > data-container > data-stack`. Header and Footer skip that wrapper — they ship their own `data-section="md"` bar shell inside a 390px `frameBar`.
+Stories render production HTML templates directly on Storybook’s default padded canvas.
 
 [Layout docs](?path=/docs/docs-layout--docs)
 
