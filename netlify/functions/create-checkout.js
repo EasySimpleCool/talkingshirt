@@ -4,7 +4,7 @@ import {
   CURRENCY,
   SHIPPING_AMOUNT_CENTS,
   UNIT_AMOUNT_CENTS,
-  ordersDisabled,
+  ordersAtCapacity,
 } from "./_shared/constants.js";
 import { sanitiseCustomText } from "./_shared/sanitise.js";
 
@@ -20,7 +20,8 @@ export default async (req) => {
     return json(405, { error: "Method not allowed" });
   }
 
-  if (ordersDisabled()) {
+  const capacity = await ordersAtCapacity();
+  if (capacity.atCapacity) {
     return json(403, { error: "Orders are paused", ordersOpen: false });
   }
 
