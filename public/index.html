@@ -80,14 +80,24 @@
                 <option value="XXLarge">XXLarge</option>
               </select>
             </label>
-            <span class="button-wrap" id="addToCartWrap">
-              <button
-                class="button type-medium"
-                id="addToCart"
-                type="button"
-              >
-                Order | $23
-              </button>
+            <span class="order-actions">
+              <span data-row data-gap="xs">
+                <span
+                  class="stock-left type-small"
+                  id="stockLeft"
+                  aria-live="polite"
+                  hidden
+                ></span>
+                <span class="button-wrap" id="addToCartWrap">
+                  <button
+                    class="button type-medium"
+                    id="addToCart"
+                    type="button"
+                  >
+                    Order | $23
+                  </button>
+                </span>
+              </span>
             </span>
           </div>
         </div>

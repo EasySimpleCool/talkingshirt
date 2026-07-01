@@ -212,3 +212,15 @@ body.about-open .footer-slider {
   transform: translateX(-100%);
   opacity: 0;
 }
+
+/* Shrink-to-fit wrapper so the inner [data-row] cluster hugs its content
+   instead of stretching full-width in the space-between footer row — same
+   inline-block pattern as .button-wrap and the header toggle. */
+.order-actions {
+  display: inline-block;
+}
+
+.stock-left {
+  color: var(--theme-faint);
+  white-space: nowrap;
+}

@@ -14,6 +14,7 @@ export function initLanding() {
   const aboutContent = document.getElementById("aboutContent");
   const ordersPausedPost = document.getElementById("ordersPausedPost");
   const ordersOpenPost = document.getElementById("ordersOpenPost");
+  const stockLeft = document.getElementById("stockLeft");
 
   const ORDER_LABEL = addToCartBtn.textContent.trim();
 
@@ -267,6 +268,18 @@ export function initLanding() {
     if (ordersOpenPost) ordersOpenPost.hidden = !ordersOpen;
   }
 
+  // Shows the live "N Left" count when a cap is configured and orders remain.
+  // A null remaining (no cap) or 0 (paused/full) hides it.
+  function applyRemaining(remaining) {
+    if (!stockLeft) return;
+    if (typeof remaining === "number" && remaining > 0) {
+      stockLeft.textContent = `${remaining} Left`;
+      stockLeft.hidden = false;
+    } else {
+      stockLeft.hidden = true;
+    }
+  }
+
   addToCartWrap.addEventListener("click", () => {
     if (!addToCartBtn.disabled) return;
     if (!document.body.classList.contains("about-open")) {
@@ -279,6 +292,7 @@ export function initLanding() {
       const res = await fetch("/.netlify/functions/order-status");
       const data = await res.json().catch(() => ({}));
       applyOrdersState(data.ordersOpen !== false);
+      applyRemaining(data.remaining);
     } catch {
       // If the check fails, leave orders open (the safe default is that the
       // server-side guard in create-checkout still refuses paused orders).
@@ -304,6 +318,7 @@ export function initLanding() {
       const data = await res.json().catch(() => ({}));
       if (data.ordersOpen === false) {
         applyOrdersState(false);
+        applyRemaining(0);
         if (!document.body.classList.contains("about-open")) {
           headerToggle.click();
         }
