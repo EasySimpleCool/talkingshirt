@@ -16,6 +16,12 @@
   min-width: 0;
 }
 
+.header__about {
+  display: inline-block;
+  color: var(--theme-fg);
+  text-decoration: none;
+}
+
 .header .logo {
   display: inline-block;
   color: var(--theme-fg);

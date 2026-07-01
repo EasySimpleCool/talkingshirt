@@ -14,9 +14,15 @@
   <body>
     <div class="header header--fixed" data-section="md" data-type="home" role="banner">
       <div data-container>
-        <div data-row>
+        <div data-row data-justify="between">
           <a class="logo" href="/" aria-label="TalkingSh*rt home">
             <span class="logo__img" aria-hidden="true"></span>
+          </a>
+          <a class="header__about" href="/" aria-label="About">
+            <span class="icon-text" data-row data-gap="2xs">
+              <span class="icon-text__label type-small">About</span>
+              <span class="icon-text__icon icon-text__icon--ball" aria-hidden="true"></span>
+            </span>
           </a>
         </div>
       </div>
@@ -25,15 +31,19 @@
     <main>
       <section class="success-main" data-section="lg">
         <div data-container>
-          <div data-stack data-gap="sm">
-            <span class="success-label type-small">Order confirmed</span>
-            <p class="success-body type-medium">
-              Thanks for ordering. Your sh*rt is on its way.
-            </p>
-            <p class="success-label type-small">
-              You'll get a receipt by email. Any questions — just reply to it.
-            </p>
-            <a class="home-link type-medium" href="/">Back home</a>
+          <div data-stack>
+            <div class="post" data-stack>
+              <div class="post-head" data-row data-justify="between">
+                <span class="post-label type-small">Order confirmed</span>
+                <time class="post-date type-small" datetime="2026-04-02">
+                  2/04/26
+                </time>
+              </div>
+              <p class="post-body type-medium">
+                Thanks for ordering, your sh*rt is on the way.
+              </p>
+              <div class="post-divider" aria-hidden="true"></div>
+            </div>
           </div>
         </div>
       </section>

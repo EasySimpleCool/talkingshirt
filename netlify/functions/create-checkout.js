@@ -4,6 +4,7 @@ import {
   CURRENCY,
   SHIPPING_AMOUNT_CENTS,
   UNIT_AMOUNT_CENTS,
+  ordersDisabled,
 } from "./_shared/constants.js";
 import { sanitiseCustomText } from "./_shared/sanitise.js";
 
@@ -17,6 +18,10 @@ function json(status, body) {
 export default async (req) => {
   if (req.method !== "POST") {
     return json(405, { error: "Method not allowed" });
+  }
+
+  if (ordersDisabled()) {
+    return json(403, { error: "Orders are paused", ordersOpen: false });
   }
 
   const secretKey = Netlify.env.get("STRIPE_SECRET_KEY");

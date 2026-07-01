@@ -1,9 +1,5 @@
-.success-body {
-  color: var(--theme-fg);
-}
-
-.success-label {
-  color: var(--theme-fg-alt);
+.success-main {
+  padding-top: var(--comp-section-md-height);
 }
 
 .home-link {
@@ -11,8 +7,4 @@
   text-decoration: underline;
   text-decoration-color: var(--theme-faint-alt);
   text-underline-offset: var(--comp-link-underline-offset);
-}
-
-.success-main {
-  padding-top: var(--comp-section-md-height);
 }

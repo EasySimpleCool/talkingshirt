@@ -7,10 +7,15 @@ export function initLanding() {
   const chestTextContainer = document.querySelector(".chest-text-container");
   const footer = document.querySelector(".footer");
   const addToCartBtn = document.getElementById("addToCart");
+  const addToCartWrap = document.getElementById("addToCartWrap");
   const sizeSelect = document.getElementById("sizeSelect");
   const sizeSelectText = document.getElementById("sizeSelectText");
   const headerToggle = document.getElementById("headerToggle");
   const aboutContent = document.getElementById("aboutContent");
+  const ordersPausedPost = document.getElementById("ordersPausedPost");
+  const ordersOpenPost = document.getElementById("ordersOpenPost");
+
+  const ORDER_LABEL = addToCartBtn.textContent.trim();
 
   const FULL_TEXT = "Talk some sh*rt";
 
@@ -249,7 +254,39 @@ export function initLanding() {
     sizeSelectText.textContent = sizeSelect.value;
   });
 
+  // Orders kill switch. The button and About posts default to the "open"
+  // state in the HTML; if the server reports orders are paused we flip the
+  // UI to match. A disabled button swallows clicks (CSS pointer-events:none),
+  // so the wrapper catches them and opens the About panel instead, where the
+  // "Orders are suspended" post lives.
+  function applyOrdersState(ordersOpen) {
+    addToCartBtn.disabled = !ordersOpen;
+    addToCartBtn.setAttribute("aria-disabled", String(!ordersOpen));
+    addToCartBtn.textContent = ordersOpen ? ORDER_LABEL : "Orders paused";
+    if (ordersPausedPost) ordersPausedPost.hidden = ordersOpen;
+    if (ordersOpenPost) ordersOpenPost.hidden = !ordersOpen;
+  }
+
+  addToCartWrap.addEventListener("click", () => {
+    if (!addToCartBtn.disabled) return;
+    if (!document.body.classList.contains("about-open")) {
+      headerToggle.click();
+    }
+  });
+
+  (async () => {
+    try {
+      const res = await fetch("/.netlify/functions/order-status");
+      const data = await res.json().catch(() => ({}));
+      applyOrdersState(data.ordersOpen !== false);
+    } catch {
+      // If the check fails, leave orders open (the safe default is that the
+      // server-side guard in create-checkout still refuses paused orders).
+    }
+  })();
+
   addToCartBtn.addEventListener("click", async () => {
+    if (addToCartBtn.disabled) return;
     const text = chestText.value.trim();
     const size = sizeSelect.value;
     if (!text) return;
@@ -265,6 +302,13 @@ export function initLanding() {
         body: JSON.stringify({ size, text }),
       });
       const data = await res.json().catch(() => ({}));
+      if (data.ordersOpen === false) {
+        applyOrdersState(false);
+        if (!document.body.classList.contains("about-open")) {
+          headerToggle.click();
+        }
+        return;
+      }
       if (!res.ok || !data.url) {
         throw new Error(data.error || "Checkout failed");
       }
