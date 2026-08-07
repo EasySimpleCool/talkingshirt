@@ -31,6 +31,25 @@ export function initLanding() {
   const COLOR_FLIP_START = 0.3;
   const COLOR_FLIP_END = 0.55;
 
+  // True while a touch is actively down, so scroll-driven focus calls know
+  // they're still inside a user gesture (required for mobile browsers to
+  // open the soft keyboard).
+  let touchActive = false;
+
+  function focusChestTextIfEditable() {
+    if (document.body.classList.contains("about-open")) return false;
+    if (!chestText.classList.contains("editable")) return false;
+    const active = document.activeElement;
+    const ownsFocus =
+      active &&
+      active !== document.body &&
+      active.matches("input, select, textarea, button");
+    if (active !== chestText && !ownsFocus) {
+      chestText.focus({ preventScroll: true });
+    }
+    return true;
+  }
+
   function parseCssColorToRgb(cssColor) {
     const hex = cssColor.trim().match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i);
     if (hex) {
@@ -233,6 +252,14 @@ export function initLanding() {
     } else {
       footer.classList.remove("footer--visible");
     }
+
+    // Mobile: while a finger is still down and drag-scrolling lands us in the
+    // edit zone, focus synchronously so the soft keyboard opens inside the
+    // active touch gesture (scrollend alone doesn't count as a user gesture
+    // on iOS/Android, so this can't wait for scroll to settle).
+    if (touchActive) {
+      focusChestTextIfEditable();
+    }
   }
 
   chestText.addEventListener("input", () => {
@@ -280,7 +307,8 @@ export function initLanding() {
     }
   }
 
-  addToCartWrap.addEventListener("click", () => {
+  addToCartWrap.addEventListener("click", (e) => {
+    if (e.target === addToCartBtn) return;
     if (!addToCartBtn.disabled) return;
     if (!document.body.classList.contains("about-open")) {
       headerToggle.click();
@@ -351,16 +379,7 @@ export function initLanding() {
   window.addEventListener("resize", handleScroll);
 
   window.addEventListener("scrollend", () => {
-    if (document.body.classList.contains("about-open")) return;
-    if (!chestText.classList.contains("editable")) return;
-    const active = document.activeElement;
-    const ownsFocus =
-      active &&
-      active !== document.body &&
-      active.matches("input, select, textarea, button");
-    if (active !== chestText && !ownsFocus) {
-      chestText.focus({ preventScroll: true });
-    }
+    focusChestTextIfEditable();
   });
 
   scrollContainer.addEventListener("click", () => {
@@ -369,6 +388,60 @@ export function initLanding() {
     if (document.activeElement === chestText) return;
     chestText.focus({ preventScroll: true });
   });
+
+  // Mobile: a fling can land the scroll in the edit zone after the finger
+  // has already lifted (momentum scroll settles later, on "scrollend" above,
+  // which by itself isn't a user gesture on iOS/Android). Track touch state
+  // so handleScroll() can focus synchronously while the finger is still
+  // down, and catch the "lifted exactly at the bottom" case here too.
+  window.addEventListener(
+    "touchstart",
+    () => {
+      touchActive = true;
+    },
+    { passive: true },
+  );
+
+  window.addEventListener(
+    "touchend",
+    () => {
+      touchActive = false;
+      focusChestTextIfEditable();
+    },
+    { passive: true },
+  );
+
+  window.addEventListener(
+    "touchcancel",
+    () => {
+      touchActive = false;
+    },
+    { passive: true },
+  );
+
+  // Mobile: keep the chest text above the soft keyboard. iOS/Android shrink
+  // window.visualViewport (not the layout viewport) when the keyboard opens,
+  // so nudge the fixed stage up by the covered amount while chestText is
+  // focused.
+  if (window.visualViewport) {
+    const vv = window.visualViewport;
+    const updateKeyboardOffset = () => {
+      if (document.activeElement !== chestText) {
+        document.documentElement.style.removeProperty("--kb-offset");
+        return;
+      }
+      const offset = Math.max(
+        0,
+        window.innerHeight - vv.height - vv.offsetTop,
+      );
+      document.documentElement.style.setProperty("--kb-offset", `${offset}px`);
+    };
+    vv.addEventListener("resize", updateKeyboardOffset);
+    vv.addEventListener("scroll", updateKeyboardOffset);
+    chestText.addEventListener("blur", () => {
+      document.documentElement.style.removeProperty("--kb-offset");
+    });
+  }
 
   handleScroll();
 }
