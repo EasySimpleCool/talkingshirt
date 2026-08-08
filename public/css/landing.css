@@ -74,6 +74,14 @@ body {
   animation: blink 1s steps(1) infinite;
 }
 
+/* When there's no headline text, the margins above (which otherwise cancel
+   out to zero width so the cursor doesn't skew text centering) would instead
+   skew the cursor itself off-center. Zero them so it centers on its own. */
+.text-run:empty + .cursor {
+  margin-left: 0;
+  margin-right: 0;
+}
+
 @keyframes blink {
   0%,
   50% {
