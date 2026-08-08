@@ -1,5 +1,7 @@
 /* Landing-only scroll/animation — not part of the design system.
-   May consume --theme-* for color only. All layout/motion values are local. */
+   May consume --theme-* for color and comp-* tokens where the Figma design
+   names one explicitly (e.g. --comp-section-lg-v-pad). Otherwise all
+   layout/motion values are local. */
 
 body {
   overflow-x: hidden;
@@ -10,7 +12,6 @@ body {
   --layout-copy-max: 120px;
   --layout-shirt-min: 720px;
   --layout-shirt-max: 960px;
-  --layout-scroll-hint-bottom: 120px;
   --layout-copy-size: clamp(
     var(--layout-copy-min),
     10vw,
@@ -94,8 +95,16 @@ body {
 }
 
 .scroll-hint {
+  /* KNOWN TOKEN BUG (upstream, not fixable here): --comp-section-lg-v-pad is
+     currently a flat 40px in the published talkingshirt-tokens package
+     (tokens/🟣 Comps/section.json binds comp.section.lg.v-pad to {number.40}
+     instead of the responsive {number.lg}), so this renders 40px at every
+     width. Figma's dev-mode shows this frame's v-pad as 80px on desktop.
+     Once the source token is corrected to {number.lg}, this becomes
+     responsive automatically (80px desktop / 40px mobile) with no change
+     needed here. */
   position: absolute;
-  bottom: var(--layout-scroll-hint-bottom);
+  bottom: var(--comp-section-lg-v-pad);
   left: 50%;
   transform: translate(-50%, 0);
   opacity: 0;
