@@ -43,8 +43,6 @@ body {
   pointer-events: none;
   background: var(--theme-bg);
   overflow: hidden;
-  transform: translateY(calc(-1 * var(--kb-offset, 0px)));
-  transition: transform 0.15s ease-out;
 }
 
 .animated-text {

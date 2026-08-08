@@ -1,5 +1,6 @@
 /* Figma text style: Medium — Output tier text-medium composite */
 .type-medium {
+  font-family: var(--text-medium-font-family);
   font-size: var(--text-medium-font-size);
   font-weight: var(--text-medium-font-weight);
   line-height: var(--text-medium-line-height);
@@ -8,6 +9,7 @@
 
 /* Figma text style: Small — Output tier text-small composite */
 .type-small {
+  font-family: var(--text-small-font-family);
   font-size: var(--text-small-font-size);
   font-weight: var(--text-small-font-weight);
   line-height: var(--text-small-line-height);
