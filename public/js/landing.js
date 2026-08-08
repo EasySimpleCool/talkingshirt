@@ -3,8 +3,7 @@ export function initLanding() {
   const animatedText = document.getElementById("animatedText");
   const textRun = document.getElementById("textRun");
   const cursor = document.getElementById("cursor");
-  const textMeasure = document.getElementById("textMeasure");
-  const scrollArrow = document.getElementById("scrollArrow");
+  const scrollHint = document.getElementById("scrollHint");
   const tshirtContainer = document.getElementById("tshirtContainer");
   const chestText = document.getElementById("chestText");
   const chestTextContainer = document.querySelector(".chest-text-container");
@@ -72,6 +71,7 @@ export function initLanding() {
   const FG_DARK_CSS = `rgb(${FG_DARK_RGB.join(", ")})`;
   const BG_LIGHT_RGB = parseCssColorToRgb(readToken("--theme-bg"));
   const BG_LIGHT_CSS = `rgb(${BG_LIGHT_RGB.join(", ")})`;
+  const LIVE_CARET_COLOR = `rgba(${BG_LIGHT_RGB[0]}, ${BG_LIGHT_RGB[1]}, ${BG_LIGHT_RGB[2]}, 0.5)`;
 
   function easeOutQuart(t) {
     return 1 - Math.pow(1 - t, 4);
@@ -85,46 +85,24 @@ export function initLanding() {
     return Math.min(Math.max(v, min), max);
   }
 
-  function measureTextWidth(str) {
-    textMeasure.textContent = str;
-    return textMeasure.offsetWidth;
-  }
-
-  function setHeadline(text, caretPos, caretVisible = true) {
+  function setHeadline(text) {
     textRun.textContent = text;
     textRun.classList.remove("chest-placeholder");
-
-    if (!caretVisible) {
-      cursor.style.visibility = "hidden";
-      return;
-    }
-    cursor.style.visibility = "";
-
-    let pos = caretPos;
-    if (pos == null || pos < 0 || pos > text.length) {
-      pos = text.length;
-    }
-    const prefixWidth = measureTextWidth(text.slice(0, pos));
-    cursor.style.insetInlineStart = `${textRun.offsetLeft + prefixWidth}px`;
   }
 
   function syncHeadlineFromInput() {
-    const { value, selectionStart, selectionEnd } = chestText;
-    const collapsed = selectionStart === selectionEnd;
-    setHeadline(value, collapsed ? selectionStart : null, collapsed);
+    setHeadline(chestText.value);
   }
 
   function setHeadlinePlaceholder(len) {
-    const shown = PLACEHOLDER_TEXT.slice(0, len);
-    textRun.textContent = shown;
+    textRun.textContent = PLACEHOLDER_TEXT.slice(0, len);
     textRun.classList.add("chest-placeholder");
-    cursor.style.visibility = "";
-    cursor.style.insetInlineStart = `${textRun.offsetLeft + measureTextWidth(shown)}px`;
   }
 
   function startPlaceholderTyping() {
     if (placeholderTimer || chestText.value.length > 0) return;
     placeholderActive = true;
+    updateCaretMode();
     let len = 0;
     setHeadlinePlaceholder(len);
     placeholderTimer = setInterval(() => {
@@ -143,6 +121,7 @@ export function initLanding() {
       placeholderTimer = null;
     }
     placeholderActive = false;
+    updateCaretMode();
   }
 
   function setHeadlineOpacity(value) {
@@ -174,6 +153,16 @@ export function initLanding() {
     }
   }
 
+  // Exactly one of {fake #cursor, real chestText caret} is visible at a time.
+  // "Live editing" = the overlay mirrors chestText's real value 1:1
+  // (editable, and not mid-placeholder-hint-animation).
+  function updateCaretMode() {
+    const isLiveEditing =
+      chestText.classList.contains("editable") && !placeholderActive;
+    cursor.style.visibility = isLiveEditing ? "hidden" : "";
+    chestText.style.caretColor = isLiveEditing ? LIVE_CARET_COLOR : "transparent";
+  }
+
   function getFinalScale() {
     const copyPx = parseFloat(getComputedStyle(animatedText).fontSize);
     const chestPx = parseFloat(getComputedStyle(chestText).fontSize);
@@ -202,15 +191,16 @@ export function initLanding() {
       setHeadlineTransform(1, 0);
       setHeadlineColor(FG_DARK_CSS);
       setCursorBg(null);
-      scrollArrow.classList.add("footer--visible");
+      scrollHint.classList.add("visible");
       setShirtRise(100);
       setShirtOpacity(0);
       chestText.classList.remove("editable");
+      updateCaretMode();
       footer.classList.remove("footer--visible");
       return;
     }
 
-    scrollArrow.classList.remove("footer--visible");
+    scrollHint.classList.remove("visible");
 
     if (progress < P.type) {
       const t = (progress - P.idle) / (P.type - P.idle);
@@ -223,6 +213,7 @@ export function initLanding() {
       setShirtRise(100);
       setShirtOpacity(0);
       chestText.classList.remove("editable");
+      updateCaretMode();
       footer.classList.remove("footer--visible");
       return;
     }
@@ -268,6 +259,7 @@ export function initLanding() {
       setHeadlineOpacity(1);
 
       chestText.classList.remove("editable");
+      updateCaretMode();
       footer.classList.remove("footer--visible");
       return;
     }
@@ -285,6 +277,7 @@ export function initLanding() {
     }
 
     chestText.classList.add("editable");
+    updateCaretMode();
     if (chestText.value.trim().length > 0) {
       footer.classList.add("footer--visible");
     } else {
@@ -311,12 +304,6 @@ export function initLanding() {
 
   chestText.addEventListener("blur", () => {
     stopPlaceholderTyping();
-  });
-
-  document.addEventListener("selectionchange", () => {
-    if (document.activeElement === chestText && !placeholderActive) {
-      syncHeadlineFromInput();
-    }
   });
 
   sizeSelect.addEventListener("change", () => {

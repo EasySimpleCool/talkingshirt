@@ -10,8 +10,7 @@ body {
   --layout-copy-max: 120px;
   --layout-shirt-min: 720px;
   --layout-shirt-max: 960px;
-  --layout-arrow-min: 55px;
-  --layout-arrow-max: 90px;
+  --layout-scroll-hint-bottom: 120px;
   --layout-copy-size: clamp(
     var(--layout-copy-min),
     10vw,
@@ -65,25 +64,14 @@ body {
 }
 
 .cursor {
-  position: absolute;
-  top: 50%;
-  inset-inline-start: 0;
+  display: inline-block;
   width: 0.06em;
   height: 0.85em;
   background: var(--cursor-bg, currentColor);
-  transform: translateY(-50%);
+  margin-left: 0.06em;
+  margin-right: -0.12em;
+  vertical-align: -0.05em;
   animation: blink 1s steps(1) infinite;
-  pointer-events: none;
-}
-
-.animated-text.animated-text--measure {
-  position: fixed;
-  visibility: hidden;
-  left: -99999px;
-  top: 0;
-  transform: none;
-  pointer-events: none;
-  z-index: -1;
 }
 
 @keyframes blink {
@@ -97,46 +85,21 @@ body {
   }
 }
 
-body:has(.chest-text.editable:not(:focus)) .cursor {
-  animation: none;
-  opacity: 0;
-}
-
-.scroll-arrow {
+.scroll-hint {
   position: absolute;
-  top: calc(var(--layout-stage-center) + var(--layout-copy-size) * 0.7);
+  bottom: var(--layout-scroll-hint-bottom);
   left: 50%;
   transform: translate(-50%, 0);
-  height: clamp(
-    var(--layout-arrow-min),
-    7vw,
-    var(--layout-arrow-max)
-  );
-  aspect-ratio: 8 / 39;
-  color: var(--theme-fg);
   opacity: 0;
   transition: opacity var(--motion-fade-dur) var(--motion-ease);
-  animation: arrowBounce 1.6s ease-in-out infinite;
 }
 
-.scroll-arrow svg {
-  display: block;
-  width: 100%;
-  height: 100%;
+.scroll-hint .icon-text {
+  align-items: center;
 }
 
-.scroll-arrow.visible {
-  opacity: 0.25;
-}
-
-@keyframes arrowBounce {
-  0%,
-  100% {
-    transform: translate(-50%, 0);
-  }
-  50% {
-    transform: translate(-50%, 10px);
-  }
+.scroll-hint.visible {
+  opacity: 1;
 }
 
 .tshirt-container {
