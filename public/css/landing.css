@@ -60,6 +60,10 @@ body {
   will-change: transform, color, opacity;
 }
 
+.chest-placeholder {
+  opacity: 0.45;
+}
+
 .cursor {
   display: inline-block;
   width: 0.06em;

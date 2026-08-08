@@ -20,6 +20,11 @@ export function initLanding() {
 
   const FULL_TEXT = "Talk some sh*rt";
 
+  const PLACEHOLDER_TEXT = "Type";
+  const PLACEHOLDER_TYPE_MS = 90;
+  let placeholderTimer = null;
+  let placeholderActive = false;
+
   const P = {
     idle: 0,
     type: 0.28,
@@ -92,6 +97,37 @@ export function initLanding() {
     setHeadline(chestText.value, chestText.selectionStart);
   }
 
+  function setHeadlinePlaceholder(len) {
+    const shown = PLACEHOLDER_TEXT.slice(0, len);
+    animatedText.innerHTML =
+      '<span class="chest-placeholder">' +
+      shown +
+      '</span><span class="cursor"></span>';
+  }
+
+  function startPlaceholderTyping() {
+    if (placeholderTimer || chestText.value.length > 0) return;
+    placeholderActive = true;
+    let len = 0;
+    setHeadlinePlaceholder(len);
+    placeholderTimer = setInterval(() => {
+      len += 1;
+      setHeadlinePlaceholder(len);
+      if (len >= PLACEHOLDER_TEXT.length) {
+        clearInterval(placeholderTimer);
+        placeholderTimer = null;
+      }
+    }, PLACEHOLDER_TYPE_MS);
+  }
+
+  function stopPlaceholderTyping() {
+    if (placeholderTimer) {
+      clearInterval(placeholderTimer);
+      placeholderTimer = null;
+    }
+    placeholderActive = false;
+  }
+
   function setHeadlineOpacity(value) {
     animatedText.style.opacity = String(value);
   }
@@ -140,6 +176,8 @@ export function initLanding() {
     const maxScroll =
       scrollContainer.offsetHeight - document.documentElement.clientHeight;
     const progress = clamp(scrollTop / maxScroll, 0, 1);
+
+    if (progress < P.delete) stopPlaceholderTyping();
 
     if (progress <= P.idle) {
       setHeadline("");
@@ -225,7 +263,9 @@ export function initLanding() {
       `rgba(${BG_LIGHT_RGB[0]}, ${BG_LIGHT_RGB[1]}, ${BG_LIGHT_RGB[2]}, 0.5)`,
     );
     setHeadlineOpacity(1);
-    syncHeadlineFromInput();
+    if (!placeholderActive) {
+      syncHeadlineFromInput();
+    }
 
     chestText.classList.add("editable");
     if (chestText.value.trim().length > 0) {
@@ -236,6 +276,7 @@ export function initLanding() {
   }
 
   chestText.addEventListener("input", () => {
+    stopPlaceholderTyping();
     syncHeadlineFromInput();
     const hasText = chestText.value.trim().length > 0;
     if (hasText) {
@@ -245,8 +286,18 @@ export function initLanding() {
     }
   });
 
+  chestText.addEventListener("focus", () => {
+    if (chestText.value.length === 0) {
+      startPlaceholderTyping();
+    }
+  });
+
+  chestText.addEventListener("blur", () => {
+    stopPlaceholderTyping();
+  });
+
   document.addEventListener("selectionchange", () => {
-    if (document.activeElement === chestText) {
+    if (document.activeElement === chestText && !placeholderActive) {
       syncHeadlineFromInput();
     }
   });
