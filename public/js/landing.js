@@ -1,6 +1,9 @@
 export function initLanding() {
   const scrollContainer = document.querySelector(".scroll-container");
   const animatedText = document.getElementById("animatedText");
+  const textRun = document.getElementById("textRun");
+  const cursor = document.getElementById("cursor");
+  const textMeasure = document.getElementById("textMeasure");
   const scrollArrow = document.getElementById("scrollArrow");
   const tshirtContainer = document.getElementById("tshirtContainer");
   const chestText = document.getElementById("chestText");
@@ -82,27 +85,41 @@ export function initLanding() {
     return Math.min(Math.max(v, min), max);
   }
 
-  function setHeadline(text, caretPos) {
+  function measureTextWidth(str) {
+    textMeasure.textContent = str;
+    return textMeasure.offsetWidth;
+  }
+
+  function setHeadline(text, caretPos, caretVisible = true) {
+    textRun.textContent = text;
+    textRun.classList.remove("chest-placeholder");
+
+    if (!caretVisible) {
+      cursor.style.visibility = "hidden";
+      return;
+    }
+    cursor.style.visibility = "";
+
     let pos = caretPos;
     if (pos == null || pos < 0 || pos > text.length) {
       pos = text.length;
     }
-    const before = text.slice(0, pos);
-    const after = text.slice(pos);
-    animatedText.innerHTML =
-      before + '<span class="cursor"></span>' + after;
+    const prefixWidth = measureTextWidth(text.slice(0, pos));
+    cursor.style.insetInlineStart = `${textRun.offsetLeft + prefixWidth}px`;
   }
 
   function syncHeadlineFromInput() {
-    setHeadline(chestText.value, chestText.selectionStart);
+    const { value, selectionStart, selectionEnd } = chestText;
+    const collapsed = selectionStart === selectionEnd;
+    setHeadline(value, collapsed ? selectionStart : null, collapsed);
   }
 
   function setHeadlinePlaceholder(len) {
     const shown = PLACEHOLDER_TEXT.slice(0, len);
-    animatedText.innerHTML =
-      '<span class="chest-placeholder">' +
-      shown +
-      '</span><span class="cursor"></span>';
+    textRun.textContent = shown;
+    textRun.classList.add("chest-placeholder");
+    cursor.style.visibility = "";
+    cursor.style.insetInlineStart = `${textRun.offsetLeft + measureTextWidth(shown)}px`;
   }
 
   function startPlaceholderTyping() {

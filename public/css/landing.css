@@ -65,21 +65,25 @@ body {
 }
 
 .cursor {
-  display: inline-block;
+  position: absolute;
+  top: 50%;
+  inset-inline-start: 0;
   width: 0.06em;
   height: 0.85em;
   background: var(--cursor-bg, currentColor);
-  margin-left: 0.06em;
-  vertical-align: -0.05em;
+  transform: translateY(-50%);
   animation: blink 1s steps(1) infinite;
+  pointer-events: none;
 }
 
-.cursor:not(:only-child):last-child {
-  margin-right: -0.12em;
-}
-
-.cursor:only-child {
-  margin-left: 0;
+.animated-text.animated-text--measure {
+  position: fixed;
+  visibility: hidden;
+  left: -99999px;
+  top: 0;
+  transform: none;
+  pointer-events: none;
+  z-index: -1;
 }
 
 @keyframes blink {
@@ -172,6 +176,7 @@ body:has(.chest-text.editable:not(:focus)) .cursor {
   color: transparent;
   font-size: var(--layout-chest-font);
   font-weight: var(--text-medium-font-weight);
+  line-height: normal;
   border: none;
   background: transparent;
   text-align: center;
@@ -180,6 +185,10 @@ body:has(.chest-text.editable:not(:focus)) .cursor {
   pointer-events: none;
   caret-color: transparent;
   font-family: inherit;
+}
+
+.chest-text::selection {
+  color: transparent;
 }
 
 .chest-text.editable {
