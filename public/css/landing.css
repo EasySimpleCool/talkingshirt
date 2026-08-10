@@ -29,7 +29,7 @@ body {
 }
 
 .scroll-container {
-  height: 300vh;
+  height: 270vh;
   position: relative;
   background: var(--theme-bg);
 }
@@ -73,6 +73,14 @@ body {
   margin-right: -0.12em;
   vertical-align: -0.05em;
   animation: blink 1s steps(1) infinite;
+}
+
+/* Backstop against the fake cursor and the real input's native caret ever
+   rendering at once: whenever chestText is focused with real text in it,
+   force the fake cursor hidden regardless of JS state (updateCaretMode
+   normally handles this, but this guarantees it can't desync). */
+.product-slider:has(#chestText:focus:not(:placeholder-shown)) #cursor {
+  visibility: hidden;
 }
 
 /* When there's no headline text, the margins above (which otherwise cancel

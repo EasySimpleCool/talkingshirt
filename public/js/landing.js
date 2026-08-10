@@ -26,6 +26,7 @@ export function initLanding() {
   const PLACEHOLDER_TYPE_MS = 90;
   let placeholderTimer = null;
   let placeholderActive = false;
+  let placeholderSettled = false;
 
   const P = {
     idle: 0,
@@ -103,6 +104,7 @@ export function initLanding() {
     if (placeholderTimer || chestText.value.length > 0) return;
     placeholderActive = true;
     updateCaretMode();
+    if (placeholderSettled) return;
     let len = 0;
     setHeadlinePlaceholder(len);
     placeholderTimer = setInterval(() => {
@@ -111,6 +113,7 @@ export function initLanding() {
       if (len >= PLACEHOLDER_TEXT.length) {
         clearInterval(placeholderTimer);
         placeholderTimer = null;
+        placeholderSettled = true;
       }
     }, PLACEHOLDER_TYPE_MS);
   }
@@ -153,14 +156,20 @@ export function initLanding() {
     }
   }
 
-  // Exactly one of {fake #cursor, real chestText caret} is visible at a time.
-  // "Live editing" = the overlay mirrors chestText's real value 1:1
-  // (editable, and not mid-placeholder-hint-animation).
+  // Exactly one of {fake overlay text, real chestText text} is visible at a
+  // time. "Live editing" = editable and not mid-placeholder-hint-animation.
+  // The overlay is rendered large and CSS-scaled down to align with chestText,
+  // and font kerning/hinting isn't perfectly linear across sizes — so once
+  // live editing starts, chestText's own text (and caret) take over as the
+  // sole visible rendering, rather than trying to keep two separately-sized
+  // renderings of the same string pixel-aligned glyph-for-glyph.
   function updateCaretMode() {
     const isLiveEditing =
       chestText.classList.contains("editable") && !placeholderActive;
     cursor.style.visibility = isLiveEditing ? "hidden" : "";
     chestText.style.caretColor = isLiveEditing ? LIVE_CARET_COLOR : "transparent";
+    chestText.style.color = isLiveEditing ? BG_LIGHT_CSS : "transparent";
+    setHeadlineOpacity(isLiveEditing ? 0 : 1);
   }
 
   function getFinalScale() {
@@ -226,6 +235,8 @@ export function initLanding() {
       setCursorBg(null);
       setShirtRise(100);
       setShirtOpacity(0);
+      chestText.classList.remove("editable");
+      updateCaretMode();
       footer.classList.remove("footer--visible");
       return;
     }
@@ -291,8 +302,10 @@ export function initLanding() {
     const hasText = chestText.value.trim().length > 0;
     if (hasText) {
       footer.classList.add("footer--visible");
+      placeholderSettled = false;
     } else {
       footer.classList.remove("footer--visible");
+      startPlaceholderTyping();
     }
   });
 
