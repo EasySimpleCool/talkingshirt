@@ -20,6 +20,23 @@ export function initLanding() {
   const ordersOpenPost = document.getElementById("ordersOpenPost");
   const stockLeft = document.getElementById("stockLeft");
 
+  // Frozen layout-viewport height, used instead of live vh/clientHeight
+  // everywhere in the scroll stage. Brave on iOS shrinks the layout viewport
+  // for the on-screen keyboard (unlike Safari/Chrome, which only shrink the
+  // visual viewport per spec), which would otherwise corrupt scroll progress
+  // and shirt geometry mid-type. Only refreshed while chestText isn't
+  // focused, so a keyboard-driven change (which only ever happens while
+  // focused) never updates it — only genuine resizes do.
+  let stageHeight = window.innerHeight;
+  document.documentElement.style.setProperty("--stage-h", `${stageHeight}px`);
+
+  function refreshStageHeight() {
+    if (document.activeElement === chestText) return;
+    if (Math.abs(window.innerHeight - stageHeight) < 100) return;
+    stageHeight = window.innerHeight;
+    document.documentElement.style.setProperty("--stage-h", `${stageHeight}px`);
+  }
+
   const ORDER_LABEL = addToCartBtn.textContent.trim();
 
   const FULL_TEXT = "Talk some sh*rt";
@@ -134,7 +151,7 @@ export function initLanding() {
   }
 
   function setShirtRise(riseVh) {
-    tshirtContainer.style.transform = `translate(-50%, calc(-1 * var(--layout-chest-y) + ${riseVh}vh))`;
+    tshirtContainer.style.transform = `translate(-50%, calc(-1 * var(--layout-chest-y) + ${riseVh / 100} * var(--stage-h)))`;
   }
 
   function setShirtOpacity(value) {
@@ -188,8 +205,7 @@ export function initLanding() {
 
   function isKeyboardOpen() {
     const vv = window.visualViewport;
-    if (!vv) return false;
-    return window.innerHeight - vv.height > 150;
+    return vv ? stageHeight - vv.height > 150 : false;
   }
 
   function handleScroll() {
@@ -203,8 +219,7 @@ export function initLanding() {
     }
 
     const scrollTop = window.scrollY;
-    const maxScroll =
-      scrollContainer.offsetHeight - document.documentElement.clientHeight;
+    const maxScroll = scrollContainer.offsetHeight - stageHeight;
     const progress = clamp(scrollTop / maxScroll, 0, 1);
 
     if (progress < P.delete) stopPlaceholderTyping();
@@ -447,7 +462,10 @@ export function initLanding() {
   });
 
   window.addEventListener("scroll", handleScroll, { passive: true });
-  window.addEventListener("resize", handleScroll);
+  window.addEventListener("resize", () => {
+    refreshStageHeight();
+    handleScroll();
+  });
 
   function syncFixedToVisualViewport() {
     const vv = window.visualViewport;

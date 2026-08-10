@@ -29,7 +29,10 @@ body {
 }
 
 .scroll-container {
-  height: 270vh;
+  /* --stage-h is a frozen window.innerHeight set by landing.js, not live vh —
+     Brave on iOS (unlike Safari/Chrome) shrinks the layout viewport for the
+     on-screen keyboard, which would otherwise collapse this height mid-type. */
+  height: calc(var(--stage-h, 100vh) * 2.7);
   position: relative;
   background: var(--theme-bg);
 }
