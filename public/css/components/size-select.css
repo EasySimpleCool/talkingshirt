@@ -29,3 +29,8 @@
   -moz-appearance: none;
   appearance: none;
 }
+
+.size-select-native option {
+  color: var(--theme-fg);
+  background: var(--theme-bg);
+}
