@@ -34,6 +34,8 @@ async function recordOrder(session) {
     text,
     size: size || "?",
     qty: 1,
+    fulfillment: session.shipping_cost?.amount_total === 0 ? "pickup" : "delivery",
+    phone: session.customer_details?.phone ?? null,
     ts: new Date().toISOString(),
   };
 

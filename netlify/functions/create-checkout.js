@@ -2,6 +2,7 @@ import Stripe from "stripe";
 import {
   ALLOWED_SIZES,
   CURRENCY,
+  PICKUP_SHIPPING_LABEL,
   SHIPPING_AMOUNT_CENTS,
   UNIT_AMOUNT_CENTS,
   ordersAtCapacity,
@@ -70,6 +71,7 @@ export default async (req) => {
       ],
       metadata,
       payment_intent_data: { metadata, statement_descriptor_suffix: "TEE" },
+      phone_number_collection: { enabled: true },
       shipping_address_collection: { allowed_countries: ["AU"] },
       shipping_options: [
         {
@@ -77,6 +79,13 @@ export default async (req) => {
             type: "fixed_amount",
             fixed_amount: { amount: SHIPPING_AMOUNT_CENTS, currency: CURRENCY },
             display_name: "Standard shipping",
+          },
+        },
+        {
+          shipping_rate_data: {
+            type: "fixed_amount",
+            fixed_amount: { amount: 0, currency: CURRENCY },
+            display_name: PICKUP_SHIPPING_LABEL,
           },
         },
       ],

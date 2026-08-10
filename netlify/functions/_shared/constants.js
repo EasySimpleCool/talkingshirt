@@ -4,6 +4,11 @@ export const UNIT_AMOUNT_CENTS = 2300;
 export const SHIPPING_AMOUNT_CENTS = 1000;
 export const CURRENCY = "aud";
 
+// Only a suburb is shown at checkout, never a precise address — the exact
+// meetup spot is arranged privately by text after the order comes in.
+export const PICKUP_SUBURB = "South Yarra";
+export const PICKUP_SHIPPING_LABEL = `Local pickup — ${PICKUP_SUBURB} (I'll message you to arrange the exact spot)`;
+
 // Kill switch: set ORDERS_DISABLED=true in Netlify to pause all orders.
 // Both create-checkout and order-status read this so the UI and the
 // server agree without a redeploy — just flip the env var.
