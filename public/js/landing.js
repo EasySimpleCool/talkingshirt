@@ -1,5 +1,6 @@
 export function initLanding() {
   const scrollContainer = document.querySelector(".scroll-container");
+  const fixedContent = document.querySelector(".fixed-content");
   const animatedText = document.getElementById("animatedText");
   const textRun = document.getElementById("textRun");
   const cursor = document.getElementById("cursor");
@@ -421,6 +422,19 @@ export function initLanding() {
     if (document.activeElement === chestText && chestText.classList.contains("editable")) return;
     handleScroll();
   });
+
+  function syncFixedToVisualViewport() {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    fixedContent.style.height = `${vv.height}px`;
+    fixedContent.style.transform = vv.offsetTop ? `translateY(${vv.offsetTop}px)` : "";
+  }
+
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", syncFixedToVisualViewport);
+    window.visualViewport.addEventListener("scroll", syncFixedToVisualViewport);
+    syncFixedToVisualViewport();
+  }
 
   window.addEventListener("scrollend", () => {
     if (document.body.classList.contains("about-open")) return;
