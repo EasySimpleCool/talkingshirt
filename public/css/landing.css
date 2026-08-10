@@ -26,6 +26,17 @@ body {
   --layout-chest-x: 51.25%;
   --layout-chest-y: 27%;
   --layout-chest-font: 4.7cqi;
+  --layout-shirt-keyboard-drop: 0px;
+}
+
+/* When the on-screen keyboard is up, .fixed-content shrinks to the visual
+   viewport and the shirt (chest anchored at 36% of that shrunken area) rides
+   too high — its collar sits above the visible frame. Drop it by a fraction
+   of the frozen stage so the collar reappears and the chest text sits nearer
+   the middle of the visible space. Toggled from landing.js via
+   isKeyboardOpen(). */
+body.keyboard-open {
+  --layout-shirt-keyboard-drop: calc(var(--stage-h, 100vh) * 0.12);
 }
 
 .scroll-container {

@@ -151,7 +151,7 @@ export function initLanding() {
   }
 
   function setShirtRise(riseVh) {
-    tshirtContainer.style.transform = `translate(-50%, calc(-1 * var(--layout-chest-y) + ${riseVh / 100} * var(--stage-h)))`;
+    tshirtContainer.style.transform = `translate(-50%, calc(-1 * var(--layout-chest-y) + ${riseVh / 100} * var(--stage-h) + var(--layout-shirt-keyboard-drop, 0px)))`;
   }
 
   function setShirtOpacity(value) {
@@ -474,6 +474,7 @@ export function initLanding() {
     fixedContent.style.transform = vv.offsetTop ? `translateY(${vv.offsetTop}px)` : "";
     const keyboardInset = window.innerHeight - vv.height - vv.offsetTop;
     footerSlider.style.bottom = keyboardInset > 0 ? `${keyboardInset}px` : "";
+    document.body.classList.toggle("keyboard-open", isKeyboardOpen());
   }
 
   if (window.visualViewport) {
