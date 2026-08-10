@@ -1,6 +1,7 @@
 export function initLanding() {
   const scrollContainer = document.querySelector(".scroll-container");
   const fixedContent = document.querySelector(".fixed-content");
+  const footerSlider = document.querySelector(".footer-slider");
   const animatedText = document.getElementById("animatedText");
   const textRun = document.getElementById("textRun");
   const cursor = document.getElementById("cursor");
@@ -185,8 +186,21 @@ export function initLanding() {
     return rect.left + rect.width / 2 - window.innerWidth / 2;
   }
 
+  function isKeyboardOpen() {
+    const vv = window.visualViewport;
+    if (!vv) return false;
+    return window.innerHeight - vv.height > 150;
+  }
+
   function handleScroll() {
     if (document.body.classList.contains("about-open")) return;
+    if (
+      document.activeElement === chestText &&
+      chestText.classList.contains("editable") &&
+      isKeyboardOpen()
+    ) {
+      return;
+    }
 
     const scrollTop = window.scrollY;
     const maxScroll =
@@ -310,7 +324,17 @@ export function initLanding() {
     }
   });
 
+  chestText.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      chestText.blur();
+    }
+  });
+
+  let scrollYBeforeFocus = null;
+
   chestText.addEventListener("focus", () => {
+    scrollYBeforeFocus = window.scrollY;
     if (chestText.value.length === 0) {
       startPlaceholderTyping();
     }
@@ -318,6 +342,11 @@ export function initLanding() {
 
   chestText.addEventListener("blur", () => {
     stopPlaceholderTyping();
+    if (scrollYBeforeFocus !== null) {
+      window.scrollTo(0, scrollYBeforeFocus);
+      scrollYBeforeFocus = null;
+    }
+    handleScroll();
   });
 
   sizeSelect.addEventListener("change", () => {
@@ -418,16 +447,15 @@ export function initLanding() {
   });
 
   window.addEventListener("scroll", handleScroll, { passive: true });
-  window.addEventListener("resize", () => {
-    if (document.activeElement === chestText && chestText.classList.contains("editable")) return;
-    handleScroll();
-  });
+  window.addEventListener("resize", handleScroll);
 
   function syncFixedToVisualViewport() {
     const vv = window.visualViewport;
     if (!vv) return;
     fixedContent.style.height = `${vv.height}px`;
     fixedContent.style.transform = vv.offsetTop ? `translateY(${vv.offsetTop}px)` : "";
+    const keyboardInset = window.innerHeight - vv.height - vv.offsetTop;
+    footerSlider.style.bottom = keyboardInset > 0 ? `${keyboardInset}px` : "";
   }
 
   if (window.visualViewport) {
