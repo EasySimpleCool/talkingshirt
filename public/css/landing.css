@@ -61,7 +61,10 @@ body.keyboard-open {
 
 .animated-text {
   position: absolute;
-  top: var(--layout-stage-center);
+  /* Follows the shirt's keyboard-drop so the placeholder (rendered here) and
+     the real chestText (rendered inside .tshirt-container, which the same
+     variable drops) stay Y-aligned — no jump when typing starts. */
+  top: calc(var(--layout-stage-center) + var(--layout-shirt-keyboard-drop, 0px));
   left: 50%;
   transform: translate(-50%, -50%) scale(1);
   transform-origin: center center;
