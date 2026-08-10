@@ -404,7 +404,10 @@ export function initLanding() {
   });
 
   window.addEventListener("scroll", handleScroll, { passive: true });
-  window.addEventListener("resize", handleScroll);
+  window.addEventListener("resize", () => {
+    if (document.activeElement === chestText && chestText.classList.contains("editable")) return;
+    handleScroll();
+  });
 
   window.addEventListener("scrollend", () => {
     if (document.body.classList.contains("about-open")) return;
