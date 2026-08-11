@@ -1,10 +1,11 @@
 export function initLanding() {
-  const stageEl = document.querySelector(".stage");
+  const scrollContainer = document.querySelector(".scroll-container");
   const fixedContent = document.querySelector(".fixed-content");
   const footerSlider = document.querySelector(".footer-slider");
   const animatedText = document.getElementById("animatedText");
   const textRun = document.getElementById("textRun");
   const cursor = document.getElementById("cursor");
+  const scrollHint = document.getElementById("scrollHint");
   const tshirtContainer = document.getElementById("tshirtContainer");
   const chestText = document.getElementById("chestText");
   const chestTextContainer = document.querySelector(".chest-text-container");
@@ -14,19 +15,18 @@ export function initLanding() {
   const sizeSelect = document.getElementById("sizeSelect");
   const sizeSelectText = document.getElementById("sizeSelectText");
   const headerToggle = document.getElementById("headerToggle");
-  const logo = document.querySelector(".logo");
   const aboutContent = document.getElementById("aboutContent");
   const ordersPausedPost = document.getElementById("ordersPausedPost");
   const ordersOpenPost = document.getElementById("ordersOpenPost");
   const stockLeft = document.getElementById("stockLeft");
 
   // Frozen layout-viewport height, used instead of live vh/clientHeight
-  // everywhere in the stage. Brave on iOS shrinks the layout viewport for the
-  // on-screen keyboard (unlike Safari/Chrome, which only shrink the visual
-  // viewport per spec), which would otherwise corrupt shirt geometry
-  // mid-type. Only refreshed while chestText isn't focused, so a
-  // keyboard-driven change (which only ever happens while focused) never
-  // updates it — only genuine resizes do.
+  // everywhere in the scroll stage. Brave on iOS shrinks the layout viewport
+  // for the on-screen keyboard (unlike Safari/Chrome, which only shrink the
+  // visual viewport per spec), which would otherwise corrupt scroll progress
+  // and shirt geometry mid-type. Only refreshed while chestText isn't
+  // focused, so a keyboard-driven change (which only ever happens while
+  // focused) never updates it — only genuine resizes do.
   let stageHeight = window.innerHeight;
   document.documentElement.style.setProperty("--stage-h", `${stageHeight}px`);
 
@@ -35,21 +35,6 @@ export function initLanding() {
     if (Math.abs(window.innerHeight - stageHeight) < 100) return;
     stageHeight = window.innerHeight;
     document.documentElement.style.setProperty("--stage-h", `${stageHeight}px`);
-  }
-
-  // Reference-counted body scroll lock shared by the About panel and chest-
-  // text edit mode, so one closing/blurring can't clobber the other's lock
-  // if they ever briefly overlap (About force-blurs chestText on open).
-  let scrollLockCount = 0;
-  function lockScroll() {
-    scrollLockCount++;
-    document.documentElement.classList.add("is-scroll-locked");
-  }
-  function unlockScroll() {
-    scrollLockCount = Math.max(0, scrollLockCount - 1);
-    if (scrollLockCount === 0) {
-      document.documentElement.classList.remove("is-scroll-locked");
-    }
   }
 
   const ORDER_LABEL = addToCartBtn.textContent.trim();
@@ -69,31 +54,6 @@ export function initLanding() {
     delete: 0.85,
     edit: 1.0,
   };
-
-  // Which "lane" of the journey we're in. Orthogonal to editLocked/
-  // placeholderActive/placeholderSettled below, which stay meaningful within
-  // any mode — this is the one cross-cutting, mutually-exclusive concern
-  // several independent listeners need to branch on.
-  const MODE = { AUTOPLAY: "autoplay", READY: "ready", EDIT: "edit", VIEW: "view" };
-  let mode = MODE.AUTOPLAY;
-
-  // Single source of truth for the animation's position (0-1), driven purely
-  // by time (see startAnimating) — never derived from real document scroll.
-  let progress = 0;
-
-  const AUTOPLAY_START_DELAY_MS = 1000; // initial blank/blink hold
-  let autoplayRafId = null;
-  let autoplayTimer1 = null;
-
-  const AUTOPLAY_STAGES = [
-    // Ramp from blank to the full "Talk some sh*rt" headline.
-    { from: 0, to: P.pause, duration: 1000, ease: easeInQuad },
-    // Continue from full headline to empty/shirt-risen end state.
-    // Linear-in-time: render()'s own pause<=progress<delete branch already
-    // applies its own easeOutQuart to the sub-range t for the rise/crossfade
-    // visuals, so a second easing here on top would double up.
-    { from: P.pause, to: 1, duration: 1000, ease: (t) => t },
-  ];
 
   const COLOR_FLIP_START = 0.3;
   const COLOR_FLIP_END = 0.55;
@@ -135,10 +95,6 @@ export function initLanding() {
 
   function easeOutQuart(t) {
     return 1 - Math.pow(1 - t, 4);
-  }
-
-  function easeInQuad(t) {
-    return t * t;
   }
 
   function lerp(a, b, t) {
@@ -252,10 +208,19 @@ export function initLanding() {
     return vv ? stageHeight - vv.height > 150 : false;
   }
 
-  function render() {
+  function handleScroll() {
     if (document.body.classList.contains("about-open")) return;
-    if (editLocked) return;
-    if (mode === MODE.VIEW) return;
+    if (
+      document.activeElement === chestText &&
+      chestText.classList.contains("editable") &&
+      isKeyboardOpen()
+    ) {
+      return;
+    }
+
+    const scrollTop = window.scrollY;
+    const maxScroll = scrollContainer.offsetHeight - stageHeight;
+    const progress = clamp(scrollTop / maxScroll, 0, 1);
 
     if (progress < P.delete) stopPlaceholderTyping();
 
@@ -265,6 +230,7 @@ export function initLanding() {
       setHeadlineTransform(1, 0);
       setHeadlineColor(FG_DARK_CSS);
       setCursorBg(null);
+      scrollHint.classList.add("visible");
       setShirtRise(100);
       setShirtOpacity(0);
       chestText.classList.remove("editable");
@@ -272,6 +238,8 @@ export function initLanding() {
       footer.classList.remove("footer--visible");
       return;
     }
+
+    scrollHint.classList.remove("visible");
 
     if (progress < P.type) {
       const t = (progress - P.idle) / (P.type - P.idle);
@@ -358,16 +326,6 @@ export function initLanding() {
     }
   }
 
-  // View-mode: reached when the user dismisses the keyboard. The footer
-  // drawer (size + order) only shows once there's text on the shirt.
-  function enterViewMode() {
-    mode = MODE.VIEW;
-    footer.classList.toggle(
-      "footer--visible",
-      chestText.value.trim().length > 0,
-    );
-  }
-
   chestText.addEventListener("input", () => {
     stopPlaceholderTyping();
     syncHeadlineFromInput();
@@ -388,18 +346,10 @@ export function initLanding() {
     }
   });
 
+  let scrollYBeforeFocus = null;
+
   chestText.addEventListener("focus", () => {
-    // render() adds .editable (and its pointer-events:auto) purely off
-    // progress, which crosses P.delete before autoplay's rAF loop itself
-    // reports done — a precisely-timed direct click on the input during that
-    // tail window could otherwise focus it early. Bounce it back out so
-    // "ignore input during autoplay" holds for this path too.
-    if (mode === MODE.AUTOPLAY) {
-      chestText.blur();
-      return;
-    }
-    mode = MODE.EDIT;
-    enterEditLock();
+    scrollYBeforeFocus = window.scrollY;
     if (chestText.value.length === 0) {
       startPlaceholderTyping();
     }
@@ -407,8 +357,11 @@ export function initLanding() {
 
   chestText.addEventListener("blur", () => {
     stopPlaceholderTyping();
-    exitEditLock();
-    enterViewMode();
+    if (scrollYBeforeFocus !== null) {
+      window.scrollTo(0, scrollYBeforeFocus);
+      scrollYBeforeFocus = null;
+    }
+    handleScroll();
   });
 
   sizeSelect.addEventListener("change", () => {
@@ -502,80 +455,26 @@ export function initLanding() {
     headerToggle.setAttribute("aria-label", open ? "Close about" : "About");
     headerToggle.setAttribute("aria-expanded", String(open));
     aboutContent.setAttribute("aria-hidden", String(!open));
-    if (open) {
-      lockScroll();
-    } else {
-      unlockScroll();
-    }
+    document.documentElement.classList.toggle("is-scroll-locked", open);
     if (open && document.activeElement === chestText) {
       chestText.blur();
     }
   });
 
+  window.addEventListener("scroll", handleScroll, { passive: true });
   window.addEventListener("resize", () => {
     refreshStageHeight();
-    render();
+    handleScroll();
   });
-
-  // Edit-mode keyboard clearance: while chestText is locked/focused, the
-  // keyboard shrinks visualViewport.height. Rather than resizing
-  // .fixed-content live to match (which used to make every top:%-based
-  // descendant jitter as the keyboard animated, since they resolve against
-  // its shrinking box), .fixed-content's own height stays pinned to the
-  // frozen --stage-h (see landing.css) and we instead wait for the
-  // visualViewport events to go quiet, then apply a single deliberate
-  // translateY shift that clears the keyboard.
-  let editLocked = false;
-  let editClearanceShiftPx = 0;
-  let vvSettleTimer = null;
-  const VV_SETTLE_MS = 120;
-  const STAGE_CENTER_FRACTION =
-    (parseFloat(readToken("--layout-stage-center")) || 36) / 100;
-
-  function applyFixedTransform() {
-    const vv = window.visualViewport;
-    const panY = vv ? vv.offsetTop : 0;
-    const y = panY - editClearanceShiftPx;
-    fixedContent.style.transform = y ? `translateY(${y}px)` : "";
-  }
-
-  function applyEditKeyboardClearance() {
-    const vv = window.visualViewport;
-    if (!vv) return;
-    const keyboardInsetPx = Math.max(0, stageHeight - vv.height);
-    editClearanceShiftPx = editLocked
-      ? Math.min(STAGE_CENTER_FRACTION * keyboardInsetPx, keyboardInsetPx)
-      : 0;
-    applyFixedTransform();
-  }
-
-  function scheduleEditKeyboardClearance() {
-    if (!editLocked) return;
-    clearTimeout(vvSettleTimer);
-    vvSettleTimer = setTimeout(applyEditKeyboardClearance, VV_SETTLE_MS);
-  }
-
-  function enterEditLock() {
-    editLocked = true;
-    lockScroll();
-  }
-
-  function exitEditLock() {
-    editLocked = false;
-    clearTimeout(vvSettleTimer);
-    editClearanceShiftPx = 0;
-    applyFixedTransform();
-    unlockScroll();
-  }
 
   function syncFixedToVisualViewport() {
     const vv = window.visualViewport;
     if (!vv) return;
-    applyFixedTransform();
+    fixedContent.style.height = `${vv.height}px`;
+    fixedContent.style.transform = vv.offsetTop ? `translateY(${vv.offsetTop}px)` : "";
     const keyboardInset = window.innerHeight - vv.height - vv.offsetTop;
     footerSlider.style.bottom = keyboardInset > 0 ? `${keyboardInset}px` : "";
     document.body.classList.toggle("keyboard-open", isKeyboardOpen());
-    scheduleEditKeyboardClearance();
   }
 
   if (window.visualViewport) {
@@ -584,90 +483,25 @@ export function initLanding() {
     syncFixedToVisualViewport();
   }
 
-  // Sole entry point into Edit-mode: an explicit tap, never a silent
-  // programmatic focus. Auto-focusing on scrollend (as this used to) doesn't
-  // reliably raise the on-screen keyboard on iOS/Android since it isn't
-  // driven by a real user gesture.
-  stageEl.addEventListener("click", () => {
+  window.addEventListener("scrollend", () => {
     if (document.body.classList.contains("about-open")) return;
     if (!chestText.classList.contains("editable")) return;
-    if (mode !== MODE.READY && mode !== MODE.VIEW) return;
+    const active = document.activeElement;
+    const ownsFocus =
+      active &&
+      active !== document.body &&
+      active.matches("input, select, textarea, button");
+    if (active !== chestText && !ownsFocus) {
+      chestText.focus({ preventScroll: true });
+    }
+  });
+
+  scrollContainer.addEventListener("click", () => {
+    if (document.body.classList.contains("about-open")) return;
+    if (!chestText.classList.contains("editable")) return;
     if (document.activeElement === chestText) return;
     chestText.focus({ preventScroll: true });
   });
 
-  logo.addEventListener("click", (e) => {
-    e.preventDefault();
-    if (document.body.classList.contains("about-open")) headerToggle.click();
-    if (document.activeElement === chestText) chestText.blur();
-    runIntroSequence();
-  });
-
-  // Auto-play orchestrator: plays the intro on load and is replayed by the
-  // logo click above. Fully self-resetting so it's safe to re-enter mid-run
-  // (e.g. the logo mashed repeatedly) without competing scroll loops.
-  function runIntroSequence() {
-    cancelAnimationFrame(autoplayRafId);
-    clearTimeout(autoplayTimer1);
-
-    if (editLocked) exitEditLock();
-    stopPlaceholderTyping();
-    placeholderSettled = false;
-    footer.classList.remove("footer--visible");
-
-    mode = MODE.AUTOPLAY;
-
-    progress = 0;
-    render();
-
-    autoplayTimer1 = setTimeout(startAnimating, AUTOPLAY_START_DELAY_MS);
-  }
-
-  function startAnimating() {
-    let lastTs = null;
-    let stageIndex = 0;
-    let elapsedInStage = 0;
-
-    function finish() {
-      progress = 1;
-      render();
-      mode = MODE.READY;
-      startPlaceholderTyping();
-    }
-
-    function frame(ts) {
-      const delta = lastTs === null ? 0 : ts - lastTs;
-      lastTs = ts;
-      if (!document.body.classList.contains("about-open")) {
-        elapsedInStage += delta;
-      }
-
-      // Advance past any stages that fully elapsed within one frame delta
-      // (e.g. after a tab-switch stall), rather than getting stuck replaying
-      // a finished stage.
-      while (
-        stageIndex < AUTOPLAY_STAGES.length &&
-        elapsedInStage >= AUTOPLAY_STAGES[stageIndex].duration
-      ) {
-        elapsedInStage -= AUTOPLAY_STAGES[stageIndex].duration;
-        stageIndex += 1;
-      }
-
-      if (stageIndex >= AUTOPLAY_STAGES.length) {
-        finish();
-        return;
-      }
-
-      const stage = AUTOPLAY_STAGES[stageIndex];
-      const t = clamp(elapsedInStage / stage.duration, 0, 1);
-      const eased = stage.ease(t);
-      progress = lerp(stage.from, stage.to, eased);
-      render();
-
-      autoplayRafId = requestAnimationFrame(frame);
-    }
-    autoplayRafId = requestAnimationFrame(frame);
-  }
-
-  runIntroSequence();
+  handleScroll();
 }

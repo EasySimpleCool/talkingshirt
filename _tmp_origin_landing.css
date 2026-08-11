@@ -1,16 +1,10 @@
-/* Landing-only intro animation — not part of the design system. May consume
-   --theme-* for color and comp-* tokens where the Figma design names one
-   explicitly. Otherwise all layout/motion values are local. */
+/* Landing-only scroll/animation — not part of the design system.
+   May consume --theme-* for color and comp-* tokens where the Figma design
+   names one explicitly (e.g. --comp-section-lg-v-pad). Otherwise all
+   layout/motion values are local. */
 
-/* The intro is a pure time-driven animation, never attached to real scroll —
-   lock the page down entirely so nothing (wheel, touch-drag, pull-to-refresh,
-   keyboard scroll) can move it. Scoped to this file, which only index.html
-   loads, so success.html (a normal-flow document that needs its own scroll)
-   is unaffected. */
-html,
 body {
-  overflow: hidden;
-  height: 100%;
+  overflow-x: hidden;
 }
 
 :root {
@@ -45,11 +39,11 @@ body.keyboard-open {
   --layout-shirt-keyboard-drop: calc(var(--stage-h, 100vh) * 0.12);
 }
 
-.stage {
+.scroll-container {
   /* --stage-h is a frozen window.innerHeight set by landing.js, not live vh —
      Brave on iOS (unlike Safari/Chrome) shrinks the layout viewport for the
      on-screen keyboard, which would otherwise collapse this height mid-type. */
-  height: var(--stage-h, 100vh);
+  height: calc(var(--stage-h, 100vh) * 2.7);
   position: relative;
   background: var(--theme-bg);
 }
@@ -59,15 +53,10 @@ body.keyboard-open {
   top: 0;
   left: 0;
   width: 100%;
-  /* Frozen --stage-h, not live vh — keeps every top:%-based descendant
-     (shirt, chest text, headline overlay) resolving against a stable box
-     instead of the live visualViewport height the keyboard shrinks, which
-     previously caused the whole scene to jitter as the keyboard animated. */
-  height: var(--stage-h, 100vh);
+  height: 100vh;
   pointer-events: none;
   background: var(--theme-bg);
   overflow: hidden;
-  transition: transform var(--motion-fade-dur) var(--motion-ease);
 }
 
 .animated-text {
@@ -128,6 +117,31 @@ body.keyboard-open {
   100% {
     opacity: 0;
   }
+}
+
+.scroll-hint {
+  /* KNOWN TOKEN BUG (upstream, not fixable here): --comp-section-lg-v-pad is
+     currently a flat 40px in the published talkingshirt-tokens package
+     (tokens/🟣 Comps/section.json binds comp.section.lg.v-pad to {number.40}
+     instead of the responsive {number.lg}), so this renders 40px at every
+     width. Figma's dev-mode shows this frame's v-pad as 80px on desktop.
+     Once the source token is corrected to {number.lg}, this becomes
+     responsive automatically (80px desktop / 40px mobile) with no change
+     needed here. */
+  position: absolute;
+  bottom: var(--comp-section-lg-v-pad);
+  left: 50%;
+  transform: translate(-50%, 0);
+  opacity: 0;
+  transition: opacity var(--motion-fade-dur) var(--motion-ease);
+}
+
+.scroll-hint .icon-text {
+  align-items: center;
+}
+
+.scroll-hint.visible {
+  opacity: 1;
 }
 
 .tshirt-container {

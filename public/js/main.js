@@ -1,6 +1,6 @@
 import { mountAll } from "./components/loader.js";
 
-if (document.querySelector(".scroll-container")) {
+if (document.querySelector(".stage")) {
   const { initLanding } = await import("./landing.js");
   initLanding();
 }
