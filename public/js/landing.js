@@ -411,7 +411,14 @@ export function initLanding() {
   });
 
   chestText.addEventListener("blur", () => {
-    stopPlaceholderTyping();
+    // Only tear the placeholder down once the user has committed real text.
+    // An empty-field blur (e.g. clicking the footer strip) should leave the
+    // "Type" overlay visible — placeholderActive flipping false while the
+    // input is empty would make updateCaretMode hide it, and there is no
+    // real value to paint in its place, so the shirt would go blank.
+    if (chestText.value.length > 0) {
+      stopPlaceholderTyping();
+    }
     exitEditLock();
     enterViewMode();
   });
