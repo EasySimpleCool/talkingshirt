@@ -119,34 +119,42 @@ body {
 }
 
 /* ----------------------------- Intro headline ----------------------------
-   Autoplays once on load: types "Talk some sh*rt" centered, holds, then
-   deletes as the shirt rises. Two children stack in the same grid cell:
-   a hidden __sizer that establishes the container's exact width to the
-   full text, and a visible __reveal whose width animates from 0 to that
-   width. Because the container's geometry is set by the sizer (never
-   changes), translate(-50%) keeps it dead-centred on the viewport for
-   the whole animation — the text types out from the left edge of the
-   fixed frame, no drift. */
+   Autoplays once on load: types "Talk some sh*rt" character-by-character,
+   holds, then deletes character-by-character while the shirt rises.
+
+   The visible text lives in a ::before pseudo whose `content` property is
+   animated through 16 discrete keyframes — one per character step. Because
+   the outer .intro-headline is `position: absolute; left: 50%;
+   transform: translate(-50%, ...)` and has no fixed width, the element's
+   box auto-sizes to whatever the pseudo currently contains and the
+   translate re-centres each frame. So typing grows the box outward from
+   the middle (new character appears at the trailing edge, whole visible
+   string stays centred on the viewport), and delete does the mirror. */
 
 .intro-headline {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  display: grid;
-  grid-template-columns: max-content;
   font-size: var(--intro-headline-size);
   font-weight: 700;
   color: var(--theme-fg);
-  white-space: nowrap;
+  /* pre keeps trailing spaces in the animated content: values from
+     collapsing, so "Talk " (with a real space at the end) renders wider
+     than "Talk" as it should during typing. */
+  white-space: pre;
   pointer-events: none;
   z-index: 2;
   line-height: 1;
+  /* Reserve a line-box even when the pseudo is empty so the drift
+     animation has something to move. */
+  min-height: 1em;
+  min-width: 1px;
   /* During the delete window the headline drifts up toward the chest
      area so the text visually settles onto the shirt (mirroring the
-     original, which literally landed it on the chest). Colour flip
-     runs alongside — text goes dark → light so it stays readable as
-     it moves over the dark tee. Hide follows the moment delete ends. */
+     original, which literally landed it on the chest). Colour flip runs
+     alongside — text goes dark → light so it stays readable as it moves
+     over the dark tee. Hide follows the moment delete ends. */
   animation:
     intro-headline-drift var(--intro-clear-ms)
       var(--intro-ease-in-out-quart)
@@ -175,25 +183,8 @@ body {
   to   { transform: translate(-50%, calc(-50% - 22cqh)); }
 }
 
-.intro-headline__sizer,
-.intro-headline__reveal {
-  grid-area: 1 / 1;
-  white-space: nowrap;
-}
-
-/* Reserves the container's final width by taking layout space; painted
-   invisibly so no ghost text ever shows. */
-.intro-headline__sizer {
-  visibility: hidden;
-}
-
-.intro-headline__reveal {
-  /* Reveal at full text width; clip-path insets from both sides equally
-     so the visible portion is always centred on the container's centre —
-     no matter how much has been revealed or how much is left to delete.
-     A width-based clip would left-anchor the text and leave the shrinking
-     remainder off-centre during the delete pass. */
-  clip-path: inset(0 50% 0 50%);
+.intro-headline::before {
+  content: "";
   animation:
     intro-type-in var(--intro-type-ms) var(--intro-ease-in-out-quart)
       var(--intro-blank-ms) forwards,
@@ -204,14 +195,46 @@ body {
       forwards;
 }
 
+/* One keyframe per character step of "Talk some sh*rt" (15 chars, 16
+   states including the empty start). Equal 6.667% spacing along the
+   animation timeline — the cubic-bezier easing applied to the animation
+   itself controls the pacing between these discrete content values. */
 @keyframes intro-type-in {
-  from { clip-path: inset(0 50% 0 50%); }
-  to   { clip-path: inset(0 0 0 0); }
+  0%     { content: ""; }
+  6.667% { content: "T"; }
+  13.333% { content: "Ta"; }
+  20%    { content: "Tal"; }
+  26.667% { content: "Talk"; }
+  33.333% { content: "Talk "; }
+  40%    { content: "Talk s"; }
+  46.667% { content: "Talk so"; }
+  53.333% { content: "Talk som"; }
+  60%    { content: "Talk some"; }
+  66.667% { content: "Talk some "; }
+  73.333% { content: "Talk some s"; }
+  80%    { content: "Talk some sh"; }
+  86.667% { content: "Talk some sh*"; }
+  93.333% { content: "Talk some sh*r"; }
+  100%   { content: "Talk some sh*rt"; }
 }
 
 @keyframes intro-type-out {
-  from { clip-path: inset(0 0 0 0); }
-  to   { clip-path: inset(0 50% 0 50%); }
+  0%     { content: "Talk some sh*rt"; }
+  6.667% { content: "Talk some sh*r"; }
+  13.333% { content: "Talk some sh*"; }
+  20%    { content: "Talk some sh"; }
+  26.667% { content: "Talk some s"; }
+  33.333% { content: "Talk some "; }
+  40%    { content: "Talk some"; }
+  46.667% { content: "Talk som"; }
+  53.333% { content: "Talk so"; }
+  60%    { content: "Talk s"; }
+  66.667% { content: "Talk "; }
+  73.333% { content: "Talk"; }
+  80%    { content: "Tal"; }
+  86.667% { content: "Ta"; }
+  93.333% { content: "T"; }
+  100%   { content: ""; }
 }
 
 @keyframes intro-headline-hide {
