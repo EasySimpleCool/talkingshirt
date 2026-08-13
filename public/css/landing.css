@@ -60,6 +60,10 @@ body {
      motion is done in the first 25% of the time. */
   --intro-ease-in-quad: cubic-bezier(0.55, 0.085, 0.68, 0.53);
   --intro-ease-out-quart: cubic-bezier(0.165, 0.84, 0.44, 1);
+  /* Symmetric ramp: gentle start, fast middle, gentle finish — feels right
+     for the headline typing and deleting where both endpoints (blank and
+     full) should read as settled beats. */
+  --intro-ease-in-out-quart: cubic-bezier(0.77, 0, 0.175, 1);
 
   --intro-headline-chars: 15;
   /* Sized off the shorter viewport axis so the headline never dwarfs the
@@ -126,7 +130,7 @@ body {
 
 .intro-headline {
   position: absolute;
-  top: 40%;
+  top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   display: grid;
@@ -138,11 +142,18 @@ body {
   pointer-events: none;
   z-index: 2;
   line-height: 1;
-  /* Colour flip during the delete window: dark → light so the vanishing
-     text tracks the "landing on shirt" moment from the original. Uses
-     easeOutQuart to match the render() ease that drove the colour lerp.
-     Hide runs on top the moment delete finishes. */
+  /* During the delete window the headline drifts up toward the chest
+     area so the text visually settles onto the shirt (mirroring the
+     original, which literally landed it on the chest). Colour flip
+     runs alongside — text goes dark → light so it stays readable as
+     it moves over the dark tee. Hide follows the moment delete ends. */
   animation:
+    intro-headline-drift var(--intro-clear-ms)
+      var(--intro-ease-in-out-quart)
+      calc(
+        var(--intro-blank-ms) + var(--intro-type-ms) + var(--intro-hold-ms)
+      )
+      forwards,
     intro-headline-colour-flip var(--intro-colour-flip-ms)
       var(--intro-ease-out-quart)
       var(--intro-colour-flip-delay) forwards,
@@ -152,6 +163,16 @@ body {
           var(--intro-clear-ms)
       )
       forwards;
+}
+
+@keyframes intro-headline-drift {
+  /* Drift up by ~22% of the stage's height so the headline settles near
+     the chest region of the shirt (chest sits at 27% down the tshirt
+     wrapper). cqh reads the container-type:size stage, so the drift
+     scales with whatever space header/footer leave behind — no vh math
+     that ignores the chrome. */
+  from { transform: translate(-50%, -50%); }
+  to   { transform: translate(-50%, calc(-50% - 22cqh)); }
 }
 
 .intro-headline__sizer,
@@ -169,14 +190,14 @@ body {
 .intro-headline__reveal {
   width: 0;
   overflow: hidden;
-  /* Smooth width clip (no steps()) so we can apply the original easings —
-     easeInQuad on the type-in matches how the original's stage-1 progress
-     eased characters in (slow start, accelerate); delete stays linear
-     because the original's render() used linear t for character count. */
+  /* Symmetric ease-in-out on both halves: reveal starts gentle, accelerates
+     through the middle characters, settles into the hold; delete mirrors
+     it back to zero. Reads as one continuous "in-and-out" ramp instead of
+     the linear step-through it was doing before. */
   animation:
-    intro-type-in var(--intro-type-ms) var(--intro-ease-in-quad)
+    intro-type-in var(--intro-type-ms) var(--intro-ease-in-out-quart)
       var(--intro-blank-ms) forwards,
-    intro-type-out var(--intro-clear-ms) linear
+    intro-type-out var(--intro-clear-ms) var(--intro-ease-in-out-quart)
       calc(
         var(--intro-blank-ms) + var(--intro-type-ms) + var(--intro-hold-ms)
       )
@@ -292,8 +313,10 @@ body {
     forwards;
 }
 
-.chest-text-container:has(.chest-text:not(:placeholder-shown))::before,
-.chest-text-container:has(.chest-text:focus)::before {
+/* Hide the ::before only when the user has typed real content — keeping
+   it visible on focus matches native placeholder behaviour, so the "Type"
+   hint stays put until it's actually replaced. */
+.chest-text-container:has(.chest-text:not(:placeholder-shown))::before {
   content: "" !important;
   animation: none;
 }
@@ -319,6 +342,14 @@ body {
         var(--intro-clear-ms)
     )
     forwards;
+}
+
+/* Suppress the caret while the placeholder is still showing — with the
+   input centre-aligned, an empty caret would blink right in the middle
+   of the "Type" pseudo. Restore the token caret as soon as real text
+   is entered. */
+.chest-text:placeholder-shown {
+  caret-color: transparent;
 }
 
 /* Native placeholder attribute is a single-space filler so
