@@ -50,6 +50,17 @@ body {
   --intro-placeholder-step-ms: 90ms;
   --intro-placeholder-ms: 360ms;
 
+  /* Easings ported from the original JS.
+     easeInQuad drove stage 1 (character reveal pace), so the headline
+     types out slow-start-then-accelerate — dropping steps() here so the
+     bezier can actually apply (steps and cubic-bezier can't combine on
+     one animation).
+     easeOutQuart drove the shirt rise and the colour/cursor lerps in
+     render(); it's the "snappy" ease from the original — 68% of the
+     motion is done in the first 25% of the time. */
+  --intro-ease-in-quad: cubic-bezier(0.55, 0.085, 0.68, 0.53);
+  --intro-ease-out-quart: cubic-bezier(0.165, 0.84, 0.44, 1);
+
   --intro-headline-chars: 15;
   /* Sized off the shorter viewport axis so the headline never dwarfs the
      shirt on landscape or crushes the composition on portrait. */
@@ -84,16 +95,18 @@ body {
 }
 
 /* Stage is a normal-flow section that expands to fill the space between
-   the fixed header and footer. Its data-section="lg" attribute adds the
-   design-system vertical/horizontal padding (via layout.css) so the shirt
-   never touches the edges. container-type:size lets .tshirt-container
-   read the stage's inner box via cqw/cqh — that's what keeps the shirt
-   always fully in view regardless of viewport aspect. */
+   the fixed header and footer. data-section="md" (in layout.css) gives
+   it the design-system horizontal padding at md scale; the fixed height
+   that comes with that attribute is overridden with flex:1 + height:auto
+   so the stage still stretches to fill available vertical space instead
+   of collapsing to --comp-section-md-height. container-type:size lets
+   .tshirt-container read the stage's inner box via cqw/cqh — that's
+   what keeps the shirt always fully in view regardless of viewport
+   aspect. */
 .stage {
   flex: 1;
   min-height: 0;
-  display: flex;
-  align-items: center;
+  height: auto;
   justify-content: center;
   background: var(--theme-bg);
   container-type: size;
@@ -126,10 +139,12 @@ body {
   z-index: 2;
   line-height: 1;
   /* Colour flip during the delete window: dark → light so the vanishing
-     text tracks the "landing on shirt" moment from the original. Hide
-     runs on top the moment delete finishes. */
+     text tracks the "landing on shirt" moment from the original. Uses
+     easeOutQuart to match the render() ease that drove the colour lerp.
+     Hide runs on top the moment delete finishes. */
   animation:
-    intro-headline-colour-flip var(--intro-colour-flip-ms) linear
+    intro-headline-colour-flip var(--intro-colour-flip-ms)
+      var(--intro-ease-out-quart)
       var(--intro-colour-flip-delay) forwards,
     intro-headline-hide 100ms linear
       calc(
@@ -154,17 +169,14 @@ body {
 .intro-headline__reveal {
   width: 0;
   overflow: hidden;
-  /* Two chained animations, each stepping character-by-character. Combining
-     type + hold + delete into one keyframes and applying steps() across
-     the whole thing would spread the 15 discrete jumps over all three
-     phases — you'd see about 7 chars typed and 3 chars deleted. Splitting
-     the phases keeps the per-character cadence for both. */
+  /* Smooth width clip (no steps()) so we can apply the original easings —
+     easeInQuad on the type-in matches how the original's stage-1 progress
+     eased characters in (slow start, accelerate); delete stays linear
+     because the original's render() used linear t for character count. */
   animation:
-    intro-type-in var(--intro-type-ms)
-      steps(var(--intro-headline-chars), end)
+    intro-type-in var(--intro-type-ms) var(--intro-ease-in-quad)
       var(--intro-blank-ms) forwards,
-    intro-type-out var(--intro-clear-ms)
-      steps(var(--intro-headline-chars), end)
+    intro-type-out var(--intro-clear-ms) linear
       calc(
         var(--intro-blank-ms) + var(--intro-type-ms) + var(--intro-hold-ms)
       )
@@ -206,7 +218,7 @@ body {
   opacity: 0;
   container-type: inline-size;
   animation: intro-shirt-rise var(--intro-rise-ms)
-    cubic-bezier(0.2, 0.8, 0.2, 1)
+    var(--intro-ease-out-quart)
     calc(
       var(--intro-blank-ms) + var(--intro-type-ms) + var(--intro-hold-ms)
     )
@@ -300,7 +312,8 @@ body {
   font-family: inherit;
   opacity: 0;
   pointer-events: none;
-  animation: intro-input-arrive var(--intro-arrive-ms) linear
+  animation: intro-input-arrive var(--intro-arrive-ms)
+    var(--intro-ease-out-quart)
     calc(
       var(--intro-blank-ms) + var(--intro-type-ms) + var(--intro-hold-ms) +
         var(--intro-clear-ms)
