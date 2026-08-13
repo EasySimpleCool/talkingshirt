@@ -22,7 +22,9 @@ html:has(details.about-panel[open]) {
   --intro-arrive-ms: 300ms;
 
   --intro-headline-chars: 15;
-  --intro-headline-size: clamp(40px, 10vw, 120px);
+  /* Sized off the shorter viewport axis so the headline never dwarfs the
+     shirt on landscape or crushes the composition on portrait. */
+  --intro-headline-size: clamp(28px, 6.5vmin, 72px);
 
   /* Chest position within the square tshirt asset. Measured from the red
      guide rectangle in tshirt-align.png (centre 50.2%,27.1%, size 21.8%×
@@ -63,27 +65,56 @@ html:has(details.about-panel[open]) {
 
 /* ----------------------------- Intro headline ----------------------------
    Autoplays once on load: types "Talk some sh*rt" centered, holds, then
-   deletes as the shirt rises. Uses the classic width + steps() typewriter
-   pattern so no JS is involved. */
+   deletes as the shirt rises. Two children stack in the same grid cell:
+   a hidden __sizer that establishes the container's exact width to the
+   full text, and a visible __reveal whose width animates from 0 to that
+   width. Because the container's geometry is set by the sizer (never
+   changes), translate(-50%) keeps it dead-centred on the viewport for
+   the whole animation — the text types out from the left edge of the
+   fixed frame, no drift. */
 
 .intro-headline {
   position: absolute;
   top: 40%;
   left: 50%;
   transform: translate(-50%, -50%);
+  display: grid;
+  grid-template-columns: max-content;
   font-size: var(--intro-headline-size);
-  font-weight: var(--text-medium-font-weight, 500);
+  font-weight: 700;
   color: var(--theme-fg);
   white-space: nowrap;
-  overflow: hidden;
   pointer-events: none;
   z-index: 2;
+  line-height: 1;
+  animation: intro-headline-hide 100ms linear
+    calc(
+      var(--intro-blank-ms) + var(--intro-type-ms) + var(--intro-hold-ms) +
+        var(--intro-clear-ms)
+    )
+    forwards;
+}
+
+.intro-headline__sizer,
+.intro-headline__reveal {
+  grid-area: 1 / 1;
+  white-space: nowrap;
+}
+
+/* Reserves the container's final width by taking layout space; painted
+   invisibly so no ghost text ever shows. */
+.intro-headline__sizer {
+  visibility: hidden;
+}
+
+.intro-headline__reveal {
   width: 0;
+  overflow: hidden;
   /* Two chained animations, each stepping character-by-character. Combining
-     type + hold + delete into one keyframes and applying steps() across the
-     whole thing would spread the 15 discrete jumps over all three phases —
-     you'd see about 7 chars typed and 3 chars deleted. Splitting the phases
-     keeps the per-character cadence for both. */
+     type + hold + delete into one keyframes and applying steps() across
+     the whole thing would spread the 15 discrete jumps over all three
+     phases — you'd see about 7 chars typed and 3 chars deleted. Splitting
+     the phases keeps the per-character cadence for both. */
   animation:
     intro-type-in var(--intro-type-ms)
       steps(var(--intro-headline-chars), end)
@@ -93,26 +124,16 @@ html:has(details.about-panel[open]) {
       calc(
         var(--intro-blank-ms) + var(--intro-type-ms) + var(--intro-hold-ms)
       )
-      forwards,
-    intro-headline-hide 100ms linear
-      calc(
-        var(--intro-blank-ms) + var(--intro-type-ms) + var(--intro-hold-ms) +
-          var(--intro-clear-ms)
-      )
       forwards;
-}
-
-.intro-headline::before {
-  content: "Talk some sh*rt";
 }
 
 @keyframes intro-type-in {
   from { width: 0; }
-  to { width: calc(1ch * var(--intro-headline-chars)); }
+  to { width: 100%; }
 }
 
 @keyframes intro-type-out {
-  from { width: calc(1ch * var(--intro-headline-chars)); }
+  from { width: 100%; }
   to { width: 0; }
 }
 
@@ -319,9 +340,11 @@ html:has(details.about-panel[open]) {
 
 /* --------------------------------- Size select --------------------------
    No-JS: hide the cosmetic label mirror and reveal the native <select> so
-   it shows whichever size is chosen. -webkit-appearance:none strips OS
-   chrome; the OS dropdown still opens on tap because the element is a
-   real <select>, keeping the change flow accessible everywhere. */
+   it shows whichever size is chosen. Draw the underline as a real
+   border-bottom (with 2px of padding above it), not text-decoration —
+   Safari and Firefox render text-decoration on <select> inconsistently
+   once -webkit-appearance:none is applied, and this way the underline
+   is guaranteed. */
 
 .size-select-text {
   display: none;
@@ -334,12 +357,13 @@ html:has(details.about-panel[open]) {
   height: auto;
   color: var(--theme-fg);
   background: transparent;
+  background-image: none;
   font: inherit;
-  padding: 0;
+  padding: 0 0 2px;
   border: 0;
-  text-decoration: underline;
-  text-decoration-color: var(--theme-faint);
-  text-underline-offset: var(--comp-link-underline-offset);
+  border-bottom: 1px solid
+    var(--theme-faint, currentColor);
+  border-radius: 0;
   cursor: pointer;
   -webkit-appearance: none;
   -moz-appearance: none;
