@@ -373,7 +373,20 @@ export function initLanding() {
     );
   }
 
+  const EMOJI_RE =
+    /\p{Extended_Pictographic}(\uFE0F|\u200D\p{Extended_Pictographic})*|[\u{1F1E6}-\u{1F1FF}]/gu;
+
   chestText.addEventListener("input", () => {
+    const cleaned = chestText.value.replace(EMOJI_RE, "");
+    if (cleaned !== chestText.value) {
+      const pos = chestText.selectionStart;
+      const delta = chestText.value.length - cleaned.length;
+      chestText.value = cleaned;
+      try {
+        const next = Math.max(0, pos - delta);
+        chestText.setSelectionRange(next, next);
+      } catch {}
+    }
     stopPlaceholderTyping();
     syncHeadlineFromInput();
     const hasText = chestText.value.trim().length > 0;
