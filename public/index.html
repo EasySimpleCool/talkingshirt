@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=overlays-content" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content" />
     <meta
       name="format-detection"
       content="telephone=no, email=no, address=no, date=no"
@@ -16,7 +16,6 @@
     <meta name="twitter:title" content="TalkingSh*rt" />
     <meta name="twitter:description" content="Custom tees." />
 
-    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -31,6 +30,18 @@
     <link rel="stylesheet" href="/css/landing.css" />
   </head>
   <body>
+    <!-- CSS-only About panel toggle. Hidden checkbox drives .about-open state
+         via a sibling ~ selector chain. The label in the header flips it; the
+         logo stays a real <a href="/"> so it can navigate without also
+         toggling the panel (which would happen if both lived inside a
+         <details>/<summary>). -->
+    <input
+      type="checkbox"
+      id="aboutOpen"
+      class="about-toggle"
+      aria-label="Toggle About panel"
+    />
+
     <div class="header header--fixed" data-section="md" data-type="home" role="banner">
       <div data-container>
         <div data-row data-justify="between">
@@ -38,120 +49,27 @@
             <a class="logo" href="/" aria-label="TalkingSh*rt home">
               <span class="logo__img" aria-hidden="true"></span>
             </a>
-    
-            <div class="header__title type-medium" aria-hidden="true">About</div>
+            <span class="header__title type-medium" aria-hidden="true">About</span>
           </div>
-          <button
-            class="header__toggle"
-            id="headerToggle"
-            data-about-toggle
-            type="button"
-            aria-label="About"
-            aria-expanded="false"
-            aria-controls="aboutContent"
-          >
+          <label class="header__toggle" for="aboutOpen">
             <span class="header__toggle-state header__toggle-state--home icon-text" data-row data-gap="2xs">
               <span class="icon-text__label type-small">About</span>
               <span class="icon-text__icon icon-text__icon--ball" aria-hidden="true"></span>
             </span>
-            <span
-              class="header__toggle-state header__toggle-state--about icon-text"
-              data-row
-              data-gap="2xs"
-            >
+            <span class="header__toggle-state header__toggle-state--about icon-text" data-row data-gap="2xs">
               <span class="icon-text__label type-small">Close</span>
               <span class="icon-text__icon icon-text__icon--close" aria-hidden="true"></span>
             </span>
-          </button>
+          </label>
         </div>
       </div>
     </div>
 
-    <div class="footer-slider">
-      <div class="footer" data-section="md" role="contentinfo">
-        <div data-container>
-          <div data-row data-justify="between">
-            <label class="size-select">
-              <span class="size-select-text type-medium" id="sizeSelectText"
-                >Large</span
-              >
-              <select
-                class="size-select-native"
-                id="sizeSelect"
-                aria-label="Size"
-              >
-                <option value="Small">Small</option>
-                <option value="Medium">Medium</option>
-                <option value="Large" selected>Large</option>
-                <option value="XLarge">XLarge</option>
-                <option value="XXLarge">XXLarge</option>
-              </select>
-            </label>
-            <span class="order-actions">
-              <span data-row data-gap="xs">
-                <span
-                  class="stock-left type-small"
-                  id="stockLeft"
-                  aria-live="polite"
-                  hidden
-                ></span>
-                <span class="button-wrap" id="addToCartWrap">
-                  <button
-                    class="button type-medium"
-                    id="addToCart"
-                    type="button"
-                  >
-                    Order | $23
-                  </button>
-                </span>
-              </span>
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="stage">
-      <div class="fixed-content">
-        <div class="product-slider" id="productSlider">
-          <div class="animated-text" id="animatedText">
-            <span class="text-run" id="textRun"></span><span class="cursor" id="cursor"></span>
-          </div>
-
-          <div class="tshirt-container" id="tshirtContainer">
-            <div class="tshirt-wrapper">
-              <img
-                src="/assets/images/black-tee.png"
-                alt="Black T-shirt"
-                class="tshirt-image"
-              />
-              <div class="chest-text-container">
-                <input
-                  type="text"
-                  class="chest-text"
-                  id="chestText"
-                  maxlength="12"
-                  placeholder=" "
-                  aria-label="Shirt text"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div
-      class="about-content about-content--overlay"
-      id="aboutContent"
-      data-section="lg"
-      role="region"
-      aria-label="About"
-      aria-hidden="true"
-    >
+    <div class="about-content" data-section="lg" role="region" aria-label="About">
       <div data-container>
         <div data-stack data-gap="lg">
-          <div class="post" data-stack id="ordersOpenPost">
+          <!--ORDER_STATE_POST-->
+          <div class="post" data-stack>
             <div class="post-head" data-row data-justify="between">
               <span class="post-label type-small">Open</span>
               <time class="post-date type-small" datetime="2026-04-12">
@@ -194,6 +112,72 @@
       </div>
     </div>
 
-    <script type="module" src="/js/main.js"></script>
+    <form
+      class="order-form"
+      method="POST"
+      action="/.netlify/functions/create-checkout"
+    >
+      <div class="stage">
+        <span class="intro-headline" aria-hidden="true"></span>
+
+        <div class="tshirt-container">
+          <div class="tshirt-wrapper">
+            <!-- Fallback: black-tee.png. Swap to tshirt-align.png while
+                 tuning .chest-text-container against the alignment guide,
+                 then to tshirt.png for production. Both new assets are
+                 square with the tee centred so the chest sits at a fixed
+                 % of the wrapper regardless of viewport width. -->
+            <img
+              src="/assets/images/black-tee.png"
+              alt="Black T-shirt"
+              class="tshirt-image"
+            />
+            <label class="chest-text-container">
+              <span class="visually-hidden">Shirt text</span>
+              <input
+                type="text"
+                class="chest-text"
+                name="text"
+                maxlength="12"
+                placeholder="Type"
+                required
+                autocomplete="off"
+                autocapitalize="off"
+                spellcheck="false"
+              />
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-slider footer-slider--static">
+        <div class="footer" data-section="md" role="contentinfo">
+          <div data-container>
+            <div data-row data-justify="between">
+              <label class="size-select">
+                <span class="size-select-text type-medium">Large</span>
+                <select class="size-select-native" name="size" aria-label="Size">
+                  <option value="Small">Small</option>
+                  <option value="Medium">Medium</option>
+                  <option value="Large" selected>Large</option>
+                  <option value="XLarge">XLarge</option>
+                  <option value="XXLarge">XXLarge</option>
+                </select>
+              </label>
+              <span class="order-actions">
+                <span data-row data-gap="xs">
+                  <!--STOCK_LEFT-->
+                  <span class="button-wrap">
+                    <button class="button type-medium" type="submit">
+                      Order | $23
+                    </button>
+                  </span>
+                </span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
   </body>
 </html>

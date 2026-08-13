@@ -10,8 +10,9 @@ export const PICKUP_SUBURB = "South Yarra";
 export const PICKUP_SHIPPING_LABEL = `Local pickup — ${PICKUP_SUBURB} (I'll message you to arrange the exact spot)`;
 
 // Kill switch: set ORDERS_DISABLED=true in Netlify to pause all orders.
-// Both create-checkout and order-status read this so the UI and the
-// server agree without a redeploy — just flip the env var.
+// The home edge function and create-checkout both read this so the
+// server-rendered UI and the checkout guard agree without a redeploy —
+// just flip the env var.
 export function ordersDisabled() {
   const flag = Netlify.env.get("ORDERS_DISABLED");
   return flag === "true" || flag === "1" || flag === "yes";

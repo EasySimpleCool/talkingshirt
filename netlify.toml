@@ -2,6 +2,20 @@
   command = "npm ci && npm run build:site"
   publish = "public"
   functions = "netlify/functions"
+  edge_functions = "netlify/edge-functions"
 
 [build.environment]
   NODE_VERSION = "20"
+
+# Bundle the confirmation template with the function that renders it.
+[functions."order-confirmed"]
+  included_files = ["public/success.html"]
+
+# Route the Stripe success return to the fulfillment-aware renderer.
+# create-checkout points success_url at /success.html?session_id=...
+# so we rewrite that (and the bare /success.html) to the function.
+[[redirects]]
+  from = "/success.html"
+  to = "/.netlify/functions/order-confirmed"
+  status = 200
+  force = true

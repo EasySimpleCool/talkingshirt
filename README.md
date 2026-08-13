@@ -37,17 +37,17 @@ npm run build:site
 ```
 public/
   css/main.css           # Component CSS bundle
-  css/landing.css        # Landing-only styles (index.html)
+  css/landing.css        # Landing-only styles + CSS-only intro (index.html)
   css/components/        # Hand-written component CSS
-  js/main.js             # Page bootstrap
-  js/landing.js          # Landing interactions
-  js/components/         # Partial loader + HTML templates
   assets/images/         # SVG, PNG
-netlify/functions/       # Stripe checkout + webhook
+netlify/functions/       # Stripe checkout, webhook, confirmation-page render
+netlify/edge-functions/  # Home page: injects order state into index.html
 stories/                 # Storybook stories (Figma components)
 .storybook/              # Storybook config
 docs/                    # Internal docs (not deployed)
 ```
+
+The landing page ships **no client-side JavaScript** — the intro animation is a pure-CSS keyframe timeline, the About panel is a hidden-checkbox toggle, size selection is a native `<select>`, and Stripe checkout is a plain `<form method="POST">` that the function replies to with a 303 redirect.
 
 ## Tokens
 

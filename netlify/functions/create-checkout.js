@@ -9,48 +9,74 @@ import {
 } from "./_shared/constants.js";
 import { sanitiseCustomText } from "./_shared/sanitise.js";
 
-function json(status, body) {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { "content-type": "application/json" },
+function redirect(location) {
+  return new Response(null, {
+    status: 303,
+    headers: { location, "cache-control": "no-store" },
   });
 }
 
+function errorRedirect(origin, code) {
+  const url = new URL("/", origin);
+  url.searchParams.set("checkout_error", code);
+  return redirect(url.toString());
+}
+
+function isFormRequest(req) {
+  const type = req.headers.get("content-type") || "";
+  return (
+    type.includes("application/x-www-form-urlencoded") ||
+    type.includes("multipart/form-data")
+  );
+}
+
+async function readPayload(req) {
+  if (isFormRequest(req)) {
+    const form = await req.formData();
+    return {
+      size: form.get("size"),
+      text: form.get("text"),
+    };
+  }
+  return req.json();
+}
+
 export default async (req) => {
+  const origin = Netlify.env.get("URL") || new URL(req.url).origin;
+
   if (req.method !== "POST") {
-    return json(405, { error: "Method not allowed" });
+    return errorRedirect(origin, "method");
   }
 
   const capacity = await ordersAtCapacity();
   if (capacity.atCapacity) {
-    return json(403, { error: "Orders are paused", ordersOpen: false });
+    return errorRedirect(origin, "paused");
   }
 
   const secretKey = Netlify.env.get("STRIPE_SECRET_KEY");
   if (!secretKey) {
-    return json(500, { error: "Server is missing STRIPE_SECRET_KEY" });
+    return errorRedirect(origin, "server");
   }
 
   let payload;
   try {
-    payload = await req.json();
+    payload = await readPayload(req);
   } catch {
-    return json(400, { error: "Invalid JSON body" });
+    return errorRedirect(origin, "invalid");
   }
 
   const size = typeof payload?.size === "string" ? payload.size : "";
   const textResult = sanitiseCustomText(payload?.text);
 
   if (!ALLOWED_SIZES.has(size)) {
-    return json(400, { error: "Invalid size" });
+    return errorRedirect(origin, "size");
   }
   if (!textResult.ok) {
-    return json(400, { error: textResult.error });
+    return errorRedirect(origin, "text");
   }
 
   const text = textResult.text;
   const stripe = new Stripe(secretKey);
-  const origin = Netlify.env.get("URL") || new URL(req.url).origin;
   const metadata = { size, custom_text: text };
 
   try {
@@ -93,9 +119,9 @@ export default async (req) => {
       cancel_url: `${origin}/`,
     });
 
-    return json(200, { url: session.url });
+    return redirect(session.url);
   } catch (err) {
     console.error("Stripe session create failed:", err);
-    return json(500, { error: "Could not start checkout" });
+    return errorRedirect(origin, "stripe");
   }
 };

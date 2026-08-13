@@ -1,221 +1,245 @@
-/* Landing-only intro animation — not part of the design system. May consume
-   --theme-* for color and comp-* tokens where the Figma design names one
-   explicitly. Otherwise all layout/motion values are local. */
+/* Landing-only intro animation — pure CSS, no JS. The intro is a canned
+   timeline, not scroll-driven. The chest input IS the visible shirt text
+   at all times (no mirror element), so typing goes straight onto the tee. */
 
-/* The intro is a pure time-driven animation, never attached to real scroll —
-   lock the page down entirely so nothing (wheel, touch-drag, pull-to-refresh,
-   keyboard scroll) can move it. Scoped to this file, which only index.html
-   loads, so success.html (a normal-flow document that needs its own scroll)
-   is unaffected. */
 html,
 body {
   overflow: hidden;
   height: 100%;
 }
 
-:root {
-  --layout-copy-min: 40px;
-  --layout-copy-max: 120px;
-  --layout-shirt-min: 720px;
-  --layout-shirt-max: 960px;
-  --layout-copy-size: clamp(
-    var(--layout-copy-min),
-    10vw,
-    var(--layout-copy-max)
-  );
-  --layout-shirt-size: clamp(
-    var(--layout-shirt-min),
-    140vw,
-    var(--layout-shirt-max)
-  );
-  --layout-stage-center: 36%;
-  --layout-chest-x: 51.25%;
-  --layout-chest-y: 27%;
-  --layout-chest-font: 4.7cqi;
-  --layout-shirt-keyboard-drop: 0px;
+/* Only the About panel needs its own scroll — lock the rest. */
+html:has(details.about-panel[open]) {
+  overflow: hidden;
 }
 
-/* When the on-screen keyboard is up, .fixed-content shrinks to the visual
-   viewport and the shirt (chest anchored at 36% of that shrunken area) rides
-   too high — its collar sits above the visible frame. Drop it by a fraction
-   of the frozen stage so the collar reappears and the chest text sits nearer
-   the middle of the visible space. Toggled from landing.js via
-   isKeyboardOpen(). */
-body.keyboard-open {
-  --layout-shirt-keyboard-drop: calc(var(--stage-h, 100vh) * 0.12);
+:root {
+  --intro-blank-ms: 400ms;
+  --intro-type-ms: 1100ms;
+  --intro-hold-ms: 500ms;
+  --intro-clear-ms: 500ms;
+  --intro-rise-ms: 1200ms;
+  --intro-arrive-ms: 300ms;
+
+  --intro-headline-chars: 15;
+  --intro-headline-size: clamp(40px, 10vw, 120px);
+
+  /* Chest position within the square tshirt asset. Tune these against
+     tshirt-align.png so the input snaps to the chest marker at every width. */
+  --chest-top: 42%;
+  --chest-left: 50%;
+  --chest-width: 60%;
+  --chest-font-size: 5cqi;
+
+  --shirt-size: min(94vw, 720px);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.order-form {
+  display: contents;
 }
 
 .stage {
-  /* --stage-h is a frozen window.innerHeight set by landing.js, not live vh —
-     Brave on iOS (unlike Safari/Chrome) shrinks the layout viewport for the
-     on-screen keyboard, which would otherwise collapse this height mid-type. */
-  height: var(--stage-h, 100vh);
-  position: relative;
-  background: var(--theme-bg);
-}
-
-.fixed-content {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  /* Frozen --stage-h, not live vh — keeps every top:%-based descendant
-     (shirt, chest text, headline overlay) resolving against a stable box
-     instead of the live visualViewport height the keyboard shrinks, which
-     previously caused the whole scene to jitter as the keyboard animated. */
-  height: var(--stage-h, 100vh);
-  pointer-events: none;
+  inset: 0;
   background: var(--theme-bg);
   overflow: hidden;
-  transition: transform var(--motion-fade-dur) var(--motion-ease);
 }
 
-.animated-text {
+/* ----------------------------- Intro headline ----------------------------
+   Autoplays once on load: types "Talk some sh*rt" centered, holds, then
+   deletes as the shirt rises. Uses the classic width + steps() typewriter
+   pattern so no JS is involved. */
+
+.intro-headline {
   position: absolute;
-  /* Follows the shirt's keyboard-drop so the placeholder (rendered here) and
-     the real chestText (rendered inside .tshirt-container, which the same
-     variable drops) stay Y-aligned — no jump when typing starts. */
-  top: calc(var(--layout-stage-center) + var(--layout-shirt-keyboard-drop, 0px));
+  top: 40%;
   left: 50%;
-  transform: translate(-50%, -50%) scale(1);
-  transform-origin: center center;
-  font-size: var(--layout-copy-size);
-  font-weight: var(--text-medium-font-weight);
+  transform: translate(-50%, -50%);
+  font-size: var(--intro-headline-size);
+  font-weight: var(--text-medium-font-weight, 500);
   color: var(--theme-fg);
-  text-align: center;
   white-space: nowrap;
+  overflow: hidden;
+  pointer-events: none;
   z-index: 2;
-  will-change: transform, color, opacity;
+  width: 0;
+  /* Two chained animations, each stepping character-by-character. Combining
+     type + hold + delete into one keyframes and applying steps() across the
+     whole thing would spread the 15 discrete jumps over all three phases —
+     you'd see about 7 chars typed and 3 chars deleted. Splitting the phases
+     keeps the per-character cadence for both. */
+  animation:
+    intro-type-in var(--intro-type-ms)
+      steps(var(--intro-headline-chars), end)
+      var(--intro-blank-ms) forwards,
+    intro-type-out var(--intro-clear-ms)
+      steps(var(--intro-headline-chars), end)
+      calc(
+        var(--intro-blank-ms) + var(--intro-type-ms) + var(--intro-hold-ms)
+      )
+      forwards,
+    intro-headline-hide 100ms linear
+      calc(
+        var(--intro-blank-ms) + var(--intro-type-ms) + var(--intro-hold-ms) +
+          var(--intro-clear-ms)
+      )
+      forwards;
 }
 
-.chest-placeholder {
-  opacity: 0.45;
+.intro-headline::before {
+  content: "Talk some sh*rt";
 }
 
-.cursor {
-  display: inline-block;
-  width: 0.06em;
-  height: 0.85em;
-  background: var(--cursor-bg, currentColor);
-  margin-left: 0.06em;
-  margin-right: -0.12em;
-  vertical-align: -0.05em;
-  animation: blink 1s steps(1) infinite;
+@keyframes intro-type-in {
+  from { width: 0; }
+  to { width: calc(1ch * var(--intro-headline-chars)); }
 }
 
-/* Backstop against the fake cursor and the real input's native caret ever
-   rendering at once: whenever chestText is focused with real text in it,
-   force the fake cursor hidden regardless of JS state (updateCaretMode
-   normally handles this, but this guarantees it can't desync). */
-.product-slider:has(#chestText:focus:not(:placeholder-shown)) #cursor {
-  visibility: hidden;
+@keyframes intro-type-out {
+  from { width: calc(1ch * var(--intro-headline-chars)); }
+  to { width: 0; }
 }
 
-/* When there's no headline text, the margins above (which otherwise cancel
-   out to zero width so the cursor doesn't skew text centering) would instead
-   skew the cursor itself off-center. Zero them so it centers on its own. */
-.text-run:empty + .cursor {
-  margin-left: 0;
-  margin-right: 0;
-}
-
-@keyframes blink {
-  0%,
-  50% {
-    opacity: 1;
-  }
-  51%,
-  100% {
+@keyframes intro-headline-hide {
+  to {
     opacity: 0;
+    visibility: hidden;
   }
 }
+
+/* ------------------------------ T-shirt rise -----------------------------
+   Rises from below and lands centered. Kicks off partway through the
+   headline delete so the two motions overlap, matching the original feel. */
 
 .tshirt-container {
   position: absolute;
-  top: var(--layout-stage-center);
+  top: 50%;
   left: 50%;
-  width: var(--layout-shirt-size);
-  transform: translate(-50%, calc(-1 * var(--layout-chest-y) + 100vh));
+  width: var(--shirt-size);
+  aspect-ratio: 1 / 1;
+  transform: translate(-50%, calc(-50% + 100vh));
   opacity: 0;
-  will-change: transform, opacity;
   container-type: inline-size;
+  animation: intro-shirt-rise var(--intro-rise-ms)
+    cubic-bezier(0.2, 0.8, 0.2, 1)
+    calc(
+      var(--intro-blank-ms) + var(--intro-type-ms) + var(--intro-hold-ms)
+    )
+    forwards;
+}
+
+@keyframes intro-shirt-rise {
+  0% {
+    transform: translate(-50%, calc(-50% + 100vh));
+    opacity: 0;
+  }
+  100% {
+    transform: translate(-50%, -50%);
+    opacity: 1;
+  }
 }
 
 .tshirt-wrapper {
   position: relative;
   width: 100%;
+  height: 100%;
 }
 
 .tshirt-image {
   width: 100%;
-  height: auto;
+  height: 100%;
   display: block;
+  object-fit: contain;
   user-select: none;
   -webkit-user-drag: none;
 }
 
+/* --------------------------- Chest text (the input) ----------------------
+   The input IS the shirt text — no overlay, no mirror. Positioned as a %
+   of the square wrapper so it stays aligned at every viewport width. */
+
 .chest-text-container {
   position: absolute;
-  top: var(--layout-chest-y);
-  left: var(--layout-chest-x);
+  top: var(--chest-top);
+  left: var(--chest-left);
   transform: translate(-50%, -50%);
-  width: 70%;
+  width: var(--chest-width);
   text-align: center;
+  cursor: text;
 }
 
 .chest-text {
-  color: transparent;
-  font-size: var(--layout-chest-font);
-  font-weight: var(--text-medium-font-weight);
+  color: var(--theme-bg);
+  font-size: var(--chest-font-size);
+  font-weight: var(--text-medium-font-weight, 500);
   line-height: normal;
   border: none;
   background: transparent;
   text-align: center;
   width: 100%;
   outline: none;
-  pointer-events: none;
-  caret-color: transparent;
+  caret-color: color-mix(in srgb, var(--theme-bg) 60%, transparent);
   font-family: inherit;
-}
-
-.chest-text.editable {
-  pointer-events: auto;
-  cursor: text;
+  opacity: 0;
+  pointer-events: none;
+  animation: intro-input-arrive var(--intro-arrive-ms) linear
+    calc(
+      var(--intro-blank-ms) + var(--intro-type-ms) + var(--intro-hold-ms) +
+        var(--intro-rise-ms) * 0.7
+    )
+    forwards;
 }
 
 .chest-text::placeholder {
-  color: transparent;
+  color: color-mix(in srgb, var(--theme-bg) 45%, transparent);
 }
 
-.product-slider {
-  position: absolute;
-  inset: 0;
-  will-change: transform, opacity;
-  transition:
-    transform var(--motion-slide-dur) var(--motion-ease),
-    opacity var(--motion-fade-dur) var(--motion-ease);
+@keyframes intro-input-arrive {
+  0% {
+    opacity: 0;
+    pointer-events: none;
+  }
+  100% {
+    opacity: 1;
+    pointer-events: auto;
+  }
 }
 
-.footer-slider {
-  transform: translateX(0);
-  transition:
-    transform var(--motion-slide-dur) var(--motion-ease),
-    opacity var(--motion-fade-dur) var(--motion-ease);
+/* Respect reduced motion — snap to final layout with no animation. */
+@media (prefers-reduced-motion: reduce) {
+  .intro-headline {
+    display: none;
+  }
+  .tshirt-container {
+    animation: none;
+    transform: translate(-50%, -50%);
+    opacity: 1;
+  }
+  .chest-text {
+    animation: none;
+    opacity: 1;
+    pointer-events: auto;
+  }
 }
 
-body.about-open .product-slider {
-  transform: translateX(-100vw);
-  opacity: 0;
+/* ------------------------------ Footer strip ----------------------------- */
+
+.footer-slider--static .footer {
+  transform: translateY(0);
 }
 
-body.about-open .footer-slider {
-  transform: translateX(-100%);
-  opacity: 0;
-}
-
-/* Shrink-to-fit wrapper so the inner [data-row] cluster hugs its content
-   instead of stretching full-width in the space-between footer row — same
-   inline-block pattern as .button-wrap and the header toggle. */
 .order-actions {
   display: inline-block;
 }
@@ -223,4 +247,102 @@ body.about-open .footer-slider {
 .stock-left {
   color: var(--theme-faint);
   white-space: nowrap;
+}
+
+/* -------------------------- About panel (checkbox) ---------------------
+   Hidden checkbox drives the panel via sibling ~ selectors. Every
+   controlled element must be a following sibling of the checkbox — the
+   #aboutOpen checkbox lives at the top of <body>, so this holds for the
+   header, about-content, and the order form. */
+
+.about-toggle {
+  position: fixed;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+  /* Keep it focusable via keyboard so Space/Enter on the label works. */
+}
+
+.about-content {
+  position: fixed;
+  top: var(--comp-section-md-height);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 900;
+  overflow-y: auto;
+  background: var(--theme-bg);
+  transform: translateX(100%);
+  opacity: 0;
+  transition:
+    transform var(--motion-slide-dur) var(--motion-ease),
+    opacity var(--motion-fade-dur) var(--motion-ease);
+}
+
+.about-toggle:checked ~ .about-content {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+/* Header toggle two-state text swap. */
+.about-toggle:checked ~ .header .logo,
+.about-toggle:checked ~ .header .header__toggle-state--home {
+  transform: translateX(-100vw);
+  opacity: 0;
+}
+
+.about-toggle:checked ~ .header .header__title,
+.about-toggle:checked ~ .header .header__toggle-state--about {
+  transform: translate(0, -50%);
+  opacity: 1;
+}
+
+/* Slide the shirt/form out of view when the panel is open. */
+.order-form .stage,
+.order-form .footer-slider {
+  transition:
+    transform var(--motion-slide-dur) var(--motion-ease),
+    opacity var(--motion-fade-dur) var(--motion-ease);
+}
+
+.about-toggle:checked ~ .order-form .stage,
+.about-toggle:checked ~ .order-form .footer-slider {
+  transform: translateX(-100vw);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* --------------------------------- Size select --------------------------
+   No-JS: hide the cosmetic label mirror and reveal the native <select> so
+   it shows whichever size is chosen. -webkit-appearance:none strips OS
+   chrome; the OS dropdown still opens on tap because the element is a
+   real <select>, keeping the change flow accessible everywhere. */
+
+.size-select-text {
+  display: none;
+}
+
+.size-select-native {
+  position: static;
+  opacity: 1;
+  width: auto;
+  height: auto;
+  color: var(--theme-fg);
+  background: transparent;
+  font: inherit;
+  padding: 0;
+  border: 0;
+  text-decoration: underline;
+  text-decoration-color: var(--theme-faint);
+  text-underline-offset: var(--comp-link-underline-offset);
+  cursor: pointer;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+.size-select-native:focus-visible {
+  outline: 2px solid var(--theme-fg);
+  outline-offset: 2px;
 }

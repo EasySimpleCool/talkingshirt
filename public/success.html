@@ -39,8 +39,8 @@
                   2/04/26
                 </time>
               </div>
-              <p class="post-body type-medium" id="successMessage">
-                Thanks for ordering, your sh*rt is on the way.
+              <p class="post-body type-medium">
+                <!--SUCCESS_MESSAGE-->Thanks for ordering, your sh*rt is on the way.
               </p>
               <div class="post-divider" aria-hidden="true"></div>
             </div>
@@ -48,26 +48,5 @@
         </div>
       </section>
     </main>
-
-    <script type="module">
-      const sessionId = new URLSearchParams(window.location.search).get(
-        "session_id",
-      );
-      if (sessionId) {
-        fetch(
-          `/.netlify/functions/order-summary?session_id=${encodeURIComponent(sessionId)}`,
-        )
-          .then((res) => (res.ok ? res.json() : null))
-          .then((data) => {
-            if (data?.fulfillment === "pickup") {
-              document.getElementById("successMessage").textContent =
-                "Thanks for ordering — I'll message you soon to sort a time and place nearby to hand it over.";
-            }
-          })
-          .catch(() => {
-            // Leave the default delivery message in place on any failure.
-          });
-      }
-    </script>
   </body>
 </html>
