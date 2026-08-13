@@ -178,10 +178,6 @@ body.keyboard-open {
   font-family: inherit;
 }
 
-.chest-text::selection {
-  color: transparent;
-}
-
 .chest-text.editable {
   pointer-events: auto;
   cursor: text;

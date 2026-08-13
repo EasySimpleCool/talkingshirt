@@ -30,6 +30,11 @@ export function initLanding() {
   let stageHeight = window.innerHeight;
   document.documentElement.style.setProperty("--stage-h", `${stageHeight}px`);
 
+  // Real cursor + fine pointer = desktop-class device where auto-focus after
+  // the intro is a win. On touch it silently swallows the tap that would
+  // otherwise raise the on-screen keyboard, so mobile stays tap-to-focus.
+  const isDesktopPointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+
   function refreshStageHeight() {
     if (document.activeElement === chestText) return;
     if (Math.abs(window.innerHeight - stageHeight) < 100) return;
@@ -406,7 +411,14 @@ export function initLanding() {
   });
 
   chestText.addEventListener("blur", () => {
-    stopPlaceholderTyping();
+    // Only tear the placeholder down once the user has committed real text.
+    // An empty-field blur (e.g. clicking the footer strip) should leave the
+    // "Type" overlay visible — placeholderActive flipping false while the
+    // input is empty would make updateCaretMode hide it, and there is no
+    // real value to paint in its place, so the shirt would go blank.
+    if (chestText.value.length > 0) {
+      stopPlaceholderTyping();
+    }
     exitEditLock();
     enterViewMode();
   });
@@ -632,7 +644,11 @@ export function initLanding() {
       progress = 1;
       render();
       mode = MODE.READY;
-      startPlaceholderTyping();
+      if (isDesktopPointer) {
+        chestText.focus({ preventScroll: true });
+      } else {
+        startPlaceholderTyping();
+      }
     }
 
     function frame(ts) {
