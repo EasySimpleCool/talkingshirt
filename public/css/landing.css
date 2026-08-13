@@ -24,12 +24,16 @@ html:has(details.about-panel[open]) {
   --intro-headline-chars: 15;
   --intro-headline-size: clamp(40px, 10vw, 120px);
 
-  /* Chest position within the square tshirt asset. Tune these against
-     tshirt-align.png so the input snaps to the chest marker at every width. */
-  --chest-top: 42%;
+  /* Chest position within the square tshirt asset. Measured from the red
+     guide rectangle in tshirt-align.png (centre 50.2%,27.1%, size 21.8%×
+     5.4% of the 900×900 image). Font-size is tuned so the 12-character
+     max ("Refrigerator") fills ~90% of the box width in Inter Bold, and
+     cap height sits ~60% of the box height — matching the print-area
+     reference. */
+  --chest-top: 27%;
   --chest-left: 50%;
-  --chest-width: 60%;
-  --chest-font-size: 5cqi;
+  --chest-width: 22%;
+  --chest-font-size: 3.8cqi;
 
   --shirt-size: min(94vw, 720px);
 }
@@ -183,7 +187,7 @@ html:has(details.about-panel[open]) {
 .chest-text {
   color: var(--theme-bg);
   font-size: var(--chest-font-size);
-  font-weight: var(--text-medium-font-weight, 500);
+  font-weight: 700;
   line-height: normal;
   border: none;
   background: transparent;
