@@ -30,6 +30,11 @@ export function initLanding() {
   let stageHeight = window.innerHeight;
   document.documentElement.style.setProperty("--stage-h", `${stageHeight}px`);
 
+  // Real cursor + fine pointer = desktop-class device where auto-focus after
+  // the intro is a win. On touch it silently swallows the tap that would
+  // otherwise raise the on-screen keyboard, so mobile stays tap-to-focus.
+  const isDesktopPointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+
   function refreshStageHeight() {
     if (document.activeElement === chestText) return;
     if (Math.abs(window.innerHeight - stageHeight) < 100) return;
@@ -632,7 +637,11 @@ export function initLanding() {
       progress = 1;
       render();
       mode = MODE.READY;
-      startPlaceholderTyping();
+      if (isDesktopPointer) {
+        chestText.focus({ preventScroll: true });
+      } else {
+        startPlaceholderTyping();
+      }
     }
 
     function frame(ts) {
