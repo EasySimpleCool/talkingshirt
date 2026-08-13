@@ -188,12 +188,12 @@ body {
 }
 
 .intro-headline__reveal {
-  width: 0;
-  overflow: hidden;
-  /* Symmetric ease-in-out on both halves: reveal starts gentle, accelerates
-     through the middle characters, settles into the hold; delete mirrors
-     it back to zero. Reads as one continuous "in-and-out" ramp instead of
-     the linear step-through it was doing before. */
+  /* Reveal at full text width; clip-path insets from both sides equally
+     so the visible portion is always centred on the container's centre —
+     no matter how much has been revealed or how much is left to delete.
+     A width-based clip would left-anchor the text and leave the shrinking
+     remainder off-centre during the delete pass. */
+  clip-path: inset(0 50% 0 50%);
   animation:
     intro-type-in var(--intro-type-ms) var(--intro-ease-in-out-quart)
       var(--intro-blank-ms) forwards,
@@ -205,13 +205,13 @@ body {
 }
 
 @keyframes intro-type-in {
-  from { width: 0; }
-  to { width: 100%; }
+  from { clip-path: inset(0 50% 0 50%); }
+  to   { clip-path: inset(0 0 0 0); }
 }
 
 @keyframes intro-type-out {
-  from { width: 100%; }
-  to { width: 0; }
+  from { clip-path: inset(0 0 0 0); }
+  to   { clip-path: inset(0 50% 0 50%); }
 }
 
 @keyframes intro-headline-hide {
