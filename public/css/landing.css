@@ -21,12 +21,34 @@ body {
 }
 
 :root {
-  --intro-blank-ms: 400ms;
-  --intro-type-ms: 1100ms;
-  --intro-hold-ms: 500ms;
-  --intro-clear-ms: 500ms;
-  --intro-rise-ms: 1200ms;
-  --intro-arrive-ms: 300ms;
+  /* Timings ported verbatim from the pre-refactor JS intro
+     (public/js/landing.js at commit 5c01e09^):
+       AUTOPLAY_START_DELAY_MS = 1000  → --intro-blank-ms
+       Stage 1 easeInQuad, progress 0→0.28 (type)   → 907ms  ≈ 900ms
+       Stage 1 tail, progress 0.28→0.34 (hold)      → 93ms   ≈ 100ms
+       Stage 2 linear, progress 0.34→0.85 (delete +
+         concurrent shirt rise)                     → 773ms  ≈ 770ms
+       Stage 2 tail, progress 0.85→1.0 (settle
+         before input becomes editable)             → 227ms  ≈ 230ms
+     Total ≈ 3000ms, matching the original feel. */
+  --intro-blank-ms: 1000ms;
+  --intro-type-ms: 900ms;
+  --intro-hold-ms: 100ms;
+  --intro-clear-ms: 770ms;
+  --intro-rise-ms: 770ms;
+  --intro-arrive-ms: 230ms;
+
+  /* Colour flip: original spans progress 0.30 → 0.55, which converts to
+     real time 940ms → 1318ms measured from the end of the blank hold.
+     Add the blank offset for a page-load anchor: 1940ms → 2318ms. */
+  --intro-colour-flip-delay: 1940ms;
+  --intro-colour-flip-ms: 380ms;
+
+  /* Placeholder "Type" typewriter after the intro completes.
+     PLACEHOLDER_TYPE_MS = 90ms per char × 4 chars. */
+  --intro-placeholder-chars: 4;
+  --intro-placeholder-step-ms: 90ms;
+  --intro-placeholder-ms: 360ms;
 
   --intro-headline-chars: 15;
   /* Sized off the shorter viewport axis so the headline never dwarfs the
@@ -103,12 +125,18 @@ body {
   pointer-events: none;
   z-index: 2;
   line-height: 1;
-  animation: intro-headline-hide 100ms linear
-    calc(
-      var(--intro-blank-ms) + var(--intro-type-ms) + var(--intro-hold-ms) +
-        var(--intro-clear-ms)
-    )
-    forwards;
+  /* Colour flip during the delete window: dark → light so the vanishing
+     text tracks the "landing on shirt" moment from the original. Hide
+     runs on top the moment delete finishes. */
+  animation:
+    intro-headline-colour-flip var(--intro-colour-flip-ms) linear
+      var(--intro-colour-flip-delay) forwards,
+    intro-headline-hide 100ms linear
+      calc(
+        var(--intro-blank-ms) + var(--intro-type-ms) + var(--intro-hold-ms) +
+          var(--intro-clear-ms)
+      )
+      forwards;
 }
 
 .intro-headline__sizer,
@@ -158,6 +186,11 @@ body {
     opacity: 0;
     visibility: hidden;
   }
+}
+
+@keyframes intro-headline-colour-flip {
+  from { color: var(--theme-fg); }
+  to { color: var(--theme-bg); }
 }
 
 /* ------------------------------ T-shirt rise -----------------------------
@@ -220,6 +253,39 @@ body {
   cursor: text;
 }
 
+/* Pure-CSS placeholder typewriter: types "Type" one character at a time
+   after the intro finishes. Native <input placeholder> can't be animated
+   char-by-char, so we render it as a ::before pseudo on the container.
+   The pseudo is hidden while the input is focused or has real text —
+   :placeholder-shown flips off in both cases, so :has(:not(...)) covers
+   both without extra selectors. */
+.chest-text-container::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: color-mix(in srgb, var(--theme-bg) 45%, transparent);
+  font-size: var(--chest-font-size);
+  font-weight: 700;
+  line-height: normal;
+  pointer-events: none;
+  animation: intro-placeholder-type var(--intro-placeholder-ms)
+    steps(var(--intro-placeholder-chars), end)
+    calc(
+      var(--intro-blank-ms) + var(--intro-type-ms) + var(--intro-hold-ms) +
+        var(--intro-clear-ms) + var(--intro-arrive-ms)
+    )
+    forwards;
+}
+
+.chest-text-container:has(.chest-text:not(:placeholder-shown))::before,
+.chest-text-container:has(.chest-text:focus)::before {
+  content: "" !important;
+  animation: none;
+}
+
 .chest-text {
   color: var(--theme-bg);
   font-size: var(--chest-font-size);
@@ -237,13 +303,17 @@ body {
   animation: intro-input-arrive var(--intro-arrive-ms) linear
     calc(
       var(--intro-blank-ms) + var(--intro-type-ms) + var(--intro-hold-ms) +
-        var(--intro-rise-ms) * 0.7
+        var(--intro-clear-ms)
     )
     forwards;
 }
 
+/* Native placeholder attribute is a single-space filler so
+   :placeholder-shown still matches an empty input (that's what gates
+   the ::before typewriter above). Actual "Type" copy is drawn by the
+   pseudo, not the placeholder, so hide the native version entirely. */
 .chest-text::placeholder {
-  color: color-mix(in srgb, var(--theme-bg) 45%, transparent);
+  color: transparent;
 }
 
 @keyframes intro-input-arrive {
@@ -255,6 +325,16 @@ body {
     opacity: 1;
     pointer-events: auto;
   }
+}
+
+/* Steps() animates content: through four discrete states, one glyph per
+   step, matching the original PLACEHOLDER_TYPE_MS = 90ms cadence. */
+@keyframes intro-placeholder-type {
+  0%   { content: ""; }
+  25%  { content: "T"; }
+  50%  { content: "Ty"; }
+  75%  { content: "Typ"; }
+  100% { content: "Type"; }
 }
 
 /* Respect reduced motion — snap to final layout with no animation. */
@@ -271,6 +351,10 @@ body {
     animation: none;
     opacity: 1;
     pointer-events: auto;
+  }
+  .chest-text-container::before {
+    animation: none;
+    content: "Type";
   }
 }
 
