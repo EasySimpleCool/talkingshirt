@@ -8,9 +8,16 @@ body {
   height: 100%;
 }
 
-/* Only the About panel needs its own scroll — lock the rest. */
-html:has(details.about-panel[open]) {
-  overflow: hidden;
+/* Body reserves space for the fixed header (top) and footer (bottom) so
+   the middle .stage section owns everything in between. Header and footer
+   heights come from the design tokens. */
+body {
+  display: flex;
+  flex-direction: column;
+  padding-top: var(--comp-section-md-height);
+  padding-bottom: var(--comp-section-md-height);
+  min-height: 100vh;
+  box-sizing: border-box;
 }
 
 :root {
@@ -36,8 +43,6 @@ html:has(details.about-panel[open]) {
   --chest-left: 50%;
   --chest-width: 22%;
   --chest-font-size: 3.8cqi;
-
-  --shirt-size: min(94vw, 720px);
 }
 
 .visually-hidden {
@@ -56,10 +61,21 @@ html:has(details.about-panel[open]) {
   display: contents;
 }
 
+/* Stage is a normal-flow section that expands to fill the space between
+   the fixed header and footer. Its data-section="lg" attribute adds the
+   design-system vertical/horizontal padding (via layout.css) so the shirt
+   never touches the edges. container-type:size lets .tshirt-container
+   read the stage's inner box via cqw/cqh — that's what keeps the shirt
+   always fully in view regardless of viewport aspect. */
 .stage {
-  position: fixed;
-  inset: 0;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: var(--theme-bg);
+  container-type: size;
+  position: relative;
   overflow: hidden;
 }
 
@@ -145,16 +161,15 @@ html:has(details.about-panel[open]) {
 }
 
 /* ------------------------------ T-shirt rise -----------------------------
-   Rises from below and lands centered. Kicks off partway through the
-   headline delete so the two motions overlap, matching the original feel. */
+   Rises from below the viewport and lands centred in the stage. Sized to
+   min(100cqw, 100cqh) so the square shirt always fits whatever inner
+   box the section leaves — landscape viewports shrink it to the height,
+   portrait viewports shrink it to the width, both stay fully in view. */
 
 .tshirt-container {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: var(--shirt-size);
+  width: min(100cqw, 100cqh);
   aspect-ratio: 1 / 1;
-  transform: translate(-50%, calc(-50% + 100vh));
+  transform: translateY(100vh);
   opacity: 0;
   container-type: inline-size;
   animation: intro-shirt-rise var(--intro-rise-ms)
@@ -167,11 +182,11 @@ html:has(details.about-panel[open]) {
 
 @keyframes intro-shirt-rise {
   0% {
-    transform: translate(-50%, calc(-50% + 100vh));
+    transform: translateY(100vh);
     opacity: 0;
   }
   100% {
-    transform: translate(-50%, -50%);
+    transform: translateY(0);
     opacity: 1;
   }
 }
@@ -249,7 +264,7 @@ html:has(details.about-panel[open]) {
   }
   .tshirt-container {
     animation: none;
-    transform: translate(-50%, -50%);
+    transform: none;
     opacity: 1;
   }
   .chest-text {
