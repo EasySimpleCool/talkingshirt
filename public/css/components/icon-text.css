@@ -1,12 +1,12 @@
 .icon-text__label {
-  color: var(--theme-fg);
+  color: var(--output-color-fg);
 }
 
 .icon-text__icon {
   width: var(--comp-nav-icon-size);
   height: var(--comp-nav-icon-size);
   flex-shrink: 0;
-  background-color: var(--theme-fg);
+  background-color: var(--output-color-fg);
   -webkit-mask: var(--icon-text-mask) center / contain no-repeat;
   mask: var(--icon-text-mask) center / contain no-repeat;
 }

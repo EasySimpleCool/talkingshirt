@@ -1,7 +1,6 @@
 @import "./components/reset.css";
 @import "./components/base.css";
 @import "./components/layout.css";
-@import "./components/type.css";
 @import "./components/icon-text.css";
 @import "./components/header.css";
 @import "./components/button.css";
@@ -9,3 +8,9 @@
 @import "./components/footer.css";
 @import "./components/post.css";
 @import "./components/success-content.css";
+/* type.css loads last so .type-medium/.type-small win the font-family
+   cascade against components like .button that declare
+   `font-family: inherit` at equal specificity — those components fall
+   back to inherited system fonts when no type class is applied, but the
+   type composite wins when one is. */
+@import "./components/type.css";

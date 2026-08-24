@@ -155,7 +155,11 @@
           <div data-container>
             <div data-row data-justify="between">
               <label class="size-select">
-                <span class="size-select-text type-medium">Large</span>
+                <!-- Text intentionally empty: the visible label is drawn
+                     by the .size-select-text::before rule in landing.css,
+                     which mirrors the currently-selected option via
+                     :has(option:checked). -->
+                <span class="size-select-text type-medium" aria-hidden="true"></span>
                 <select class="size-select-native" name="size" aria-label="Size">
                   <option value="Small">Small</option>
                   <option value="Medium">Medium</option>

@@ -4,18 +4,18 @@
 
 .post-label,
 .post-date {
-  color: var(--theme-fg-alt);
+  color: var(--output-color-fg-alt);
 }
 
 .post-body {
-  color: var(--theme-fg);
+  color: var(--output-color-fg);
   width: 100%;
   overflow-wrap: anywhere;
 }
 
 .post-divider {
   border: 0;
-  border-top: var(--comp-border-width) solid var(--theme-faint-alt);
+  border-top: var(--comp-border-width) solid var(--output-color-faint);
   width: 100%;
   margin: 0;
 }

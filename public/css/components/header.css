@@ -1,6 +1,6 @@
 .header {
-  background: var(--theme-bg);
-  border-bottom: var(--comp-border-width) solid var(--theme-faint-alt);
+  background: var(--output-color-bg);
+  border-bottom: var(--comp-border-width) solid var(--output-color-faint);
 }
 
 .header--fixed {
@@ -18,13 +18,13 @@
 
 .header__about {
   display: inline-block;
-  color: var(--theme-fg);
+  color: var(--output-color-fg);
   text-decoration: none;
 }
 
 .header .logo {
   display: inline-block;
-  color: var(--theme-fg);
+  color: var(--output-color-fg);
   line-height: 0;
   transform: translateX(0);
   opacity: 1;
@@ -43,7 +43,7 @@
 }
 
 .header__title {
-  color: var(--theme-fg);
+  color: var(--output-color-fg);
   position: absolute;
   left: 0;
   top: 50%;
@@ -61,7 +61,7 @@
   border: 0;
   background: transparent;
   cursor: pointer;
-  color: var(--theme-faint);
+  color: var(--output-color-faint);
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -106,8 +106,8 @@ body.about-open .header__toggle-state--about {
 
 /* Page chrome — scrollable Post stack below Header Type=About (not a Figma component). */
 .about-content {
-  background: var(--theme-bg);
-  border-top: var(--comp-border-width) solid var(--theme-faint-alt);
+  background: var(--output-color-bg);
+  border-top: var(--comp-border-width) solid var(--output-color-faint);
 }
 
 .about-content--overlay {

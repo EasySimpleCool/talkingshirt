@@ -3,8 +3,8 @@
 }
 
 .home-link {
-  color: var(--theme-fg);
+  color: var(--output-color-fg);
   text-decoration: underline;
-  text-decoration-color: var(--theme-faint-alt);
+  text-decoration-color: var(--output-color-faint);
   text-underline-offset: var(--comp-link-underline-offset);
 }

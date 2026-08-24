@@ -112,7 +112,7 @@ body {
   min-height: 0;
   height: auto;
   justify-content: center;
-  background: var(--theme-bg);
+  background: var(--output-color-bg);
   container-type: size;
   position: relative;
   overflow: hidden;
@@ -138,7 +138,7 @@ body {
   transform: translate(-50%, -50%);
   font-size: var(--intro-headline-size);
   font-weight: 700;
-  color: var(--theme-fg);
+  color: var(--output-color-fg);
   /* pre keeps trailing spaces in the animated content: values from
      collapsing, so "Talk " (with a real space at the end) renders wider
      than "Talk" as it should during typing. */
@@ -245,8 +245,8 @@ body {
 }
 
 @keyframes intro-headline-colour-flip {
-  from { color: var(--theme-fg); }
-  to { color: var(--theme-bg); }
+  from { color: var(--output-color-fg); }
+  to { color: var(--output-color-bg); }
 }
 
 /* ------------------------------ T-shirt rise -----------------------------
@@ -322,7 +322,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: color-mix(in srgb, var(--theme-bg) 45%, transparent);
+  color: color-mix(in srgb, var(--output-color-bg) 45%, transparent);
   font-size: var(--chest-font-size);
   font-weight: 700;
   line-height: normal;
@@ -345,7 +345,7 @@ body {
 }
 
 .chest-text {
-  color: var(--theme-bg);
+  color: var(--output-color-bg);
   font-size: var(--chest-font-size);
   font-weight: 700;
   line-height: normal;
@@ -354,7 +354,7 @@ body {
   text-align: center;
   width: 100%;
   outline: none;
-  caret-color: color-mix(in srgb, var(--theme-bg) 60%, transparent);
+  caret-color: color-mix(in srgb, var(--output-color-bg) 60%, transparent);
   font-family: inherit;
   opacity: 0;
   pointer-events: none;
@@ -436,7 +436,7 @@ body {
 }
 
 .stock-left {
-  color: var(--theme-faint);
+  color: var(--output-color-faint);
   white-space: nowrap;
 }
 
@@ -463,7 +463,7 @@ body {
   bottom: 0;
   z-index: 900;
   overflow-y: auto;
-  background: var(--theme-bg);
+  background: var(--output-color-bg);
   transform: translateX(100%);
   opacity: 0;
   transition:
@@ -505,38 +505,32 @@ body {
 }
 
 /* --------------------------------- Size select --------------------------
-   No-JS: hide the cosmetic label mirror and reveal the native <select> so
-   it shows whichever size is chosen. Draw the underline as a real
-   border-bottom (with 2px of padding above it), not text-decoration —
-   Safari and Firefox render text-decoration on <select> inconsistently
-   once -webkit-appearance:none is applied, and this way the underline
-   is guaranteed. */
+   No-JS: keep the original component pattern — visible `.size-select-text`
+   span, invisible native `<select>` overlaid on top to capture clicks and
+   raise the OS picker. Sync the visible label to the currently-selected
+   option with `:has(option:checked)`, which re-evaluates whenever the
+   user picks a new option (native selects set :checked on the chosen
+   option). Pure-CSS mirror, no JS. `:has()` is baseline in every
+   evergreen browser as of 2023. */
 
-.size-select-text {
-  display: none;
+/* The static text in the HTML is a fallback if :has() isn't supported
+   (very old browsers); when it is, ::before overrides it. */
+.size-select-text::before {
+  content: "Large";
+}
+.size-select:has(select option[value="Small"]:checked) .size-select-text::before { content: "Small"; }
+.size-select:has(select option[value="Medium"]:checked) .size-select-text::before { content: "Medium"; }
+.size-select:has(select option[value="Large"]:checked) .size-select-text::before { content: "Large"; }
+.size-select:has(select option[value="XLarge"]:checked) .size-select-text::before { content: "XLarge"; }
+.size-select:has(select option[value="XXLarge"]:checked) .size-select-text::before { content: "XXLarge"; }
+
+.size-select-text::before {
+  color: var(--output-color-fg);
 }
 
-.size-select-native {
-  position: static;
-  opacity: 1;
-  width: auto;
-  height: auto;
-  color: var(--theme-fg);
-  background: transparent;
-  background-image: none;
-  font: inherit;
-  padding: 0 0 2px;
-  border: 0;
-  border-bottom: 1px solid
-    var(--theme-faint, currentColor);
-  border-radius: 0;
-  cursor: pointer;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-}
-
-.size-select-native:focus-visible {
-  outline: 2px solid var(--theme-fg);
-  outline-offset: 2px;
+/* focus-within on the label lights up when the invisible native select
+   inside it gains keyboard focus. */
+.size-select:focus-within {
+  outline: 2px solid var(--output-color-fg);
+  outline-offset: 4px;
 }

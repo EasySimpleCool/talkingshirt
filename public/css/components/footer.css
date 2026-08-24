@@ -7,8 +7,8 @@
 }
 
 .footer {
-  background: var(--theme-bg);
-  border-top: var(--comp-border-width) solid var(--theme-faint-alt);
+  background: var(--output-color-bg);
+  border-top: var(--comp-border-width) solid var(--output-color-faint);
   transform: translateY(100%);
   transition: transform var(--motion-drawer-dur) var(--motion-ease);
 }

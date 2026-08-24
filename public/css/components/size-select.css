@@ -1,13 +1,13 @@
 .size-select {
   position: relative;
   display: inline-block;
-  color: var(--theme-fg);
+  color: var(--output-color-fg);
   cursor: pointer;
 }
 
 .size-select-text {
   text-decoration: underline;
-  text-decoration-color: var(--theme-faint);
+  text-decoration-color: var(--output-color-faint);
   text-decoration-thickness: var(--comp-border-width);
   text-underline-offset: var(--comp-link-underline-offset);
 }
@@ -31,6 +31,6 @@
 }
 
 .size-select-native option {
-  color: var(--theme-fg);
-  background: var(--theme-bg);
+  color: var(--output-color-fg);
+  background: var(--output-color-bg);
 }
