@@ -489,6 +489,32 @@ body {
   opacity: 1;
 }
 
+/* Chromium runs the base .header__title / .header__toggle-state--about
+   transition from the default (opacity: 1, transform: none) to the
+   declared (opacity: 0, translate(100vw, -50%)) during initial paint,
+   briefly showing a ghost of both labels near the header row. Overlay
+   visibility: hidden so nothing paints while the toggle is closed,
+   and defer flipping visibility back to hidden until after the opacity
+   fade completes so the exit fade stays intact when the user closes
+   the About panel. */
+.header__title,
+.header .header__toggle-state--about {
+  visibility: hidden;
+  transition:
+    opacity var(--motion-fade-dur) var(--motion-ease),
+    transform var(--motion-slide-dur) var(--motion-ease),
+    visibility 0s linear var(--motion-fade-dur);
+}
+
+.about-toggle:checked ~ .header .header__title,
+.about-toggle:checked ~ .header .header__toggle-state--about {
+  visibility: visible;
+  transition:
+    opacity var(--motion-fade-dur) var(--motion-ease),
+    transform var(--motion-slide-dur) var(--motion-ease),
+    visibility 0s linear 0s;
+}
+
 /* Slide the shirt/form out of view when the panel is open. */
 .order-form .stage,
 .order-form .footer-slider {
