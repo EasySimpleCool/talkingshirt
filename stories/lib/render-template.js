@@ -1,8 +1,15 @@
-const templateModules = import.meta.glob("../../public/js/components/*.html", {
+// Gallery-only copies of the production markup. The live pages are
+// hand-written static HTML (no client-side template loader), so these exist
+// purely so Storybook can render each Figma component in isolation.
+const templateModules = import.meta.glob("../templates/*.html", {
   query: "?raw",
   import: "default",
   eager: true,
 });
+
+// Templates that own a form control write `{{id}}`; each render gets a fresh
+// value so repeated stories on one docs page never collide on an id.
+let idSeq = 0;
 
 /**
  * @param {string} name — template basename (e.g. "button", "size-select")
@@ -15,11 +22,11 @@ export function loadTemplate(name) {
   if (!entry) {
     throw new Error(`Unknown template: ${name}`);
   }
-  return entry[1];
+  return entry[1].replaceAll("{{id}}", `tpl-${name}-${++idSeq}`);
 }
 
 /**
- * Sync version of loader.js mountNested for story render().
+ * Expand `[data-mount]` hosts with the template they name.
  * @param {ParentNode} root
  */
 export function mountNested(root) {
@@ -36,10 +43,7 @@ export function mountNested(root) {
  * @returns {HTMLDivElement}
  */
 export function renderTemplate(name) {
-  const wrap = document.createElement("div");
-  wrap.innerHTML = loadTemplate(name);
-  mountNested(wrap);
-  return wrap;
+  return renderHtml(loadTemplate(name));
 }
 
 /**
@@ -51,25 +55,4 @@ export function renderHtml(html) {
   wrap.innerHTML = html;
   mountNested(wrap);
   return wrap;
-}
-
-/**
- * Wire Header About toggle on a wrapper (scoped .about-open, not document.body).
- * @param {HTMLElement} root
- */
-export function wireHeaderToggle(root) {
-  const toggle = root.querySelector(".header__toggle");
-  if (!toggle) return;
-
-  const host = root.classList.contains("header")
-    ? root.parentElement
-    : root.querySelector(".header")?.parentElement ?? root;
-
-  toggle.addEventListener("click", () => {
-    const open = host?.classList.toggle("about-open");
-    toggle.setAttribute("aria-expanded", open ? "true" : "false");
-    toggle.setAttribute("aria-label", open ? "Close about" : "About");
-    const header = root.querySelector(".header");
-    if (header) header.setAttribute("data-type", open ? "about" : "home");
-  });
 }

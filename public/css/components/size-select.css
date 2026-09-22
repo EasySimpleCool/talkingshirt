@@ -12,6 +12,27 @@
   text-underline-offset: var(--comp-link-underline-offset);
 }
 
+/* No-JS label mirror. The span in the markup is empty; the visible size is
+   drawn here and re-resolved by `:has(option:checked)` whenever the user
+   picks a new option (native selects set :checked on the chosen option).
+   `:has()` is baseline in every evergreen browser as of 2023; the plain
+   ::before below is the fallback for anything older. */
+.size-select-text::before {
+  content: "Large";
+}
+.size-select:has(option[value="Small"]:checked) .size-select-text::before { content: "Small"; }
+.size-select:has(option[value="Medium"]:checked) .size-select-text::before { content: "Medium"; }
+.size-select:has(option[value="Large"]:checked) .size-select-text::before { content: "Large"; }
+.size-select:has(option[value="XLarge"]:checked) .size-select-text::before { content: "XLarge"; }
+.size-select:has(option[value="XXLarge"]:checked) .size-select-text::before { content: "XXLarge"; }
+
+/* focus-within on the label lights up when the invisible native select
+   inside it gains keyboard focus. */
+.size-select:focus-within {
+  outline: 2px solid var(--output-color-fg);
+  outline-offset: 4px;
+}
+
 .size-select-native {
   position: absolute;
   inset: 0;

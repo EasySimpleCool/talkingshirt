@@ -21,8 +21,3 @@ body {
   /* TODO: placeholder — ship comp/link/underline-offset from CDN. */
   --comp-link-underline-offset: 2px;
 }
-
-html.is-scroll-locked,
-html.is-scroll-locked body {
-  overflow: hidden;
-}

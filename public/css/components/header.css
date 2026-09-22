@@ -42,6 +42,14 @@
   mask: url(/assets/images/Logo.svg) no-repeat center / contain;
 }
 
+/* visibility: hidden on the two closed-state labels, here and on
+   .header__toggle-state--about below. Chromium otherwise runs the
+   transition from the property defaults (opacity: 1, transform: none) to
+   the declared closed values during initial paint, ghosting both labels
+   near the header row on every load. Flipping visibility back to hidden
+   is delayed by the fade duration so the exit fade still plays when the
+   About panel closes; the :checked rule re-declares it at 0s so opening
+   is immediate. */
 .header__title {
   color: var(--output-color-fg);
   position: absolute;
@@ -49,10 +57,12 @@
   top: 50%;
   transform: translate(100vw, -50%);
   opacity: 0;
+  visibility: hidden;
   white-space: nowrap;
   transition:
     opacity var(--motion-fade-dur) var(--motion-ease),
-    transform var(--motion-slide-dur) var(--motion-ease);
+    transform var(--motion-slide-dur) var(--motion-ease),
+    visibility 0s linear var(--motion-fade-dur);
 }
 
 .header__toggle {
@@ -79,46 +89,58 @@
   top: 50%;
   transform: translate(100vw, -50%);
   opacity: 0;
+  visibility: hidden;
   transition:
     opacity var(--motion-fade-dur) var(--motion-ease),
-    transform var(--motion-slide-dur) var(--motion-ease);
+    transform var(--motion-slide-dur) var(--motion-ease),
+    visibility 0s linear var(--motion-fade-dur);
 }
 
-body.about-open .header .logo {
+/* ------------------------------ About toggle -----------------------------
+   CSS-only, no JS: a visually-hidden checkbox placed *before* the header
+   drives every About state through sibling (~) selectors. The label that
+   flips it lives inside the header. Storybook renders the same markup, so
+   these rules are the single definition of the two-state swap — there is no
+   story-only variant to keep in sync. */
+
+.about-toggle {
+  position: fixed;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+  /* Not display:none — it has to stay focusable so Space/Enter on the
+     label reaches it. */
+}
+
+.about-toggle:checked ~ .header .logo,
+.about-toggle:checked ~ .header .header__toggle-state--home {
   transform: translateX(-100vw);
   opacity: 0;
 }
 
-body.about-open .header__title {
-  transform: translateY(-50%);
-  opacity: 1;
-}
-
-body.about-open .header__toggle-state--home {
-  transform: translateX(-100vw);
-  opacity: 0;
-}
-
-body.about-open .header__toggle-state--about {
+.about-toggle:checked ~ .header .header__title,
+.about-toggle:checked ~ .header .header__toggle-state--about {
   transform: translate(0, -50%);
   opacity: 1;
+  visibility: visible;
+  transition:
+    opacity var(--motion-fade-dur) var(--motion-ease),
+    transform var(--motion-slide-dur) var(--motion-ease),
+    visibility 0s linear 0s;
 }
 
-/* Page chrome — scrollable Post stack below Header Type=About (not a Figma component). */
+/* Page chrome — scrollable Post stack revealed below Header Type=About
+   (not a Figma component). Slides in from the right over the page. */
 .about-content {
-  background: var(--output-color-bg);
-  border-top: var(--comp-border-width) solid var(--output-color-faint);
-}
-
-.about-content--overlay {
   position: fixed;
-  border-top: 0;
   top: var(--comp-section-md-height);
   left: 0;
   right: 0;
   bottom: 0;
   z-index: 900;
   overflow-y: auto;
+  background: var(--output-color-bg);
   transform: translateX(100%);
   opacity: 0;
   transition:
@@ -126,7 +148,7 @@ body.about-open .header__toggle-state--about {
     opacity var(--motion-fade-dur) var(--motion-ease);
 }
 
-body.about-open .about-content--overlay {
+.about-toggle:checked ~ .about-content {
   transform: translateX(0);
   opacity: 1;
 }

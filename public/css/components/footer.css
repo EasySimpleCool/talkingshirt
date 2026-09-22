@@ -13,10 +13,6 @@
   transition: transform var(--motion-drawer-dur) var(--motion-ease);
 }
 
-.footer--visible {
-  transform: translateY(0);
-}
-
 .footer-slider--static .footer {
   transform: translateY(0);
 }

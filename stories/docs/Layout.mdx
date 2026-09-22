@@ -47,12 +47,15 @@ Every block follows **`section > container > stack | row`**. Layout is expressed
 <div class="footer" data-section="md">
   <div data-container>
     <div data-row data-justify="between">
-      <div data-mount="size-select"></div>
-      <div data-mount="button"></div>
+      <label class="size-select">...</label>
+      <span class="button-wrap"><button class="button">...</button></span>
     </div>
   </div>
 </div>
 ```
+
+(The gallery template writes those two ends as `data-mount="size-select"` and
+`data-mount="button"` so each renders as its own story; production inlines them.)
 
 **Post (content block):**
 

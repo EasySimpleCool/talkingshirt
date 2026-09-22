@@ -1,0 +1,27 @@
+<!-- Same CSS-only About toggle as production: a hidden checkbox ahead of the
+     header, flipped by the <label> inside it. {{id}} is swapped for a unique
+     id per render so several Header stories can share one docs page. -->
+<input type="checkbox" id="{{id}}" class="about-toggle" aria-label="Toggle About panel" />
+
+<div class="header header--fixed" data-section="md" data-type="home" role="banner">
+  <div data-container>
+    <div data-row data-justify="between">
+      <div class="header__start">
+        <a class="logo" href="/" aria-label="TalkingSh*rt home">
+          <span class="logo__img" aria-hidden="true"></span>
+        </a>
+        <span class="header__title type-medium" aria-hidden="true">About</span>
+      </div>
+      <label class="header__toggle" for="{{id}}">
+        <span class="header__toggle-state header__toggle-state--home icon-text" data-row data-gap="2xs">
+          <span class="icon-text__label type-small">About</span>
+          <span class="icon-text__icon icon-text__icon--ball" aria-hidden="true"></span>
+        </span>
+        <span class="header__toggle-state header__toggle-state--about icon-text" data-row data-gap="2xs">
+          <span class="icon-text__label type-small">Close</span>
+          <span class="icon-text__icon icon-text__icon--close" aria-hidden="true"></span>
+        </span>
+      </label>
+    </div>
+  </div>
+</div>

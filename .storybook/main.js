@@ -13,7 +13,6 @@ const config = {
   framework: "@storybook/html-vite",
   staticDirs: [
     { from: "../public/css", to: "/css" },
-    { from: "../public/js", to: "/js" },
     { from: "../public/assets", to: "/assets" },
   ],
   docs: {

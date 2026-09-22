@@ -10,9 +10,9 @@ npm run dev
 
 Open http://127.0.0.1:8888/ (port increments if 8888 is busy).
 
-- `/` — landing page (scroll animation, checkout)
+- `/` — landing page (CSS-only intro, checkout)
 - `/success.html` — order confirmation
-- `/rebuild.html` — redirects to `/storybook/` (legacy path)
+- `/rebuild.html` — 301s to `/storybook/` via `netlify.toml` (legacy path; no such file on the dev server)
 
 ### Component gallery (Storybook)
 
@@ -22,7 +22,7 @@ Local:
 npm run storybook
 ```
 
-Open http://localhost:6006. Stories render templates from `public/js/components/*.html`.
+Open http://localhost:6006. Stories render gallery copies of the production markup from `stories/templates/*.html`.
 
 Published (after Netlify deploy): `/storybook/` on your site domain.
 
@@ -42,16 +42,17 @@ public/
   assets/images/         # SVG, PNG
 netlify/functions/       # Stripe checkout, webhook, confirmation-page render
 netlify/edge-functions/  # Home page: injects order state into index.html
-stories/                 # Storybook stories (Figma components)
+stories/figma/           # Storybook stories (Figma components)
+stories/templates/       # Gallery-only copies of the production markup
 .storybook/              # Storybook config
-docs/                    # Internal docs (not deployed)
+docs/                    # Internal docs and dev-only assets (not deployed)
 ```
 
 The landing page ships **no client-side JavaScript** — the intro animation is a pure-CSS keyframe timeline, the About panel is a hidden-checkbox toggle, size selection is a native `<select>`, and Stripe checkout is a plain `<form method="POST">` that the function replies to with a 303 redirect.
 
 ## Tokens
 
-Design tokens load from jsDelivr (external `talkingshirt-tokens` repo). Every page loads the CDN bundle first, then local CSS. See [`docs/components.md`](docs/components.md) and [`.cursor/rules/main-rules.mdc`](.cursor/rules/main-rules.mdc).
+Design tokens load from jsDelivr (external `talkingshirt-tokens` repo), tracking `@main`. Every page — and Storybook — loads the CDN bundle first, then local CSS, so a token release reaches all of them at once without a site deploy. See [`docs/components.md`](docs/components.md).
 
 ## Environment
 

@@ -1,5 +1,5 @@
-import { userEvent, within } from "storybook/test";
-import { renderTemplate, wireHeaderToggle } from "../lib/render-template.js";
+import { userEvent } from "storybook/test";
+import { renderTemplate } from "../lib/render-template.js";
 
 /** @type { import('@storybook/html-vite').Meta } */
 export default {
@@ -9,48 +9,32 @@ export default {
     docs: {
       description: {
         component:
-          "Top nav bar (`79:486`). Template: `header.html`. Type Home and Type About states; About toggle wired in stories via `wireHeaderToggle`.",
+          "Top nav bar (`79:486`). Template: `header.html`. Type Home and Type About states, driven by the same hidden-checkbox toggle as production — no story-only JS.",
       },
     },
   },
 };
 
-function renderHeaderFrame() {
-  const wrap = document.createElement("div");
-  const root = renderTemplate("header");
-  const header = root.querySelector(".header") ?? root;
-  wrap.appendChild(header);
-  wireHeaderToggle(wrap);
-  return wrap;
-}
-
 export const TypeHome = {
   name: "Type Home",
-  render: renderHeaderFrame,
+  render: () => renderTemplate("header"),
 };
 
 export const TypeAbout = {
   name: "Type About",
   render: () => {
-    const wrap = renderHeaderFrame();
-    wrap.classList.add("about-open");
-    const header = wrap.querySelector(".header");
-    const toggle = wrap.querySelector(".header__toggle");
-    if (header) header.setAttribute("data-type", "about");
-    if (toggle) {
-      toggle.setAttribute("aria-expanded", "true");
-      toggle.setAttribute("aria-label", "Close about");
-    }
-    return wrap;
+    const root = renderTemplate("header");
+    root.querySelector(".about-toggle").checked = true;
+    root.querySelector(".header").setAttribute("data-type", "about");
+    return root;
   },
 };
 
 export const ToggleInteraction = {
   name: "Toggle interaction",
-  render: renderHeaderFrame,
+  render: () => renderTemplate("header"),
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const toggle = canvas.getByRole("button", { name: "About" });
-    await userEvent.click(toggle);
+    // Click the <label>, not the visually-hidden checkbox it controls.
+    await userEvent.click(canvasElement.querySelector(".header__toggle"));
   },
 };

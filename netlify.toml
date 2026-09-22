@@ -19,3 +19,9 @@
   to = "/.netlify/functions/order-confirmed"
   status = 200
   force = true
+
+# Legacy path for the component gallery, kept for old bookmarks.
+[[redirects]]
+  from = "/rebuild.html"
+  to = "/storybook/"
+  status = 301

@@ -20,7 +20,7 @@ Code names: [`design-audit/name-map.yaml`](../design-audit/name-map.yaml). Figma
 | `Icon` | VARIANT or INSTANCE_SWAP | About → `ball.svg`, Close → `close.svg` | `.icon-text__icon` modifier (`--ball` / `--close`) |
 
 **Template:** [`code-connect/IconText.figma.ts`](../code-connect/IconText.figma.ts)  
-**HTML:** [`public/js/components/icon-text.html`](../public/js/components/icon-text.html)
+**HTML:** inline in [`IconText.stories.js`](../stories/figma/IconText.stories.js)
 
 If `Icon` is VARIANT (not swap), use: `About`, `Close` mapping to the `icon-text__icon--ball` and `icon-text__icon--close` modifier classes (each sets a `--icon-text-mask` to the matching SVG).
 
@@ -32,7 +32,7 @@ If `Icon` is VARIANT (not swap), use: `About`, `Close` mapping to the `icon-text
 | `State` | VARIANT | `Default`, `Hover`, `Disabled` | default / `.button--hover` / `disabled` attr |
 
 **Template:** [`code-connect/Button.figma.ts`](../code-connect/Button.figma.ts)  
-**HTML:** [`button.html`](../public/js/components/button.html), [`button-disabled.html`](../public/js/components/button-disabled.html)
+**HTML:** [`button.html`](../stories/templates/button.html), [`button-disabled.html`](../stories/templates/button-disabled.html)
 
 ## Post
 
@@ -44,7 +44,7 @@ If `Icon` is VARIANT (not swap), use: `About`, `Close` mapping to the `icon-text
 | `Body` | TEXT | paragraph | `.post-body` |
 
 **Template:** [`code-connect/Post.figma.ts`](../code-connect/Post.figma.ts)  
-**HTML:** [`post.html`](../public/js/components/post.html)
+**HTML:** [`post.html`](../stories/templates/post.html)
 
 ## SizeSelect
 
@@ -53,8 +53,8 @@ If `Icon` is VARIANT (not swap), use: `About`, `Close` mapping to the `icon-text
 | `Size` | VARIANT | Small, Medium, Large, XLarge, XXLarge | label + `<option selected>` |
 
 **Template:** [`code-connect/SizeSelect.figma.ts`](../code-connect/SizeSelect.figma.ts)  
-**HTML:** [`size-select.html`](../public/js/components/size-select.html)  
-**Usage:** Nested in Footer; production loads via `data-mount="size-select"`.
+**HTML:** [`size-select.html`](../stories/templates/size-select.html)  
+**Usage:** Nested in Footer; the gallery template mounts it via `data-mount="size-select"`, production inlines it.
 
 ## Footer
 
@@ -64,7 +64,7 @@ If `Icon` is VARIANT (not swap), use: `About`, `Close` mapping to the `icon-text
 | Button | INSTANCE_SWAP `Button` or layer `Button` | `executeTemplate()` → `id: button` |
 
 **Template:** [`code-connect/Footer.figma.ts`](../code-connect/Footer.figma.ts)  
-**HTML:** [`footer.html`](../public/js/components/footer.html) — production uses `data-mount` for children; Dev Mode snippet shows resolved nested markup.
+**HTML:** [`footer.html`](../stories/templates/footer.html) — the gallery template mounts children via `data-mount`; production and the Dev Mode snippet show the resolved markup.
 
 ## Header
 
@@ -79,7 +79,7 @@ Toggle uses inline IconText (not `data-mount`). Layer names for `findInstance` (
 **About** variant: `aria-expanded="true"`, `aria-label="Close about"` on `.header__toggle`.
 
 **Template:** [`code-connect/Header.figma.ts`](../code-connect/Header.figma.ts)  
-**HTML:** [`header.html`](../public/js/components/header.html)
+**HTML:** [`header.html`](../stories/templates/header.html)
 
 ## Personal Figma prep (optional, before work access)
 

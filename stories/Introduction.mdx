@@ -4,7 +4,7 @@ import { Meta } from "@storybook/addon-docs/blocks";
 
 # TalkingSh*rt components
 
-Six Figma components, rendered from the same HTML templates as production (`public/js/components/*.html`).
+Six Figma components, rendered from gallery copies of the production markup (`stories/templates/*.html`). The live pages are hand-written static HTML with no client-side template loader, so these copies exist only for Storybook.
 
 ## Docs
 
@@ -33,9 +33,9 @@ Code Connect templates: `code-connect/*.figma.ts` — publish blocked until work
 
 ## Tokens
 
-CDN pin `6989e79`:
+Same bundle the production pages load:
 
-`https://cdn.jsdelivr.net/gh/EasySimpleCool/talkingshirt-tokens@6989e7981a44a6f747d5c7f76d439aa85399cc93/dist/index.css`
+`https://cdn.jsdelivr.net/gh/EasySimpleCool/talkingshirt-tokens@main/dist/index.css`
 
 Loaded in `.storybook/preview-head.html` before `/css/main.css`.
 

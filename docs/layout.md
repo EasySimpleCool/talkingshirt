@@ -183,8 +183,8 @@ If you find yourself writing flex rules on a component class, you're skipping th
 
 /* RIGHT — primitives handle layout, component class handles chrome */
 .my-card {
-  background: var(--theme-bg);
-  border: 1px solid var(--theme-faint-alt);
+  background: var(--output-color-bg);
+  border: 1px solid var(--output-color-faint);
   border-radius: 8px;
 }
 ```

@@ -71,7 +71,7 @@ body {
   --intro-headline-size: clamp(28px, 6.5vmin, 72px);
 
   /* Chest position within the square tshirt asset. Measured from the red
-     guide rectangle in tshirt-align.png (centre 50.2%,27.1%, size 21.8%×
+     guide rectangle in docs/tshirt-align.png (centre 50.2%,27.1%, size 21.8%×
      5.4% of the 900×900 image). Font-size is tuned so the 12-character
      max ("Refrigerator") fills ~90% of the box width in Inter Bold, and
      cap height sits ~60% of the box height — matching the print-area
@@ -427,10 +427,6 @@ body {
 
 /* ------------------------------ Footer strip ----------------------------- */
 
-.footer-slider--static .footer {
-  transform: translateY(0);
-}
-
 .order-actions {
   display: inline-block;
 }
@@ -441,81 +437,12 @@ body {
 }
 
 /* -------------------------- About panel (checkbox) ---------------------
-   Hidden checkbox drives the panel via sibling ~ selectors. Every
-   controlled element must be a following sibling of the checkbox — the
-   #aboutOpen checkbox lives at the top of <body>, so this holds for the
-   header, about-content, and the order form. */
+   The toggle itself, the header swap, and the panel slide-in all live in
+   header.css so Storybook gets them too. What's landing-only is below:
+   pushing the shirt and order bar aside while the panel is open. Both are
+   following siblings of the #aboutOpen checkbox at the top of <body>, which
+   is what the ~ chain needs. */
 
-.about-toggle {
-  position: fixed;
-  width: 0;
-  height: 0;
-  opacity: 0;
-  pointer-events: none;
-  /* Keep it focusable via keyboard so Space/Enter on the label works. */
-}
-
-.about-content {
-  position: fixed;
-  top: var(--comp-section-md-height);
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 900;
-  overflow-y: auto;
-  background: var(--output-color-bg);
-  transform: translateX(100%);
-  opacity: 0;
-  transition:
-    transform var(--motion-slide-dur) var(--motion-ease),
-    opacity var(--motion-fade-dur) var(--motion-ease);
-}
-
-.about-toggle:checked ~ .about-content {
-  transform: translateX(0);
-  opacity: 1;
-}
-
-/* Header toggle two-state text swap. */
-.about-toggle:checked ~ .header .logo,
-.about-toggle:checked ~ .header .header__toggle-state--home {
-  transform: translateX(-100vw);
-  opacity: 0;
-}
-
-.about-toggle:checked ~ .header .header__title,
-.about-toggle:checked ~ .header .header__toggle-state--about {
-  transform: translate(0, -50%);
-  opacity: 1;
-}
-
-/* Chromium runs the base .header__title / .header__toggle-state--about
-   transition from the default (opacity: 1, transform: none) to the
-   declared (opacity: 0, translate(100vw, -50%)) during initial paint,
-   briefly showing a ghost of both labels near the header row. Overlay
-   visibility: hidden so nothing paints while the toggle is closed,
-   and defer flipping visibility back to hidden until after the opacity
-   fade completes so the exit fade stays intact when the user closes
-   the About panel. */
-.header__title,
-.header .header__toggle-state--about {
-  visibility: hidden;
-  transition:
-    opacity var(--motion-fade-dur) var(--motion-ease),
-    transform var(--motion-slide-dur) var(--motion-ease),
-    visibility 0s linear var(--motion-fade-dur);
-}
-
-.about-toggle:checked ~ .header .header__title,
-.about-toggle:checked ~ .header .header__toggle-state--about {
-  visibility: visible;
-  transition:
-    opacity var(--motion-fade-dur) var(--motion-ease),
-    transform var(--motion-slide-dur) var(--motion-ease),
-    visibility 0s linear 0s;
-}
-
-/* Slide the shirt/form out of view when the panel is open. */
 .order-form .stage,
 .order-form .footer-slider {
   transition:
@@ -530,33 +457,3 @@ body {
   pointer-events: none;
 }
 
-/* --------------------------------- Size select --------------------------
-   No-JS: keep the original component pattern — visible `.size-select-text`
-   span, invisible native `<select>` overlaid on top to capture clicks and
-   raise the OS picker. Sync the visible label to the currently-selected
-   option with `:has(option:checked)`, which re-evaluates whenever the
-   user picks a new option (native selects set :checked on the chosen
-   option). Pure-CSS mirror, no JS. `:has()` is baseline in every
-   evergreen browser as of 2023. */
-
-/* The static text in the HTML is a fallback if :has() isn't supported
-   (very old browsers); when it is, ::before overrides it. */
-.size-select-text::before {
-  content: "Large";
-}
-.size-select:has(select option[value="Small"]:checked) .size-select-text::before { content: "Small"; }
-.size-select:has(select option[value="Medium"]:checked) .size-select-text::before { content: "Medium"; }
-.size-select:has(select option[value="Large"]:checked) .size-select-text::before { content: "Large"; }
-.size-select:has(select option[value="XLarge"]:checked) .size-select-text::before { content: "XLarge"; }
-.size-select:has(select option[value="XXLarge"]:checked) .size-select-text::before { content: "XXLarge"; }
-
-.size-select-text::before {
-  color: var(--output-color-fg);
-}
-
-/* focus-within on the label lights up when the invisible native select
-   inside it gains keyboard focus. */
-.size-select:focus-within {
-  outline: 2px solid var(--output-color-fg);
-  outline-offset: 4px;
-}

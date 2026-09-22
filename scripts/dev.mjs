@@ -61,7 +61,6 @@ async function main() {
       await tryListen(port);
       const base = `http://127.0.0.1:${port}`;
       console.log(`TalkingSh*rt dev server: ${base}/`);
-      console.log(`  rebuild.html → ${base}/rebuild.html`);
       if (port !== START_PORT) {
         console.log(`  (port ${START_PORT} was busy — using ${port})`);
       }

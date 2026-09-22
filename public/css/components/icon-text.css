@@ -18,7 +18,3 @@
 .icon-text__icon--close {
   --icon-text-mask: url("/assets/images/close.svg");
 }
-
-.icon-text__icon--arrow-down {
-  --icon-text-mask: url("/assets/images/arrow-down.svg");
-}

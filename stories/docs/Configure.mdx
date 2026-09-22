@@ -8,7 +8,7 @@ TalkingSh*rt Storybook renders production HTML templates with the same CDN token
 
 ## Production pipeline
 
-CDN tokens load first in `.storybook/preview-head.html`, then `/css/main.css`. Stories import templates from `public/js/components/*.html` via `stories/lib/render-template.js`.
+CDN tokens load first in `.storybook/preview-head.html`, then `/css/main.css`. Stories import templates from `stories/templates/*.html` via `stories/lib/render-template.js`.
 
 [Storybook configuration docs](https://storybook.js.org/docs/configure)
 
@@ -62,4 +62,4 @@ Dev Mode HTML snippets: [`docs/code-connect.md`](../../docs/code-connect.md) (`c
 
 ## Tokens
 
-All visual values come from the CDN bundle. Components use `var(--theme-*)` and `var(--comp-*)` only. See [Screen sizing](?path=/docs/docs-screensizing--docs) for viewport and breakpoint tooling.
+All visual values come from the CDN bundle. Components use `var(--output-*)` and `var(--comp-*)` only. See [Screen sizing](?path=/docs/docs-screensizing--docs) for viewport and breakpoint tooling.
