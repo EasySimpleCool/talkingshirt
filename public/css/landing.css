@@ -178,9 +178,15 @@ body {
      the chest region of the shirt (chest sits at 27% down the tshirt
      wrapper). cqh reads the container-type:size stage, so the drift
      scales with whatever space header/footer leave behind — no vh math
-     that ignores the chrome. */
-  from { transform: translate(-50%, -50%); }
-  to   { transform: translate(-50%, calc(-50% - 22cqh)); }
+     that ignores the chrome.
+
+     Also scale the headline down toward chest-text size as it drifts, so
+     the text visually "lands" on the chest instead of just sliding up at
+     full headline size. The original ran easeOutQuart on both the rise
+     and a getFinalScale() shrink; we approximate finalScale with 0.4,
+     which lines up a ~72px headline with the ~27px chest print. */
+  from { transform: translate(-50%, -50%) scale(1); }
+  to   { transform: translate(-50%, calc(-50% - 22cqh)) scale(0.4); }
 }
 
 .intro-headline::before {
@@ -193,6 +199,29 @@ body {
         var(--intro-blank-ms) + var(--intro-type-ms) + var(--intro-hold-ms)
       )
       forwards;
+}
+
+/* Blinking cursor at the trailing edge of the typewriter — matches the
+   original's .cursor overlay. Inline-block so it flows right after the
+   ::before text; background: currentColor inherits the headline's
+   current colour (so the cursor goes through the same dark→light flip
+   the text does during delete). The 1s steps(1) blink is the classic
+   typewriter cadence; the outer .intro-headline's hide animation at
+   end-of-delete takes the cursor down with it via opacity/visibility. */
+.intro-headline::after {
+  content: "";
+  display: inline-block;
+  width: 0.06em;
+  height: 0.85em;
+  background: currentColor;
+  margin-left: 0.06em;
+  vertical-align: -0.05em;
+  animation: intro-cursor-blink 1s steps(1) infinite;
+}
+
+@keyframes intro-cursor-blink {
+  0%, 50% { opacity: 1; }
+  50.01%, 100% { opacity: 0; }
 }
 
 /* One keyframe per character step of "Talk some sh*rt" (15 chars, 16
