@@ -21,49 +21,35 @@ body {
 }
 
 :root {
-  /* Timings ported verbatim from the pre-refactor JS intro
-     (public/js/landing.js at commit 5c01e09^):
-       AUTOPLAY_START_DELAY_MS = 1000  → --intro-blank-ms
-       Stage 1 easeInQuad, progress 0→0.28 (type)   → 907ms  ≈ 900ms
-       Stage 1 tail, progress 0.28→0.34 (hold)      → 93ms   ≈ 100ms
-       Stage 2 linear, progress 0.34→0.85 (delete +
-         concurrent shirt rise)                     → 773ms  ≈ 770ms
-       Stage 2 tail, progress 0.85→1.0 (settle
-         before input becomes editable)             → 227ms  ≈ 230ms
-     Total ≈ 3000ms, matching the original feel. */
-  --intro-blank-ms: 1000ms;
-  --intro-type-ms: 900ms;
-  --intro-hold-ms: 100ms;
-  --intro-clear-ms: 770ms;
-  --intro-rise-ms: 770ms;
-  --intro-arrive-ms: 230ms;
+  /* Quick four-phase intro:
+       1. initial blank (cursor blinks on its own)
+       1 → 2: type "Talk some sh*rt" (easeOut)
+       pause 500ms
+       2 → 3: delete back to blank (easeOut)
+       pause 500ms (shirt rises here, off-stage → chest-centred)
+       3 → 4: "Type" placeholder appears on the chest (easeOut)
+     Total ≈ 2.2s — the previous timing was ~3s. */
+  --intro-blank-ms: 100ms;
+  --intro-type-ms: 400ms;
+  --intro-hold-ms: 500ms;
+  --intro-clear-ms: 400ms;
+  --intro-settle-ms: 500ms;
+  --intro-rise-ms: 500ms;
+  --intro-arrive-ms: 200ms;
 
-  /* Colour flip: original spans progress 0.30 → 0.55, which converts to
-     real time 940ms → 1318ms measured from the end of the blank hold.
-     Add the blank offset for a page-load anchor: 1940ms → 2318ms. */
-  --intro-colour-flip-delay: 1940ms;
-  --intro-colour-flip-ms: 380ms;
-
-  /* Placeholder "Type" typewriter after the intro completes.
-     PLACEHOLDER_TYPE_MS = 90ms per char × 4 chars. */
+  /* Placeholder "Type" typewriter after the intro completes. steps(4)
+     because content: keyframes only step through four discrete strings
+     anyway; cubic-bezier on four keyframes reads as "Typ" snaps in and
+     the lone 'e' lags behind. 320ms keeps it snappy. */
   --intro-placeholder-chars: 4;
-  --intro-placeholder-step-ms: 90ms;
-  --intro-placeholder-ms: 360ms;
+  --intro-placeholder-ms: 320ms;
 
   /* Easings ported from the original JS.
-     easeInQuad drove stage 1 (character reveal pace), so the headline
-     types out slow-start-then-accelerate — dropping steps() here so the
-     bezier can actually apply (steps and cubic-bezier can't combine on
-     one animation).
      easeOutQuart drove the shirt rise and the colour/cursor lerps in
-     render(); it's the "snappy" ease from the original — 68% of the
-     motion is done in the first 25% of the time. */
-  --intro-ease-in-quad: cubic-bezier(0.55, 0.085, 0.68, 0.53);
+     render() — it's the "snappy" ease, 68% of the motion done in the
+     first 25% of the time — and it's the single curve the whole intro
+     now uses. */
   --intro-ease-out-quart: cubic-bezier(0.165, 0.84, 0.44, 1);
-  /* Symmetric ramp: gentle start, fast middle, gentle finish — feels right
-     for the headline typing and deleting where both endpoints (blank and
-     full) should read as settled beats. */
-  --intro-ease-in-out-quart: cubic-bezier(0.77, 0, 0.175, 1);
 
   --intro-headline-chars: 15;
   /* Sized off the shorter viewport axis so the headline never dwarfs the
@@ -146,55 +132,27 @@ body {
   pointer-events: none;
   z-index: 2;
   line-height: 1;
-  /* Reserve a line-box even when the pseudo is empty so the drift
-     animation has something to move. */
+  /* Reserve a line-box even when the pseudo is empty so the cursor has
+     something to hang from during the blank hold. */
   min-height: 1em;
   min-width: 1px;
-  /* During the delete window the headline drifts up toward the chest
-     area so the text visually settles onto the shirt (mirroring the
-     original, which literally landed it on the chest). Colour flip runs
-     alongside — text goes dark → light so it stays readable as it moves
-     over the dark tee. Hide follows the moment delete ends. */
-  animation:
-    intro-headline-drift var(--intro-clear-ms)
-      var(--intro-ease-in-out-quart)
-      calc(
-        var(--intro-blank-ms) + var(--intro-type-ms) + var(--intro-hold-ms)
-      )
-      forwards,
-    intro-headline-colour-flip var(--intro-colour-flip-ms)
-      var(--intro-ease-out-quart)
-      var(--intro-colour-flip-delay) forwards,
-    intro-headline-hide 100ms linear
-      calc(
-        var(--intro-blank-ms) + var(--intro-type-ms) + var(--intro-hold-ms) +
-          var(--intro-clear-ms)
-      )
-      forwards;
-}
-
-@keyframes intro-headline-drift {
-  /* Drift up by ~22% of the stage's height so the headline settles near
-     the chest region of the shirt (chest sits at 27% down the tshirt
-     wrapper). cqh reads the container-type:size stage, so the drift
-     scales with whatever space header/footer leave behind — no vh math
-     that ignores the chrome.
-
-     Also scale the headline down toward chest-text size as it drifts, so
-     the text visually "lands" on the chest instead of just sliding up at
-     full headline size. The original ran easeOutQuart on both the rise
-     and a getFinalScale() shrink; we approximate finalScale with 0.4,
-     which lines up a ~72px headline with the ~27px chest print. */
-  from { transform: translate(-50%, -50%) scale(1); }
-  to   { transform: translate(-50%, calc(-50% - 22cqh)) scale(0.4); }
+  /* Just a hide at end-of-delete now — the headline stays centred and
+     the shirt rises in afterwards, so no drift/scale/colour-flip needed
+     any more. */
+  animation: intro-headline-hide 100ms linear
+    calc(
+      var(--intro-blank-ms) + var(--intro-type-ms) + var(--intro-hold-ms) +
+        var(--intro-clear-ms)
+    )
+    forwards;
 }
 
 .intro-headline::before {
   content: "";
   animation:
-    intro-type-in var(--intro-type-ms) var(--intro-ease-in-out-quart)
+    intro-type-in var(--intro-type-ms) var(--intro-ease-out-quart)
       var(--intro-blank-ms) forwards,
-    intro-type-out var(--intro-clear-ms) var(--intro-ease-in-out-quart)
+    intro-type-out var(--intro-clear-ms) var(--intro-ease-out-quart)
       calc(
         var(--intro-blank-ms) + var(--intro-type-ms) + var(--intro-hold-ms)
       )
@@ -273,16 +231,13 @@ body {
   }
 }
 
-@keyframes intro-headline-colour-flip {
-  from { color: var(--output-color-fg); }
-  to { color: var(--output-color-bg); }
-}
-
 /* ------------------------------ T-shirt rise -----------------------------
-   Rises from below the viewport and lands centred in the stage. Sized to
-   min(100cqw, 100cqh) so the square shirt always fits whatever inner
-   box the section leaves — landscape viewports shrink it to the height,
-   portrait viewports shrink it to the width, both stay fully in view. */
+   Rises from below the viewport after the headline has fully deleted
+   (during the 500ms "settle" pause between delete end and placeholder
+   start). Sized to min(100cqw, 100cqh) so the square shirt always fits
+   whatever inner box the section leaves — landscape viewports shrink it
+   to the height, portrait viewports shrink it to the width, both stay
+   fully in view. */
 
 .tshirt-container {
   width: min(100cqw, 100cqh);
@@ -293,7 +248,8 @@ body {
   animation: intro-shirt-rise var(--intro-rise-ms)
     var(--intro-ease-out-quart)
     calc(
-      var(--intro-blank-ms) + var(--intro-type-ms) + var(--intro-hold-ms)
+      var(--intro-blank-ms) + var(--intro-type-ms) + var(--intro-hold-ms) +
+        var(--intro-clear-ms)
     )
     forwards;
 }
@@ -339,11 +295,11 @@ body {
 }
 
 /* Pure-CSS placeholder typewriter: types "Type" one character at a time
-   after the intro finishes. Native <input placeholder> can't be animated
-   char-by-char, so we render it as a ::before pseudo on the container.
-   The pseudo is hidden while the input is focused or has real text —
-   :placeholder-shown flips off in both cases, so :has(:not(...)) covers
-   both without extra selectors. */
+   after the shirt has risen and the chest input is ready. Native
+   <input placeholder> can't be animated char-by-char, so we render it as
+   a ::before pseudo on the container. The pseudo is hidden while the
+   input is focused or has real text — :placeholder-shown flips off in
+   both cases, so :has(:not(...)) covers both without extra selectors. */
 .chest-text-container::before {
   content: "";
   position: absolute;
@@ -360,7 +316,7 @@ body {
     steps(var(--intro-placeholder-chars), end)
     calc(
       var(--intro-blank-ms) + var(--intro-type-ms) + var(--intro-hold-ms) +
-        var(--intro-clear-ms) + var(--intro-arrive-ms)
+        var(--intro-clear-ms) + var(--intro-settle-ms)
     )
     forwards;
 }
@@ -391,7 +347,7 @@ body {
     var(--intro-ease-out-quart)
     calc(
       var(--intro-blank-ms) + var(--intro-type-ms) + var(--intro-hold-ms) +
-        var(--intro-clear-ms)
+        var(--intro-clear-ms) + var(--intro-settle-ms)
     )
     forwards;
 }
