@@ -136,15 +136,29 @@ body {
      something to hang from during the blank hold. */
   min-height: 1em;
   min-width: 1px;
-  /* Just a hide at end-of-delete now — the headline stays centred and
-     the shirt rises in afterwards, so no drift/scale/colour-flip needed
-     any more. */
-  animation: intro-headline-hide 100ms linear
-    calc(
-      var(--intro-blank-ms) + var(--intro-type-ms) + var(--intro-hold-ms) +
-        var(--intro-clear-ms)
-    )
-    forwards;
+  /* During 2→3 the shirt rises into view behind the headline, so the
+     text flips from fg (readable on page bg) to bg (readable on the dark
+     shirt) over the same 400ms window. Then a tiny hide snaps it off
+     at end-of-delete. */
+  animation:
+    intro-headline-colour-flip var(--intro-clear-ms)
+      var(--intro-ease-out-quart)
+      calc(
+        var(--intro-blank-ms) + var(--intro-type-ms) + var(--intro-hold-ms)
+      )
+      forwards,
+    intro-headline-hide 100ms linear
+      calc(
+        var(--intro-blank-ms) + var(--intro-type-ms) + var(--intro-hold-ms) +
+          var(--intro-clear-ms)
+      )
+      forwards;
+}
+
+@keyframes intro-headline-colour-flip {
+  to {
+    color: var(--output-color-bg);
+  }
 }
 
 .intro-headline::before {
@@ -245,11 +259,13 @@ body {
   transform: translateY(100vh);
   opacity: 0;
   container-type: inline-size;
+  /* Starts at the beginning of the 2→3 delete phase so the shirt rises
+     into view while the headline is deleting (and the headline flips to
+     bg colour to stay readable against the rising shirt). */
   animation: intro-shirt-rise var(--intro-rise-ms)
     var(--intro-ease-out-quart)
     calc(
-      var(--intro-blank-ms) + var(--intro-type-ms) + var(--intro-hold-ms) +
-        var(--intro-clear-ms)
+      var(--intro-blank-ms) + var(--intro-type-ms) + var(--intro-hold-ms)
     )
     forwards;
 }
