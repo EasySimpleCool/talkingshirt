@@ -467,6 +467,20 @@ body {
     opacity var(--motion-fade-dur) var(--motion-ease);
 }
 
+/* Footer (size + order button) stays hidden until the chest input has
+   real content. The native placeholder on .chest-text is a single space
+   so :placeholder-shown matches an empty input; :not(:placeholder-shown)
+   is the "user typed at least one character" state. */
+.order-form .footer-slider {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.order-form:has(.chest-text:not(:placeholder-shown)) .footer-slider {
+  opacity: 1;
+  pointer-events: auto;
+}
+
 .about-toggle:checked ~ .order-form .stage,
 .about-toggle:checked ~ .order-form .footer-slider {
   transform: translateX(-100vw);
