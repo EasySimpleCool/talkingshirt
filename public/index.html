@@ -118,7 +118,12 @@
       action="/.netlify/functions/create-checkout"
     >
       <div class="stage" data-section="md">
-        <span class="intro-headline" aria-hidden="true"></span>
+        <!-- Mirrors the tshirt-container's bounding box so the headline
+             can sit at the same chest coordinates the input ends up at —
+             i.e. type/delete happens exactly where "Type" will appear. -->
+        <div class="intro-align" aria-hidden="true">
+          <span class="intro-headline"></span>
+        </div>
 
         <div class="tshirt-container">
           <div class="tshirt-wrapper">

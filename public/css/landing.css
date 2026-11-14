@@ -105,22 +105,37 @@ body {
 }
 
 /* ----------------------------- Intro headline ----------------------------
-   Autoplays once on load: types "Talk some sh*rt" character-by-character,
-   holds, then deletes character-by-character while the shirt rises.
+   Autoplays once on load: types "Talk some sh*rt" character-by-character
+   at the chest position, holds, then deletes character-by-character while
+   the shirt rises — ending with "Type" typed into the same spot.
 
    The visible text lives in a ::before pseudo whose `content` property is
-   animated through 16 discrete keyframes — one per character step. Because
-   the outer .intro-headline is `position: absolute; left: 50%;
-   transform: translate(-50%, ...)` and has no fixed width, the element's
-   box auto-sizes to whatever the pseudo currently contains and the
-   translate re-centres each frame. So typing grows the box outward from
-   the middle (new character appears at the trailing edge, whole visible
-   string stays centred on the viewport), and delete does the mirror. */
+   animated through 16 discrete keyframes — one per character step. The
+   outer .intro-headline has no fixed width and is translated by -50%, so
+   the box auto-sizes to whatever the pseudo currently contains and the
+   translate re-centres it on the chest anchor each frame. Typing grows
+   the box outward from that anchor; delete mirrors it. */
 
-.intro-headline {
+/* Ghost of the tshirt-container that never rises — same bounding box,
+   same inline-size container, centred in the stage. The headline is
+   positioned at (--chest-left, --chest-top) inside it, so typing/delete
+   happens at exactly the spot the chest input will occupy. */
+.intro-align {
   position: absolute;
   top: 50%;
   left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(100cqw, 100cqh);
+  aspect-ratio: 1 / 1;
+  pointer-events: none;
+  container-type: inline-size;
+  z-index: 2;
+}
+
+.intro-headline {
+  position: absolute;
+  top: var(--chest-top);
+  left: var(--chest-left);
   transform: translate(-50%, -50%);
   font-size: var(--intro-headline-size);
   font-weight: 700;
