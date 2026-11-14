@@ -271,7 +271,7 @@ body {
 .tshirt-container {
   width: min(100cqw, 100cqh);
   aspect-ratio: 1 / 1;
-  transform: translateY(8%);
+  transform: translateY(25%);
   opacity: 0;
   container-type: inline-size;
   /* Starts at the beginning of the 2→3 delete phase so the shirt rises
@@ -285,12 +285,10 @@ body {
     forwards;
 }
 
-/* Nudges up ~8% of the shirt box with an opacity fade — the shirt is
-   mostly a fade-in with just enough motion to feel like it's settling
-   into place, not travelling. */
+/* Rises ~25% of the shirt box with an opacity fade. */
 @keyframes intro-shirt-rise {
   0% {
-    transform: translateY(8%);
+    transform: translateY(25%);
     opacity: 0;
   }
   100% {
