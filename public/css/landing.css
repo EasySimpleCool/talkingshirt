@@ -316,6 +316,10 @@ body {
    The input IS the shirt text — no overlay, no mirror. Positioned as a %
    of the square wrapper so it stays aligned at every viewport width. */
 
+/* Flex row so the ::before ("Type" placeholder) and ::after (cursor)
+   sit side-by-side and centre as a group. The <input> inside is taken
+   out of this flow by position:absolute so it still spans the full
+   chest width for typing. */
 .chest-text-container {
   position: absolute;
   top: var(--chest-top);
@@ -324,56 +328,66 @@ body {
   width: var(--chest-width);
   text-align: center;
   cursor: text;
-}
-
-/* Pure-CSS placeholder typewriter: types "Type" one character at a time
-   after the shirt has risen and the chest input is ready, then a cursor
-   "|" blinks at the end of the word to prompt the user to start typing.
-   Native <input placeholder> can't be animated char-by-char, so we render
-   it as a ::before pseudo on the container. The pseudo is hidden while
-   the input is focused or has real text — :placeholder-shown flips off
-   in both cases, so :has(:not(...)) covers both without extra selectors.
-   The blink runs as a second content animation, started once the type
-   animation has finished (delay = type delay + duration). Because both
-   animations target `content`, the blink is listed last so it wins at
-   every frame after it starts. */
-.chest-text-container::before {
-  content: "";
-  position: absolute;
-  inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+/* Pure-CSS placeholder typewriter: types "Type" one character at a time
+   after the shirt has risen and the chest input is ready. Native
+   <input placeholder> can't be animated char-by-char, so we render it
+   as a ::before pseudo on the container. The pseudo is hidden while
+   the input has real text — :has(:not(:placeholder-shown)) covers that
+   without extra selectors. Colour is a faded version of the chest text
+   colour so it reads as "placeholder". */
+.chest-text-container::before {
+  content: "";
   color: color-mix(in srgb, var(--output-color-bg) 45%, transparent);
   font-size: var(--chest-font-size);
   font-weight: 700;
   line-height: normal;
   pointer-events: none;
-  animation:
-    intro-placeholder-type var(--intro-placeholder-ms)
-      steps(var(--intro-placeholder-chars), end)
-      calc(
-        var(--intro-blank-ms) + var(--intro-type-ms) + var(--intro-hold-ms) +
-          var(--intro-clear-ms) + var(--intro-settle-ms)
-      )
-      forwards,
-    intro-placeholder-cursor-blink 1s steps(1) infinite
-      calc(
-        var(--intro-blank-ms) + var(--intro-type-ms) + var(--intro-hold-ms) +
-          var(--intro-clear-ms) + var(--intro-settle-ms) +
-          var(--intro-placeholder-ms)
-      );
+  animation: intro-placeholder-type var(--intro-placeholder-ms)
+    steps(var(--intro-placeholder-chars), end)
+    calc(
+      var(--intro-blank-ms) + var(--intro-type-ms) + var(--intro-hold-ms) +
+        var(--intro-clear-ms) + var(--intro-settle-ms)
+    )
+    forwards;
 }
 
-/* Hide the ::before only when the user has typed real content — keeping
-   it visible on focus matches native placeholder behaviour, so the "Type"
-   hint stays put until it's actually replaced. */
-.chest-text-container:has(.chest-text:not(:placeholder-shown))::before {
+/* Blinking cursor at the trailing edge of "Type" — its own pseudo so
+   it can be solid --output-color-bg (white on the dark shirt) while the
+   placeholder text stays at the faded 45%. Opacity 0 by default so it's
+   hidden during the type-out; the infinite-blink animation starts once
+   "Type" has finished typing. */
+.chest-text-container::after {
+  content: "|";
+  color: var(--output-color-bg);
+  font-size: var(--chest-font-size);
+  font-weight: 700;
+  line-height: normal;
+  pointer-events: none;
+  opacity: 0;
+  animation: intro-placeholder-cursor-blink 1s steps(1) infinite
+    calc(
+      var(--intro-blank-ms) + var(--intro-type-ms) + var(--intro-hold-ms) +
+        var(--intro-clear-ms) + var(--intro-settle-ms) +
+        var(--intro-placeholder-ms)
+    );
+}
+
+/* Hide both pseudos the instant the user types something real. */
+.chest-text-container:has(.chest-text:not(:placeholder-shown))::before,
+.chest-text-container:has(.chest-text:not(:placeholder-shown))::after {
   content: "" !important;
   animation: none;
+  opacity: 0;
 }
 
 .chest-text {
+  position: absolute;
+  inset: 0;
   color: var(--output-color-bg);
   font-size: var(--chest-font-size);
   font-weight: 700;
@@ -433,12 +447,11 @@ body {
   100% { content: "Type"; }
 }
 
-/* 1s steps(1) cycle on the content property: "Type|" for the on half,
-   "Type" for the off half — classic blinking cursor cadence, matching
-   the intro-headline cursor's 50/50 duty cycle. */
+/* 1s steps(1) opacity cycle on the ::after cursor — classic blinking
+   cursor cadence, matching the intro-headline cursor's 50/50 duty cycle. */
 @keyframes intro-placeholder-cursor-blink {
-  0%, 50%      { content: "Type|"; }
-  50.01%, 100% { content: "Type"; }
+  0%, 50%      { opacity: 1; }
+  50.01%, 100% { opacity: 0; }
 }
 
 /* Respect reduced motion — snap to final layout with no animation. */
@@ -458,7 +471,11 @@ body {
   }
   .chest-text-container::before {
     animation: none;
-    content: "Type|";
+    content: "Type";
+  }
+  .chest-text-container::after {
+    animation: none;
+    opacity: 1;
   }
 }
 
